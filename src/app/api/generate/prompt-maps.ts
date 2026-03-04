@@ -1,152 +1,74 @@
-// ── 영문 프롬프트 매핑 (FAL AI / Flux.1 최적화) ────────────────
-export const GENDER: Record<string, string> = {
-  남성: "a handsome male",
-  여성: "a beautiful female",
-  "중성/미상": "an androgynous person",
+// ── 영문 프롬프트 매핑 (포즈 추가) ────────────────
+export const GENDER: Record<string, string> = { 남성: "male", 여성: "female", "중성/미상": "androgynous" };
+export const AGE: Record<string, string> = { 유년기: "child", "소년/소녀": "teenager", 청년: "young adult", 중년: "mature", 노년: "elderly" };
+export const ETHNICITY: Record<string, string> = { 없음: "", 아시안: "Asian,", 서양: "Caucasian," };
+export const RACE: Record<string, string> = { 인간: "human", 엘프: "elf", 악마: "demon", 드래곤: "dragon-humanoid", 늑대인간: "werewolf", 고양이수인: "cat-ears", 여우수인: "fox-ears", 로봇: "android", 천사: "angel", 오크: "orc", 뱀파이어: "vampire", 유령: "ghost" };
+export const BODY: Record<string, string> = { "마른 체형": "slender", "보통 체형": "average", 근육질: "muscular", "건장한/떡대": "bulky", 글래머러스: "voluptuous", 통통한: "chubby" };
+export const JOB: Record<string, string> = { 없음: "", 전사: "warrior", 마법사: "wizard", 궁수: "archer", 암살자: "assassin", 성기사: "paladin", 소환사: "summoner", 거너: "gunner", 연금술사: "alchemist", 닌자: "ninja", 메이드: "maid", 집사: "butler" };
+
+export const POSE: Record<string, string> = {
+  "기본 정자세": "standing straight, neutral pose",
+  "모델 포즈": "fashion model pose, hand on hip",
+  "앉아 있는": "sitting on floor, relaxed pose",
+  "전투 준비": "battle stance, ready to fight, holding weapon",
+  "공중 부양": "floating in air, magical levitation",
+  "뒤돌아보기": "looking back over shoulder",
+  "웅크린": "crouching, low profile pose",
+  "역동적인 달리기": "dynamic running pose, motion blur",
+  "우아한 인사": "elegant bowing pose",
+  "자신만만한 팔짱": "standing with arms crossed, confident pose",
 };
-export const AGE: Record<string, string> = {
-  유년기: "child, young kid",
-  "소년/소녀": "teenager, adolescent",
-  청년: "young adult, in 20s",
-  중년: "middle-aged, mature",
-  노년: "elderly, old age",
-};
-export const BODY: Record<string, string> = {
-  "마른 체형": "slender and thin build",
-  "보통 체형": "average and balanced build",
-  근육질: "athletic and muscular build",
-  "건장한/떡대": "large and bulky muscular build",
-  글래머러스: "voluptuous and glamorous figure",
-  통통한: "chubby and soft build",
-};
-export const RACE: Record<string, string> = {
-  엘프: "elf with pointed ears",
-  인간: "human",
-  드래곤: "half-dragon with horns and scales",
-  악마: "demon with horns and tail",
-  드워프: "sturdy dwarf",
-  정령: "ethereal elemental spirit",
-  늑대인간: "werewolf, lycanthrope",
-  천사: "angel with white wings",
-};
-export const JOB: Record<string, string> = {
-  전사: "warrior holding a weapon",
-  마법사: "wizard wearing robes",
-  궁수: "archer with a bow",
-  암살자: "assassin in stealth outfit",
-  성기사: "paladin in holy armor",
-  소환사: "summoner with magical aura",
-  거너: "gunner with firearms",
-  연금술사: "alchemist with potions",
-};
-export const HAIR_STYLE: Record<string, string> = {
-  숏컷: "short cropped hair",
-  단발: "bob cut hairstyle",
-  롱헤어: "long flowing hair",
-  포니테일: "high ponytail hairstyle",
-  "땋은 머리": "intricate braided hair",
-  "펌/웨이브": "wavy permed hair",
-  올백: "slicked back hairstyle",
-  "묶은 머리": "hair tied in a bun",
-};
-export const HAIR_COLOR: Record<string, string> = {
-  흑발: "jet black hair",
-  금발: "shining blonde hair",
-  "은발/백발": "shimmering silver hair",
-  갈색: "natural brown hair",
-  적발: "vivid red hair",
-  청발: "deep blue hair",
-  "핑크/보라": "pastel pink and purple hair",
-  "투톤/브릿지": "two-tone hair with highlights",
-};
-export const EYE_COLOR: Record<string, string> = {
-  "흑안/갈안": "brown eyes",
-  벽안: "blue eyes",
-  녹안: "green eyes",
-  적안: "red eyes",
-  금안: "gold eyes",
-  자안: "purple eyes",
-  오드아이: "heterochromia eyes",
-};
-export const IMPRESSION: Record<string, string> = {
-  날카로운: "sharp and fierce cat-like eyes",
-  순한: "gentle and kind puppy-like eyes",
-  화려한: "glamorous and captivating eyes",
-  나른한: "sleepy and dreamy eyes",
-  흉터: "with a prominent facial scar",
-};
-export const EXPR: Record<string, string> = {
-  자신만만: "confident and smug expression",
-  쿨한: "cool and calm expression",
-  무표정: "neutral and stoic expression",
-  미소: "gentle and warm smile",
-  분노한: "angry and shouting expression",
-  슬픈: "sad and tearful expression",
-  광기어린: "insane and manic expression",
-  부끄러운: "blushing and shy expression",
-};
-export const CLOTHING: Record<string, string> = {
-  캐주얼: "modern casual everyday clothes",
-  정장: "sophisticated formal suit",
-  "스트릿 패션": "trendy urban streetwear",
-  교복: "neat school uniform",
-  "로판 드레스": "opulent fantasy ball gown dress",
-  "기사 갑옷": "intricate plate armor",
-  "마법사 로브": "decorated mystical wizard robes",
-  사제복: "holy priest vestments",
-  제복: "sharp military uniform",
-  동양풍: "traditional oriental hanbok and kimono style",
-  무협풍: "martial arts wuxia robes",
-  사이버펑크: "futuristic cyberpunk techwear",
-};
-export const MAIN_COLOR: Record<string, string> = {
-  블랙: "black",
-  화이트: "white",
-  레드: "crimson red",
-  블루: "azure blue",
-  그린: "forest green",
-  골드: "luxurious gold",
-};
-export const ACC: Record<string, string> = {
-  안경: "wearing glasses",
-  귀걸이: "wearing elegant earrings",
-  초커: "wearing a choker",
-  모자: "wearing a stylish hat",
-  망토: "wearing a flowing cape",
-  무기: "carrying a signature weapon",
-};
-export const VIBE: Record<string, string> = {
-  냉혹한: "cold and ruthless atmosphere",
-  발랄한: "cheerful and energetic vibe",
-  퇴폐적인: "decadent and moody aura",
-  우아한: "elegant and graceful appearance",
-  "광기 어린": "manic and chaotic vibe",
-  신비로운: "mysterious and mystical presence",
-};
-export const STYLE: Record<string, string> = {
-  웹툰스타일: "webtoon art style, manhwa style, clean digital lineart, cel shaded",
-  애니메이션: "anime art style, high quality japanese animation, studio ghibli inspired",
-  수채화: "watercolor painting style, soft edges, painterly texture",
-  픽셀아트: "high quality pixel art, 16-bit retro game aesthetic",
-  "3D 렌더링": "hyper-realistic 3d render, octane render, unreal engine 5, masterpiece",
-  사이버펑크: "cyberpunk aesthetic, neon glow, futuristic night city vibe",
-  다크판타지: "dark fantasy style, gothic, moody lighting, dark souls inspired",
+
+export const HAIR_STYLE: Record<string, string> = { 숏컷: "short-cut", 단발: "bob-cut", 롱헤어: "long-hair", 포니테일: "ponytail", "땋은 머리": "braided", "펌/웨이브": "wavy", 올백: "slicked-back", "묶은 머리": "bun" };
+export const HAIR_COLOR: Record<string, string> = { 흑발: "black", 금발: "blonde", "은발/백발": "silver", 갈색: "brown", 적발: "red", 청발: "blue", "핑크/보라": "pink", "투톤/브릿지": "two-tone" };
+export const EYE_COLOR: Record<string, string> = { "흑안/갈안": "brown", 벽안: "blue", 녹안: "green", 적안: "red", 금안: "gold", 자안: "purple", 오드아이: "heterochromia" };
+export const IMPRESSION: Record<string, string> = { 날카로운: "sharp", 순한: "kind", 화려한: "captivating", 나른한: "sleepy", 흉터: "scarred" };
+export const EXPR: Record<string, string> = { 자신만만: "smug", 쿨한: "cool", 무표정: "stoic", 미소: "smiling", 분노한: "angry", 슬픈: "sad", 광기어린: "manic", 부끄러운: "blushing" };
+export const CLOTHING: Record<string, string> = { 캐주얼: "casual", 정장: "suit", "스트릿 패션": "streetwear", 교복: "school-uniform", "로판 드레스": "fantasy-gown", "기사 갑옷": "armor", "마법사 로브": "wizard-robe", 사제복: "priest-robe", 제복: "uniform", 동양풍: "oriental", 무협풍: "wuxia", 사이버펑크: "techwear" };
+export const MAIN_COLOR: Record<string, string> = { 블랙: "black", 화이트: "white", 레드: "red", 블루: "blue", 그린: "green", 골드: "gold" };
+export const ACC: Record<string, string> = { 없음: "", 안경: "glasses", 귀걸이: "earrings", 초커: "choker", 모자: "hat", 망토: "cape", 무기: "weapon" };
+export const VIBE: Record<string, string> = { 냉혹한: "cold", 발랄한: "cheerful", 퇴폐적인: "decadent", 우아한: "elegant", "광기 어린": "chaotic", 신비로운: "mysterious" };
+
+export const SHOT: Record<string, string> = { "전체 샷": "full body,", "바디 절반": "waist up,", "얼굴 중심": "face portrait," };
+export const BACKGROUND: Record<string, string> = { "단색 (화이트)": "white background", "단색 (그레이)": "grey background", "단색 (다크)": "dark background", "판타지 숲": "fantasy forest", "중세 성": "medieval castle", "현대 도시": "modern city", "학교 교실": "classroom", "사이버펑크": "cyberpunk city", "바닷가": "sunny beach", "서재/도서관": "luxury library" };
+
+export const STYLE_TEMPLATES: Record<string, { prefix: string; suffix: string }> = {
+  웹툰스타일: { prefix: "WEBTOON, manhwa art, clean lineart,", suffix: "vibrant colors" },
+  애니메이션: { prefix: "ANIME illustration, high quality,", suffix: "waifu aesthetic" },
+  수채화: { prefix: "WATERCOLOR painting, traditional media,", suffix: "artistic strokes" },
+  픽셀아트: { prefix: "PIXEL-ART, 16-bit, chunky pixels,", suffix: "retro game" },
+  "3D 렌더링": { prefix: "3D RENDER, octane, unreal engine 5,", suffix: "depth of field" },
+  사이버펑크: { prefix: "CYBERPUNK art, neon glow,", suffix: "futuristic city" },
+  다크판타지: { prefix: "DARK FANTASY, grim, moody,", suffix: "dramatic shadows" }
 };
 
 export function buildPrompt(s: any) {
+  const isSheet = s.mode === "캐릭터 시트";
+  const template = STYLE_TEMPLATES[s.style] || { prefix: "", suffix: "" };
+  
+  const variations = ["soft light", "natural shadow", "sharp detail", "rich color"];
+  const randomBit = variations[Math.floor(Math.random() * variations.length)];
+
+  const core = [
+    `${ETHNICITY[s.ethnicity] || ""}${GENDER[s.gender]} ${AGE[s.age]},`,
+    `${RACE[s.race]} ${JOB[s.job]},`,
+    `${POSE[s.pose] || ""},`, // 포즈 추가
+    `${BODY[s.body]} build,`,
+    `${HAIR_COLOR[s.hairColor]} ${HAIR_STYLE[s.hairStyle]},`,
+    `${EYE_COLOR[s.eyeColor]} eyes, ${IMPRESSION[s.impression]} look, ${EXPR[s.expression]},`,
+    `${CLOTHING[s.clothing]} in ${MAIN_COLOR[s.mainColor]},`,
+    `${ACC[s.acc]}, ${VIBE[s.vibe]} vibe,`,
+    randomBit
+  ].join(" ");
+
   const parts = [
-    "character reference sheet, turnaround, three views side by side on one page",
-    "left: front view facing forward, center: side view facing right, right: back view facing away",
-    "full body length",
-    `${GENDER[s.gender]} ${AGE[s.age]}, ${BODY[s.body]}`,
-    `${RACE[s.race]} ${JOB[s.job]}`,
-    `${HAIR_COLOR[s.hairColor]} ${HAIR_STYLE[s.hairStyle]}, ${EYE_COLOR[s.eyeColor]} eyes`,
-    `${IMPRESSION[s.impression]}, ${EXPR[s.expression]}`,
-    `${CLOTHING[s.clothing]} mainly in ${MAIN_COLOR[s.mainColor]} color theme`,
-    `${ACC[s.acc]}`,
-    `${VIBE[s.vibe]}`,
-    `${STYLE[s.style]}`,
-    "pure white background, high quality, professional character design, orthographic turnaround, 8k resolution, highly detailed costume",
+    template.prefix,
+    isSheet ? "REF-SHEET, turnaround, 3-views: [front, side, back], same character," : `${SHOT[s.shot] || "full body,"}`,
+    core,
+    template.suffix,
+    isSheet ? "white background, orthographic" : `${BACKGROUND[s.background] || ""}`,
+    "masterpiece, 8k, best quality"
   ];
-  return parts.filter(Boolean).join(", ");
+
+  return parts.filter(Boolean).join(" ").replace(/ ,/g, ",").replace(/,,+/g, ",").trim();
 }
