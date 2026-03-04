@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const RACE_MAP: Record<string, string> = { 엘프: "ELF", 인간: "HUM", 드래곤: "DRG", 악마: "DMN" };
 const JOB_MAP: Record<string, string>  = { 전사: "WAR", 마법사: "MAG", 궁수: "ARC", 암살자: "ASN" };
@@ -52,6 +53,8 @@ export default function Home() {
     }, 1100);
   }
 
+  const router = useRouter();
+
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }
@@ -83,7 +86,7 @@ export default function Home() {
             웹툰 캐릭터 전·측·후면 3면도를 AI가 완성합니다.
           </p>
           <div className="hero-actions reveal d3">
-            <button className="btn-dark" onClick={() => scrollTo("cta")}>베타 신청하기</button>
+            <button className="btn-dark" onClick={() => router.push("/workspace")}>캐릭터 만들기 →</button>
             <button className="btn-ghost" onClick={() => scrollTo("demo")}>데모 보기</button>
           </div>
         </div>
