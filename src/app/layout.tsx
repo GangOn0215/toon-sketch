@@ -23,7 +23,7 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "툰스케치 — 클릭으로 완성하는 웹툰 캐릭터 시트",
+  title: "툰 스케치 — 클릭으로 완성하는 웹툰 캐릭터 시트",
   description:
     "복잡한 프롬프트 없이 버튼 클릭 15초. 웹툰 캐릭터 전·측·후면 3면도를 AI가 자동으로 완성합니다.",
 };
