@@ -42,7 +42,17 @@ export async function POST(req: Request) {
     const extract = (res: any): string =>
       res?.data?.images?.[0]?.url ?? res?.images?.[0]?.url ?? "";
 
-    return NextResponse.json({ imageUrl: extract(result), seed, prompt });
+    // fal.ai 응답에서 비용 및 소요 시간 추출 (Nano Banana 2 기준)
+    const cost = (result as any)?.cost || 0;
+    const inferenceTime = (result as any)?.timings?.inference || (result as any)?.inference_time || 0;
+
+    return NextResponse.json({ 
+      imageUrl: extract(result), 
+      seed, 
+      prompt,
+      cost,
+      inferenceTime
+    });
   } catch (e: unknown) {
     console.error("[generate] fal.ai error:", e);
     const message = e instanceof Error ? e.message : "생성 실패";

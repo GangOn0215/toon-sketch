@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { buildPrompt } from "../api/generate/prompt-maps";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const SYSTEM_OPTIONS = {
   mode:       { label: "생성 모드", items: ["캐릭터 시트", "일반 화보"] },
@@ -57,6 +58,7 @@ export default function WorkspacePage() {
   const [imageUrl, setImageUrl]   = useState<string | null>(null);
   const [seed, setSeed]           = useState<number | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
+  const [usage, setUsage]         = useState<{ cost: number; time: number } | null>(null);
   const [lockedSeed, setLockedSeed] = useState<number | null>(null);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -118,6 +120,7 @@ export default function WorkspacePage() {
       if (!res.ok) throw new Error(data.error ?? "생성 실패");
       setImageUrl(data.imageUrl);
       setSeed(data.seed);
+      setUsage({ cost: data.cost, time: data.inferenceTime });
       setLastPrompt(data.prompt || currentPrompt);
       const newItem: HistoryItem = { id: Date.now().toString(), imageUrl: data.imageUrl, selection: { ...newSelection }, seed: data.seed, timestamp: Date.now() };
       setHistory((prev) => [newItem, ...prev]);
@@ -146,7 +149,16 @@ export default function WorkspacePage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <nav><div className="nav-wrap"><Link className="logo" href="/">툰스케치<em>.</em></Link><span style={{ fontSize: 12, color: "var(--muted)" }}>워크스페이스</span><span style={{ fontSize: 11, color: "var(--subtle)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 4 }}>Beta</span></div></nav>
+      <nav>
+        <div className="nav-wrap">
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Link className="logo" href="/">툰스케치<em>.</em></Link>
+            <span style={{ fontSize: 12, color: "var(--muted)" }}>워크스페이스</span>
+            <span style={{ fontSize: 11, color: "var(--subtle)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 4 }}>Beta</span>
+          </div>
+          <ThemeToggle />
+        </div>
+      </nav>
       <main style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
         <aside style={{ borderRight: "1px solid var(--border)", paddingRight: 36, paddingTop: 48, paddingBottom: 48, display: "flex", flexDirection: "column", gap: 0, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
           <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, marginBottom: 36 }}>캐릭터 빌더</h1>
@@ -203,8 +215,30 @@ export default function WorkspacePage() {
           <button className="btn-dark" onClick={handleGenerate} disabled={loading} style={{ width: "100%", opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40 }}>{loading ? "생성 중..." : "✦ 캐릭터 소환"}</button>
           {error && (<p style={{ marginTop: 10, fontSize: 12, color: "#e53e3e", lineHeight: 1.5 }}>{error}</p>)}
         </aside>
-        <div style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}><h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{selection.mode} <span style={{ fontSize: 11, color: "var(--subtle)", fontFamily: "var(--font-noto)", fontWeight: 400, letterSpacing: 0 }}>{selection.mode === "캐릭터 시트" ? "전면 · 측면 · 후면" : selection.ratio}</span></h2><div style={{ display: "flex", gap: 8 }}>{lastPrompt && (<button onClick={copyActualPrompt} style={{ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 6, border: "1.5px solid var(--border)", background: copiedDev ? "var(--al)" : "var(--bg2)", color: copiedDev ? "var(--accent)" : "var(--subtle)", cursor: "pointer", transition: "all .15s" }}>{copiedDev ? "✓ 실제 프롬프트 복사됨" : "🛠 실제 프롬프트 (Dev)"}</button>)}{imageUrl && (<button onClick={copyVideoPrompt} style={{ fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 6, border: "1.5px solid var(--border)", background: copied ? "var(--al)" : "transparent", color: copied ? "var(--accent)" : "var(--muted)", cursor: "pointer", transition: "all .15s" }}>{copied ? "✓ 복사됨" : "📋 영상 AI 프롬프트 복사"}</button>)}</div></div>
+        <div style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, paddingRight: 20, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+            <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>
+              {selection.mode} <span style={{ fontSize: 11, color: "var(--subtle)", fontFamily: "var(--font-noto)", fontWeight: 400, letterSpacing: 0 }}>{selection.mode === "캐릭터 시트" }</span>
+            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {usage && (
+                <div style={{ fontSize: 11, color: "var(--subtle)", padding: "0 8px", borderRight: "1px solid var(--border)", display: "flex", gap: "10px" }}>
+                  <span>Cost: <strong>${usage.cost.toFixed(4)}</strong></span>
+                  <span>Time: <strong>{usage.time.toFixed(2)}s</strong></span>
+                </div>
+              )}
+              {lastPrompt && (
+                <button onClick={copyActualPrompt} style={{ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 6, border: "1.5px solid var(--border)", background: copiedDev ? "var(--al)" : "var(--bg2)", color: copiedDev ? "var(--accent)" : "var(--subtle)", cursor: "pointer", transition: "all .15s" }}>
+                  {copiedDev ? "✓ 실제 프롬프트 복사됨" : "🛠 실제 프롬프트 (Dev)"}
+                </button>
+              )}
+              {imageUrl && (
+                <button onClick={copyVideoPrompt} style={{ fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 6, border: "1.5px solid var(--border)", background: copied ? "var(--al)" : "transparent", color: copied ? "var(--accent)" : "var(--muted)", cursor: "pointer", transition: "all .15s" }}>
+                  {copied ? "✓ 복사됨" : "📋 영상 AI 프롬프트 복사"}
+                </button>
+              )}
+            </div>
+          </div>
           <div onClick={() => imageUrl && setModalImage(imageUrl)} style={{ width: "100%", aspectRatio: selection.mode === "캐릭터 시트" ? "16/9" : selection.ratio.replace(":", "/"), borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", cursor: imageUrl ? "zoom-in" : "default" }}>{loading ? (<Skeleton />) : imageUrl ? (<Image src={imageUrl} alt="캐릭터 생성 이미지" fill sizes="(max-width: 1100px) 70vw, 720px" style={{ objectFit: "contain" }} priority />) : (<EmptyState />)}</div>
           {history.length > 0 && (<div style={{ marginTop: 80, borderTop: "1px solid var(--border)", paddingTop: 48 }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}><h3 style={{ fontFamily: "var(--font-fraunces)", fontSize: 16, fontWeight: 600 }}>최근 소환 기록</h3><button onClick={clearHistory} style={{ fontSize: 11, color: "var(--subtle)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>기록 지우기</button></div><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 16 }}>{history.map((item) => (<div key={item.id} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s", position: "relative" }} onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-4px)")} onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}><div onClick={() => setModalImage(item.imageUrl)} style={{ position: "relative", aspectRatio: item.selection.mode === "캐릭터 시트" ? "16/9" : "1/1", background: "#000", cursor: "zoom-in" }}><Image src={item.imageUrl} alt="기록 이미지" fill style={{ objectFit: "cover", opacity: 0.8 }} /></div><div onClick={() => restoreFromHistory(item)} style={{ padding: 8, cursor: "pointer" }}><div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 2 }}>{item.selection.gender} {item.selection.age}</div><div style={{ fontSize: 9, color: "var(--subtle)" }}>{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div></div></div>))}</div></div>)}
         </div>
