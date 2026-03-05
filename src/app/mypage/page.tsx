@@ -22,7 +22,6 @@ export default function MyPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [characters, setCharacters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isTopupLoading, setIsTopupLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -53,41 +52,18 @@ export default function MyPage() {
 
   useEffect(() => {
     fetchData();
+
+    // 결제 결과 확인
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      alert("결제가 성공적으로 완료되어 크레딧이 충전되었습니다! 🎉");
+      // URL 파라미터 청소
+      window.history.replaceState({}, "", "/mypage");
+    } else if (params.get("payment") === "fail") {
+      alert(`결제에 실패했습니다: ${params.get("message")}`);
+      window.history.replaceState({}, "", "/mypage");
+    }
   }, [fetchData]);
-
-  const handleTopup = async (amount: number, price: string) => {
-    if (!user) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-    
-    if (!confirm(`${price}원을 결제하고 ${amount}🪙 크레딧을 충전하시겠습니까?`)) return;
-    
-    setIsTopupLoading(true);
-    try {
-      const newBalance = (profile?.credits || 0) + amount;
-      
-      // DB 업데이트
-      await supabase.from("profiles").update({ credits: newBalance }).eq("id", user.id);
-      
-      // 로그 남기기
-      await supabase.from("credit_logs").insert({
-        user_id: user.id,
-        amount: amount,
-        current_balance: newBalance,
-        type: "topup",
-        description: `크레딧 충전 (${price}원 패키지)`
-      });
-
-      alert("충전이 완료되었습니다!");
-      await fetchData();
-    } catch (error) {
-      console.error("Error during topup:", error);
-      alert("충전 중 오류가 발생했습니다.");
-    } finally {
-      setIsTopupLoading(false);
-    }
-  };
 
   if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>로딩 중...</div>;
 
@@ -108,7 +84,7 @@ export default function MyPage() {
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "32px", fontWeight: "700", marginBottom: "40px" }}>마이페이지</h1>
 
         <MyProfile user={user} profile={profile} />
-        <CreditTopup isTopupLoading={isTopupLoading} onTopup={handleTopup} />
+        <CreditTopup isTopupLoading={false} />
         <CharacterGallery characters={characters} profile={profile} />
         <UsageLogs logs={logs} />
       </main>

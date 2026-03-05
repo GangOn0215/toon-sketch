@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 interface CreditTopupProps {
   isTopupLoading: boolean;
-  onTopup: (amount: number, price: string) => void;
 }
 
-export function CreditTopup({ isTopupLoading, onTopup }: CreditTopupProps) {
+export function CreditTopup({ isTopupLoading }: CreditTopupProps) {
+  const router = useRouter();
   const packages = [
     { id: 'light', amount: 90, price: '3,300', tag: '실속' },
     { id: 'plus', amount: 330, price: '9,900', tag: '+10% 보너스', hot: true },
@@ -27,7 +29,7 @@ export function CreditTopup({ isTopupLoading, onTopup }: CreditTopupProps) {
             <div style={{ fontSize: "14px", color: "var(--muted)", marginBottom: "20px" }}>{pkg.price}원</div>
             <button 
               disabled={isTopupLoading}
-              onClick={() => onTopup(pkg.amount, pkg.price)}
+              onClick={() => router.push(`/checkout?type=topup&id=${pkg.id}`)}
               className="btn-dark" style={{ width: "100%", padding: "10px", fontSize: "13px" }}
             >
               충전하기
