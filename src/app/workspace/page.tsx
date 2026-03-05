@@ -13,6 +13,7 @@ import { createClient } from "@/utils/supabase/client";
 import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
 import { ImageModal } from "@/components/workspace/ImageModal";
+import { TopupModal } from "@/components/workspace/TopupModal";
 
 type HistoryItem = { id: string; imageUrl: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
@@ -45,6 +46,8 @@ export default function WorkspacePage() {
   const [copiedDev, setCopiedDev] = useState(false);
   const [history, setHistory]     = useState<HistoryItem[]>([]);
   const [modalImage, setModalImage] = useState<string | null>(null);
+  
+  const [showTopupModal, setShowTopupModal] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -59,6 +62,16 @@ export default function WorkspacePage() {
       }
     };
     fetchUserData();
+    
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      alert("크레딧 충전이 완료되었습니다! 계속해서 캐릭터를 소환해보세요.");
+      window.history.replaceState({}, "", "/workspace");
+    } else if (params.get("payment") === "fail") {
+      alert(`결제 실패: ${params.get("message") || "알 수 없는 오류"}`);
+      window.history.replaceState({}, "", "/workspace");
+    }
+
     const savedHistory = localStorage.getItem("ts-history");
     if (savedHistory) { try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error(e); } }
     const savedLocks = localStorage.getItem("ts-locks");
@@ -87,7 +100,11 @@ export default function WorkspacePage() {
   };
 
   async function handleGenerate() {
-    if (credits < 30) { alert("크레딧이 부족합니다. (최소 30🪙 필요)"); return; }
+    if (credits < 30) { 
+      setShowTopupModal(true); 
+      return; 
+    }
+    
     setLoading(true);
     setError(null);
     const targetSeed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
@@ -138,9 +155,9 @@ export default function WorkspacePage() {
               <button className="nav-btn ghost" onClick={() => router.push("/login")} style={{ background: "none", border: "1px solid var(--border)", padding: "6px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer", color: "var(--muted)" }}>로그인</button>
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "4px 12px", borderRadius: "8px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "700", color: "var(--text)" }}>
-                  <span style={{ color: "#F59E0B" }}>🪙</span> {credits.toLocaleString()}
-                </div>
+                <button onClick={() => setShowTopupModal(true)} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "4px 12px", borderRadius: "8px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "700", color: "var(--text)", cursor: "pointer" }}>
+                  <span style={{ color: "#F59E0B" }}>🪙</span> {credits.toLocaleString()} <span style={{ fontSize: "10px", color: "var(--accent)", marginLeft: "4px" }}>+</span>
+                </button>
                 <PlanBadge plan={userPlan} />
                 <UserMenu user={user} />
               </div>
@@ -170,6 +187,8 @@ export default function WorkspacePage() {
       </main>
 
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} />
+      {showTopupModal && <TopupModal user={user} onClose={() => setShowTopupModal(false)} />}
+      
       {error && <div style={{ position: "fixed", bottom: 20, right: 20, background: "#e53e3e", color: "#fff", padding: "12px 24px", borderRadius: "8px", zIndex: 2000 }}>{error}</div>}
     </div>
   );
