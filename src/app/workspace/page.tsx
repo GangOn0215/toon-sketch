@@ -3,8 +3,12 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { buildPrompt } from "../api/generate/prompt-maps";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserMenu } from "@/components/UserMenu";
+import { PlanBadge } from "@/components/PlanBadge";
+import { createClient } from "@/utils/supabase/client";
 
 const SYSTEM_OPTIONS = {
   mode:       { label: "생성 모드", items: ["캐릭터 시트", "일반 화보"] },
@@ -45,6 +49,12 @@ type SelectionKey = keyof typeof ALL_OPTIONS;
 type HistoryItem = { id: string; imageUrl: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
 export default function WorkspacePage() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
+  const [userPlan, setUserPlan] = useState<any>("free");
+  const [resolution, setResolution] = useState<"0.5K" | "1K" | "2K">("0.5K");
+
   const [selection, setSelection] = useState<Record<string, string>>({
     mode: "캐릭터 시트", ratio: "16:9", background: "단색 (화이트)", style: "애니메이션", shot: "전체 샷", pose: "기본 정자세",
     gender: "여성", ethnicity: "없음", age: "청년", race: "인간", job: "없음",
@@ -68,13 +78,27 @@ export default function WorkspacePage() {
   const [modalImage, setModalImage] = useState<string | null>(null);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        setUserPlan(session.user.user_metadata?.plan || "free");
+      }
+    };
+    checkUser();
+
     const savedHistory = localStorage.getItem("ts-history");
     if (savedHistory) { try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error(e); } }
     const savedLocks = localStorage.getItem("ts-locks");
     if (savedLocks) { try { setLockedOptions(JSON.parse(savedLocks)); } catch (e) { console.error(e); } }
-  }, []);
+  }, [supabase]);
 
-  useEffect(() => { if (history.length > 0) { localStorage.setItem("ts-history", JSON.stringify(history.slice(0, 20))); } }, [history]);
+  useEffect(() => { 
+    if (history.length > 0) { 
+      try { localStorage.setItem("ts-history", JSON.stringify(history.slice(0, 20))); } 
+      catch (e) { if (e instanceof DOMException && e.name === "QuotaExceededError") { try { localStorage.setItem("ts-history", JSON.stringify(history.slice(0, 5))); } catch (innerE) {} } }
+    } 
+  }, [history]);
   useEffect(() => { localStorage.setItem("ts-locks", JSON.stringify(lockedOptions)); }, [lockedOptions]);
 
   function select(key: string, val: string) { setSelection((prev) => ({ ...prev, [key]: val })); }
@@ -95,8 +119,7 @@ export default function WorkspacePage() {
     
     Object.entries(randomizableCategories).forEach(([key, opt]) => {
       if (key === "background" && selection.mode === "캐릭터 시트") return;
-      if (key === "pose" && selection.mode === "캐릭터 시트") return; // 시트 모드에선 정자세 고정
-      
+      if (key === "pose" && selection.mode === "캐릭터 시트") return;
       if (!lockedOptions[key]) {
         const randomVal = opt.items[Math.floor(Math.random() * opt.items.length)];
         newSelection[key] = randomVal;
@@ -114,7 +137,12 @@ export default function WorkspacePage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newSelection, seed: targetSeed }),
+        body: JSON.stringify({ 
+          ...newSelection, 
+          seed: targetSeed,
+          resolution: (userPlan === "pro" || userPlan === "premium") ? resolution : "0.5K",
+          plan: userPlan
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "생성 실패");
@@ -151,25 +179,29 @@ export default function WorkspacePage() {
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <nav>
         <div className="nav-wrap">
+          <Link className="logo" href="/">툰 스케치<em>.</em></Link>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Link className="logo" href="/">툰스케치<em>.</em></Link>
-            <span style={{ fontSize: 12, color: "var(--muted)" }}>워크스페이스</span>
-            <span style={{ fontSize: 11, color: "var(--subtle)", border: "1px solid var(--border)", padding: "2px 8px", borderRadius: 4 }}>Beta</span>
+            {!user ? (
+              <button className="nav-btn ghost" onClick={() => router.push("/login")} style={{ background: "none", border: "1px solid var(--border)", padding: "6px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer", color: "var(--muted)" }}>로그인</button>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <PlanBadge plan={userPlan} />
+                <UserMenu user={user} />
+              </div>
+            )}
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
         </div>
       </nav>
       <main style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
         <aside style={{ borderRight: "1px solid var(--border)", paddingRight: 36, paddingTop: 48, paddingBottom: 48, display: "flex", flexDirection: "column", gap: 0, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
           <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, marginBottom: 36 }}>캐릭터 빌더</h1>
           <div style={{ display: "flex", flexDirection: "column", gap: 24, flex: 1 }}>
-            {/* 시스템 (잠금 없음) */}
             {(Object.entries(SYSTEM_OPTIONS) as [SelectionKey, { label: string; items: string[] }][]).map(([key, { label, items }]) => {
               if (key === "ratio" && selection.mode === "캐릭터 시트") return null;
               return (<div key={key}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--accent)", marginBottom: 9 }}>{label}</div><div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{items.map((item) => (<button key={item} className={`chip${selection[key] === item ? " on" : ""}`} style={{ background: selection[key] === item ? "var(--accent)" : "transparent", color: selection[key] === item ? "#fff" : "var(--muted)", border: selection[key] === item ? "1px solid var(--accent)" : "1px solid var(--border)" }} onClick={() => select(key, item)}>{item}</button>))}</div></div>);
             })}
 
-            {/* 주요 설정 (잠금 가능) */}
             {(Object.entries(PRIMARY_OPTIONS) as [SelectionKey, { label: string; items: string[] }][]).map(([key, { label, items }]) => {
               if (key === "background" && selection.mode === "캐릭터 시트") return null;
               if (key === "pose" && selection.mode === "캐릭터 시트") return null;
@@ -184,7 +216,6 @@ export default function WorkspacePage() {
               );
             })}
 
-            {/* 기본 필수 설정 (잠금 가능) */}
             {(Object.entries(ESSENTIAL_OPTIONS) as [SelectionKey, { label: string; items: string[] }][]).map(([key, { label, items }]) => (
               <div key={key}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
@@ -196,7 +227,24 @@ export default function WorkspacePage() {
             ))}
             
             <div style={{ position: "relative", margin: "10px 0" }}>
-              <button onClick={() => setShowDetailed(!showDetailed)} style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--border)", color: "var(--muted)", fontSize: 12, fontWeight: 600, padding: "10px", paddingRight: "40px", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{showDetailed ? "▲ 상세 옵션 접기" : "▼ 상세 옵션 더보기"}</button>
+              <button 
+                onClick={() => {
+                  if (userPlan === "free" || userPlan === "mini") {
+                    alert("상세 옵션은 Standard 플랜 이상부터 사용 가능합니다.");
+                    return;
+                  }
+                  setShowDetailed(!showDetailed);
+                }} 
+                style={{ 
+                  width: "100%", background: "var(--bg2)", border: "1px solid var(--border)", 
+                  color: (userPlan === "free" || userPlan === "mini") ? "var(--subtle)" : "var(--muted)", 
+                  fontSize: 12, fontWeight: 600, padding: "10px", paddingRight: "40px", borderRadius: 8, 
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 
+                }}
+              >
+                {showDetailed ? "▲ 상세 옵션 접기" : "▼ 상세 옵션 더보기"}
+                {(userPlan === "free" || userPlan === "mini") && <span style={{ fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "2px 6px", borderRadius: "4px", marginLeft: "8px" }}>Standard</span>}
+              </button>
               <button onClick={toggleAllDetailedLocks} style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 14, opacity: isAllDetailedLocked ? 1 : 0.3, color: isAllDetailedLocked ? "var(--accent)" : "var(--muted)", zIndex: 2 }}>{isAllDetailedLocked ? "🔒" : "🔓"}</button>
             </div>
             
@@ -210,16 +258,69 @@ export default function WorkspacePage() {
               </div>
             ))}
           </div>
+
           <div style={{ height: 40 }} />
-          {seed !== null && (<div style={{ marginBottom: 20, padding: "14px 16px", background: "var(--bg2)", borderRadius: 8, border: "1px solid var(--border)" }}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--subtle)", marginBottom: 4 }}>Seed</div><div style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginBottom: 10 }}>#{seed}</div><button onClick={() => setLockedSeed(isLocked ? null : seed)} style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 6, border: "1.5px solid", cursor: "pointer", transition: "all .15s", borderColor: isLocked ? "var(--accent)" : "var(--border)", background: isLocked ? "var(--al)" : "transparent", color: isLocked ? "var(--accent)" : "var(--muted)" }}>{isLocked ? "🔒 캐릭터 고정 중" : "이 캐릭터 유지하기"}</button></div>)}
+
+          {/* 해상도 선택 */}
+          <div style={{ marginBottom: 24, padding: "16px", background: "var(--bg2)", borderRadius: "12px", border: "1px solid var(--border)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--accent)", letterSpacing: "1px" }}>RESOLUTION</span>
+              {(userPlan !== "pro" && userPlan !== "premium") && <span style={{ fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "2px 6px", borderRadius: "4px" }}>Pro</span>}
+            </div>
+            <div style={{ display: "flex", gap: "4px", background: "var(--bg)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+              {(["0.5K", "1K", "2K"] as const).map((r) => (
+                <button
+                  key={r}
+                  disabled={(userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K"}
+                  onClick={() => setResolution(r)}
+                  style={{
+                    flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: "600", borderRadius: "6px", border: "none", 
+                    cursor: ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? "not-allowed" : "pointer",
+                    background: resolution === r ? "var(--accent)" : "transparent",
+                    color: resolution === r ? "#fff" : ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? "var(--subtle)" : "var(--muted)",
+                    opacity: ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? 0.5 : 1,
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {seed !== null && (
+            <div style={{ marginBottom: 20, padding: "14px 16px", background: "var(--bg2)", borderRadius: 8, border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--subtle)", marginBottom: 4 }}>Seed</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginBottom: 10 }}>#{seed}</div>
+              <button 
+                onClick={() => {
+                  if (userPlan !== "premium" && userPlan !== "pro") {
+                    alert("캐릭터 유지(Seed Lock) 기능은 Pro 플랜 이상에서 제공됩니다.");
+                    return;
+                  }
+                  setLockedSeed(isLocked ? null : seed);
+                }} 
+                style={{ 
+                  fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 6, border: "1.5px solid", 
+                  cursor: "pointer", transition: "all .15s", 
+                  borderColor: isLocked ? "var(--accent)" : "var(--border)", 
+                  background: isLocked ? "var(--al)" : "transparent", 
+                  color: isLocked ? "var(--accent)" : (userPlan !== "premium" && userPlan !== "pro" ? "var(--subtle)" : "var(--muted)"),
+                  opacity: (userPlan !== "premium" && userPlan !== "pro" && !isLocked) ? 0.5 : 1
+                }}
+              >
+                {isLocked ? "🔒 캐릭터 고정 중" : "이 캐릭터 유지하기"}
+                {(userPlan !== "premium" && userPlan !== "pro") && <span style={{ fontSize: "9px", marginLeft: "6px", color: "var(--accent)" }}>Pro</span>}
+              </button>
+            </div>
+          )}
+          
           <button className="btn-dark" onClick={handleGenerate} disabled={loading} style={{ width: "100%", opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40 }}>{loading ? "생성 중..." : "✦ 캐릭터 소환"}</button>
           {error && (<p style={{ marginTop: 10, fontSize: 12, color: "#e53e3e", lineHeight: 1.5 }}>{error}</p>)}
         </aside>
         <div style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, paddingRight: 20, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-            <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>
-              {selection.mode} <span style={{ fontSize: 11, color: "var(--subtle)", fontFamily: "var(--font-noto)", fontWeight: 400, letterSpacing: 0 }}>{selection.mode === "캐릭터 시트" }</span>
-            </h2>
+            <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{selection.mode}</h2>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {usage && (
                 <div style={{ fontSize: 11, color: "var(--subtle)", padding: "0 8px", borderRight: "1px solid var(--border)", display: "flex", gap: "10px" }}>
