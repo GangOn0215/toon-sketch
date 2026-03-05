@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         const logoSize = Math.round((metadata.width || width) * 0.06);
         const logoBuffer = await sharp(logoPath).resize(logoSize).png().toBuffer();
         const textSvg = `<svg width="200" height="${logoSize}"><style>.text { fill: white; font-family: sans-serif; font-weight: 800; opacity: 0.6; font-size: ${Math.round(logoSize * 0.7)}px; }</style><text x="200" y="${Math.round(logoSize * 0.75)}" text-anchor="end" class="text">툰 스케치</text></svg>`;
-        imageBuffer = await mainImage.composite([{ input: logoBuffer, top: (metadata.height || height) - logoSize - 20, left: (metadata.width || width) - logoSize - 20, blend: 'over' },{ input: Buffer.from(textSvg), top: (metadata.height || height) - logoSize - 20, left: (metadata.width || width) - logoSize - 20 - 208, blend: 'over' }]).toBuffer();
+        imageBuffer = await mainImage.composite([{ input: logoBuffer, top: (metadata.height || height) - logoSize - 20, left: (metadata.width || width) - logoSize - 20, blend: 'over' },{ input: Buffer.from(textSvg), top: (metadata.height || height) - logoSize - 20, left: (metadata.width || width) - logoSize - 20 - 208, blend: 'over' }]).toBuffer() as any;
       }
     }
 
