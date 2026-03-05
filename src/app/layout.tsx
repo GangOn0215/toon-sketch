@@ -38,8 +38,8 @@ export default function RootLayout({
       <body className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

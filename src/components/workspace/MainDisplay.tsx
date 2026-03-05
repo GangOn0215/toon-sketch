@@ -54,7 +54,7 @@ export function MainDisplay({
         borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)", 
         background: "var(--bg2)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", cursor: imageUrl ? "zoom-in" : "default" 
       }}>
-        {loading ? <Skeleton /> : imageUrl ? <Image src={imageUrl} alt="캐릭터 생성 이미지" fill sizes="(max-width: 1100px) 70vw, 720px" style={{ objectFit: "contain" }} priority /> : <EmptyState />}
+        {loading ? <Skeleton /> : imageUrl ? <Image src={imageUrl} alt="캐릭터 생성 이미지" fill sizes="(max-width: 1100px) 70vw, 720px" style={{ objectFit: "contain" }} priority unoptimized /> : <EmptyState />}
       </div>
 
       {history.length > 0 && (
@@ -67,7 +67,7 @@ export function MainDisplay({
             {history.map((item) => (
               <div key={item.id} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s", position: "relative" }} onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-4px)")} onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}>
                 <div onClick={() => onImageClick(item.imageUrl)} style={{ position: "relative", aspectRatio: item.selection.mode === "캐릭터 시트" ? "16/9" : "1/1", background: "#000", cursor: "zoom-in" }}>
-                  <Image src={item.imageUrl} alt="기록 이미지" fill style={{ objectFit: "cover", opacity: 0.8 }} />
+                  <Image src={item.imageUrl} alt="기록 이미지" fill style={{ objectFit: "cover", opacity: 0.8 }} unoptimized />
                 </div>
                 <div onClick={() => onRestoreHistory(item)} style={{ padding: 8, cursor: "pointer" }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 2 }}>{item.selection.gender} {item.selection.age}</div>
@@ -84,21 +84,12 @@ export function MainDisplay({
 
 function Skeleton() { return (<><style>{`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style><div style={{ width: "100%", height: "100%", background: "linear-gradient(90deg, var(--surface) 25%, var(--bg2) 50%, var(--surface) 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.4s ease infinite" }} /></>); }
 
-function EmptyState() { 
+function EmptyState() {
   return (
     <div style={{ textAlign: "center", width: "100%", padding: "40px" }}>
-      <div style={{ display: "flex", gap: "20px", justifyContent: "center", marginBottom: "32px", opacity: 0.4 }}>
-        {["FRONT", "SIDE", "BACK"].map(label => (
-          <div key={label} style={{ width: "100px", height: "140px", background: "var(--bg)", borderRadius: "12px", border: "1.5px dashed var(--border)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: "12px", position: "relative" }}>
-            <div style={{ position: "absolute", top: "25%", left: "50%", transform: "translateX(-50%)", width: "32px", height: "32px", borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)" }}></div>
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translateX(-50%)", width: "45px", height: "50px", borderRadius: "6px 6px 0 0", background: "var(--surface)", border: "1px solid var(--border)" }}></div>
-            <span style={{ fontSize: "10px", fontWeight: "700", color: "var(--subtle)", letterSpacing: "1.5px" }}>{label}</span>
-          </div>
-        ))}
-      </div>
       <div style={{ fontSize: 24, marginBottom: 12, opacity: 0.3 }}>✦</div>
       <p style={{ fontSize: 14, fontWeight: "600", color: "var(--subtle)", marginBottom: "4px" }}>소환 준비 완료</p>
       <p style={{ fontSize: 12, color: "var(--subtle)", opacity: 0.7 }}>왼쪽에서 옵션을 선택하고 캐릭터를 소환해보세요</p>
     </div>
-  ); 
+  );
 }

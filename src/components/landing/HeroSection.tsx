@@ -27,8 +27,19 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
         </div>
         <div className="hero-visual reveal d2">
           <div className="hero-main-box">
-            <div className="hero-card-grid"><div className="hero-card c1"></div><div className="hero-card c2"></div><div className="hero-card c3"></div></div>
-            <div className="hero-overlay-tag">Standard Model</div>
+            <div className="hero-single-container">
+              <div className="hero-card c1">
+                <div className="hero-image-wrap">
+                  {/* 이곳의 src를 실제 이미지 경로로 바꾸시면 됩니다 */}
+                  <img src="/images/sample.png" alt="Hero Character" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", margin: "0 auto" }} />
+                </div>
+                <span className="card-label">Character Preview</span>
+              </div>
+            </div>
+            <div className="hero-status-tag">
+              <span className="status-dot"></span>
+              AI Model Active
+            </div>
           </div>
         </div>
       </div>
