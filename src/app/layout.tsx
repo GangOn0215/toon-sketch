@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -33,9 +34,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
