@@ -46,9 +46,9 @@ export default function Home() {
       <main>
         <HeroSection isLoggedIn={isLoggedIn} />
         <DemoSection />
+        <PricingSection />
         <GallerySection />
         <HowItWorksSection />
-        <PricingSection />
         <CTASection isLoggedIn={isLoggedIn} />
       </main>
 
