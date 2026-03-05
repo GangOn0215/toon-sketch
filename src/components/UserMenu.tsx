@@ -67,17 +67,17 @@ export function UserMenu({ user }: UserMenuProps) {
           </div>
           
           <button 
+            onClick={() => { router.push("/mypage"); setIsOpen(false); }}
+            style={itemStyle}
+          >
+            👤 마이페이지
+          </button>
+          
+          <button 
             onClick={() => { router.push("/workspace"); setIsOpen(false); }}
             style={itemStyle}
           >
             🚀 워크스페이스
-          </button>
-          
-          <button 
-            onClick={() => { alert("정보 수정 기능은 준비 중입니다."); setIsOpen(false); }}
-            style={itemStyle}
-          >
-            ⚙️ 정보 수정
           </button>
           
           <div style={{ height: "1px", background: "var(--border2)", margin: "4px 0" }} />
