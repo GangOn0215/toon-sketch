@@ -376,6 +376,37 @@ nav {
 .summon-result .swiper-pagination-bullet { background: rgba(255,255,255,0.5); opacity: 1; }
 .summon-result .swiper-pagination-bullet-active { background: #fff; }
 
+/* 워크스페이스 시트 Swiper */
+.swiper-button-prev, .swiper-button-next {
+  width: 36px !important; height: 36px !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+  color: #1B1A17 !important;
+  top: 50% !important;
+  transition: background 0.15s, box-shadow 0.15s !important;
+}
+.swiper-button-prev:hover, .swiper-button-next:hover {
+  background: #f0f0ee !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18) !important;
+}
+.swiper-button-prev::after, .swiper-button-next::after {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+.swiper-pagination-bullet {
+  width: 6px !important; height: 6px !important;
+  background: rgba(27,26,23,0.2) !important;
+  opacity: 1 !important;
+  border-radius: 50% !important;
+  transition: all 0.2s !important;
+}
+.swiper-pagination-bullet-active {
+  width: 20px !important;
+  background: #1B1A17 !important;
+  border-radius: 3px !important;
+}
+
 @media (max-width: 600px) {
   .gallery-grid { grid-template-columns: 1fr; }
   .hero-feats { grid-template-columns: 1fr; }

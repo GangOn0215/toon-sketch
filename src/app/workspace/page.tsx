@@ -106,14 +106,16 @@ export default function WorkspacePage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           ...selection, seed: targetSeed,
           resolution: (userPlan === "pro" || userPlan === "premium") ? resolution : "0.5K",
-          plan: userPlan, userId: user.id 
+          plan: userPlan, userId: user.id
         }),
       });
+
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "생성 실패"); }
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "생성 실패");
       setImageUrl(data.imageUrl);
       setSeed(data.seed);
       setUsage({ cost: data.cost, time: data.inferenceTime });
@@ -166,10 +168,10 @@ export default function WorkspacePage() {
           loading={loading} handleGenerate={handleGenerate}
         />
         
-        <MainDisplay 
-          selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl} 
-          loading={loading} history={history} onCopyActualPrompt={copyActualPrompt} 
-          onCopyVideoPrompt={copyVideoPrompt} onImageClick={setModalImage} 
+        <MainDisplay
+          selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl}
+          loading={loading} history={history} onCopyActualPrompt={copyActualPrompt}
+          onCopyVideoPrompt={copyVideoPrompt} onImageClick={setModalImage}
           onRestoreHistory={restoreFromHistory} onClearHistory={clearHistory}
           copiedDev={copiedDev} copied={copied}
         />

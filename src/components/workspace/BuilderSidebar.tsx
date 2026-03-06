@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const SYSTEM_OPTIONS = {
-  mode:       { label: "생성 모드", items: ["캐릭터 시트", "일반 화보"] },
+  mode:       { label: "생성 모드", items: ["캐릭터 시트", "캐릭터 시트 (3장)", "일반 화보"] },
   ratio:      { label: "이미지 비율", items: ["16:9", "9:16", "1:1", "4:3", "3:4"] },
 };
 
@@ -153,7 +153,7 @@ export function BuilderSidebar({
       {activeTab === "기본" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 24 }}>
           {Object.entries(SYSTEM_OPTIONS).map(([key, { label, items }]) => {
-            if (key === "ratio" && selection.mode === "캐릭터 시트") return null;
+            if (key === "ratio" && selection.mode !== "일반 화보") return null;
             return (
               <div key={key}>
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--accent)", marginBottom: 9 }}>{label}</div>
@@ -192,8 +192,9 @@ export function BuilderSidebar({
 
         {activeTab === "기본" && <>
           {Object.entries(PRIMARY_OPTIONS).map(([key, { label, items }]) => {
-            if (key === "background" && selection.mode === "캐릭터 시트") return null;
-            if (key === "pose" && selection.mode === "캐릭터 시트") return null;
+            const isSheetMode = selection.mode === "캐릭터 시트" || selection.mode === "캐릭터 시트 (3장)";
+            if (key === "background" && isSheetMode) return null;
+            if (key === "pose" && isSheetMode) return null;
             return (
               <div key={key}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
