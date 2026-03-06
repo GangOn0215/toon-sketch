@@ -28,13 +28,12 @@ export default function WorkspacePage() {
   const [selection, setSelection] = useState<Record<string, string>>({
     mode: "캐릭터 시트", ratio: "16:9", background: "단색 (화이트)", style: "애니메이션", shot: "전체 샷", pose: "기본 정자세",
     gender: "여성", ethnicity: "없음", age: "청년", race: "인간", job: "없음",
-    body: "보통 체형", hairStyle: "단발", hairColor: "흑발", eyeColor: "흑안/갈안", 
+    body: "보통 체형", hairStyle: "단발", hairColor: "흑발", eyeColor: "흑안/갈안",
     impression: "순한", expression: "미소", clothing: "스트릿 패션",
-    mainColor: "화이트", acc: "없음", vibe: "우아한",
+    mainColor: "화이트", shoeType: "없음", shoeColor: "블랙", acc: "없음", vibe: "우아한",
   });
   
   const [lockedOptions, setLockedOptions] = useState<Record<string, boolean>>({});
-  const [showDetailed, setShowDetailed] = useState(false);
   const [imageUrl, setImageUrl]   = useState<string | null>(null);
   const [seed, setSeed]           = useState<number | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
@@ -89,15 +88,7 @@ export default function WorkspacePage() {
 
   const select = (key: string, val: string) => setSelection((prev) => ({ ...prev, [key]: val }));
   const toggleLock = (key: string) => setLockedOptions(prev => ({ ...prev, [key]: !prev[key] }));
-  const isAllDetailedLocked = ["body", "hairStyle", "hairColor", "eyeColor", "impression", "expression", "clothing", "mainColor", "acc", "vibe"].every(key => lockedOptions[key]);
-  
-  const toggleAllDetailedLocks = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newValue = !isAllDetailedLocked;
-    const nextLocks = { ...lockedOptions };
-    ["body", "hairStyle", "hairColor", "eyeColor", "impression", "expression", "clothing", "mainColor", "acc", "vibe"].forEach(key => { nextLocks[key] = newValue; });
-    setLockedOptions(nextLocks);
-  };
+  const bulkSetLocks = (keys: string[], value: boolean) => setLockedOptions(prev => { const next = { ...prev }; keys.forEach(k => { next[k] = value; }); return next; });
 
   async function handleGenerate() {
     if (credits < 30) { 
@@ -168,12 +159,10 @@ export default function WorkspacePage() {
       </nav>
 
       <main style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
-        <BuilderSidebar 
-          selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} 
-          userPlan={userPlan} showDetailed={showDetailed} setShowDetailed={setShowDetailed} 
-          isAllDetailedLocked={isAllDetailedLocked} toggleAllDetailedLocks={toggleAllDetailedLocks}
-          resolution={resolution} setResolution={setResolution} seed={seed} 
-          isLocked={lockedSeed !== null && lockedSeed === seed} setLockedSeed={setLockedSeed} 
+        <BuilderSidebar
+          selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} bulkSetLocks={bulkSetLocks}
+          userPlan={userPlan} resolution={resolution} setResolution={setResolution} seed={seed}
+          isLocked={lockedSeed !== null && lockedSeed === seed} setLockedSeed={setLockedSeed}
           loading={loading} handleGenerate={handleGenerate}
         />
         
@@ -186,7 +175,7 @@ export default function WorkspacePage() {
         />
       </main>
 
-      <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} />
+      <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan={userPlan} />
       {showTopupModal && <TopupModal user={user} onClose={() => setShowTopupModal(false)} />}
       
       {error && <div style={{ position: "fixed", bottom: 20, right: 20, background: "#e53e3e", color: "#fff", padding: "12px 24px", borderRadius: "8px", zIndex: 2000 }}>{error}</div>}

@@ -25,8 +25,10 @@ export const EYE_COLOR: Record<string, string> = { "흑안/갈안": "brown", 벽
 export const IMPRESSION: Record<string, string> = { 날카로운: "sharp", 순한: "kind", 화려한: "captivating", 나른한: "sleepy", 흉터: "scarred" };
 export const EXPR: Record<string, string> = { 자신만만: "smug", 쿨한: "cool", 무표정: "stoic", 미소: "smiling", 분노한: "angry", 슬픈: "sad", 광기어린: "manic", 부끄러운: "blushing" };
 export const CLOTHING: Record<string, string> = { 캐주얼: "casual", 정장: "suit", "스트릿 패션": "streetwear", 교복: "school-uniform", "로판 드레스": "fantasy-gown", "기사 갑옷": "armor", "마법사 로브": "wizard-robe", 사제복: "priest-robe", 제복: "uniform", 동양풍: "oriental", 무협풍: "wuxia", 사이버펑크: "techwear" };
-export const MAIN_COLOR: Record<string, string> = { 블랙: "black", 화이트: "white", 레드: "red", 블루: "blue", 그린: "green", 골드: "gold" };
-export const ACC: Record<string, string> = { 없음: "", 안경: "glasses", 귀걸이: "earrings", 초커: "choker", 모자: "hat", 망토: "cape", 무기: "weapon" };
+export const MAIN_COLOR: Record<string, string> = { 블랙: "black", 화이트: "white", 레드: "red", 블루: "blue", 그린: "green", 골드: "gold", 퍼플: "purple", 핑크: "pink", 실버: "silver", 브라운: "brown", 네이비: "navy", 오렌지: "orange", 베이지: "beige", 민트: "mint" };
+export const SHOE_TYPE: Record<string, string> = { 없음: "", 스니커즈: "sneakers", 부츠: "boots", 힐: "heels", 로퍼: "loafers", 샌들: "sandals", 워커: "combat boots", 플랫슈즈: "flat shoes", 슬리퍼: "slippers", 롱부츠: "knee-high boots", 슬립온: "slip-ons", 옥스퍼드: "oxford shoes" };
+export const SHOE_COLOR: Record<string, string> = { 블랙: "black", 화이트: "white", 브라운: "brown", 레드: "red", 블루: "blue", 골드: "gold", 실버: "silver", 베이지: "beige", 네이비: "navy", 그린: "green" };
+export const ACC: Record<string, string> = { 없음: "", 안경: "glasses", 선글라스: "sunglasses", 귀걸이: "earrings", 초커: "choker", 목걸이: "necklace", 반지: "ring", 팔찌: "bracelet", 모자: "hat", 베레모: "beret", 후드: "hoodie", 망토: "cape", 무기: "weapon", 방패: "shield", 벨트: "belt", 스카프: "scarf", 장갑: "gloves", 가방: "bag", 리본: "ribbon", 헤어핀: "hairpin" };
 export const VIBE: Record<string, string> = { 냉혹한: "cold", 발랄한: "cheerful", 퇴폐적인: "decadent", 우아한: "elegant", "광기 어린": "chaotic", 신비로운: "mysterious" };
 
 export const SHOT: Record<string, string> = { "전체 샷": "full body,", "바디 절반": "waist up,", "얼굴 중심": "face portrait," };
@@ -57,6 +59,7 @@ export function buildPrompt(s: any) {
     `${HAIR_COLOR[s.hairColor]} ${HAIR_STYLE[s.hairStyle]},`,
     `${EYE_COLOR[s.eyeColor]} eyes, ${IMPRESSION[s.impression]} look, ${EXPR[s.expression]},`,
     `${CLOTHING[s.clothing]} in ${MAIN_COLOR[s.mainColor]},`,
+    s.shoeType && SHOE_TYPE[s.shoeType] ? `wearing ${SHOE_COLOR[s.shoeColor] || ""} ${SHOE_TYPE[s.shoeType]},`.trim() : "",
     `${ACC[s.acc]}, ${VIBE[s.vibe]} vibe,`,
     randomBit
   ].join(" ");
