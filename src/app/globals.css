@@ -372,6 +372,10 @@ nav {
   .showcase-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+.summon-result .swiper { overflow: hidden; }
+.summon-result .swiper-pagination-bullet { background: rgba(255,255,255,0.5); opacity: 1; }
+.summon-result .swiper-pagination-bullet-active { background: #fff; }
+
 @media (max-width: 600px) {
   .gallery-grid { grid-template-columns: 1fr; }
   .hero-feats { grid-template-columns: 1fr; }

@@ -1,9 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 const RACE_MAP: Record<string, string> = { 엘프: "ELF", 인간: "HUM", 드래곤: "DRG", 악마: "DMN" };
 const JOB_MAP: Record<string, string>  = { 전사: "WAR", 마법사: "MAG", 궁수: "ARC", 암살자: "ASN" };
+
+const SAMPLE_IMAGES = ["/images/sample1.png", "/images/sample2.png", "/images/sample3.png"];
+
+function SampleSlide({ src, index }: { src: string; index: number }) {
+  const [errored, setErrored] = useState(false);
+  return (
+    <div style={{ width: "100%", height: "100%", background: "var(--bg2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {errored ? (
+        <div style={{ textAlign: "center", opacity: 0.35 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>✦</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--subtle)" }}>Sample {index + 1}</div>
+        </div>
+      ) : (
+        <img src={src} alt={`샘플 ${index + 1}`} onError={() => setErrored(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+      )}
+    </div>
+  );
+}
 
 function ChipGroup({ label, options, selected, onSelect }: {
   label: string;
@@ -42,7 +64,7 @@ export function DemoSection() {
   }
 
   return (
-    <section id="demo" style={{ padding: "100px 24px", borderTop: "1px solid var(--border)" }}>
+    <section id="demo" style={{ padding: "100px 24px", borderTop: "1px solid var(--border)", overflowX: "hidden" }}>
       <div className="container" style={{ maxWidth: "1000px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
         <div className="reveal">
           <h2 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "24px" }}>클릭 몇 번으로 완성되는<br />전문가급 캐릭터 시트</h2>
@@ -56,21 +78,28 @@ export function DemoSection() {
           </div>
         </div>
         <div className="reveal d2" style={{ position: "relative" }}>
-          <div className="summon-result" style={{ aspectRatio: "4/3", background: "var(--surface)", borderRadius: "24px", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            {loading ? <div className="shimmer" style={{ width: "100%", height: "100%", background: "linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }}></div> : (
-              <div style={{ textAlign: "center", padding: "40px", width: "100%" }}>
-                <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginBottom: "24px" }}>
-                  {["FRONT", "SIDE", "BACK"].map(label => (
-                    <div key={label} style={{ width: "80px", height: "110px", background: "var(--bg)", borderRadius: "8px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: "10px", position: "relative" }}>
-                      <div style={{ position: "absolute", top: "25%", left: "50%", transform: "translateX(-50%)", width: "24px", height: "24px", borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)" }}></div>
-                      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translateX(-50%)", width: "32px", height: "35px", borderRadius: "4px 4px 0 0", background: "var(--surface)", border: "1px solid var(--border)" }}></div>
-                      <span style={{ fontSize: "9px", fontWeight: "700", color: "var(--subtle)", letterSpacing: "1px" }}>{label}</span>
-                    </div>
+          <div className="summon-result" style={{ aspectRatio: "4/3", background: "var(--surface)", borderRadius: "24px", border: "1px solid var(--border)", overflow: "hidden", position: "relative" }}>
+            {loading ? (
+              <div style={{ width: "100%", height: "100%", background: "linear-gradient(90deg, var(--bg2) 25%, var(--surface) 50%, var(--bg2) 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />
+            ) : (
+              <>
+                <Swiper
+                  modules={[Autoplay, Pagination]}
+                  autoplay={{ delay: 2800, disableOnInteraction: false }}
+                  pagination={{ clickable: true }}
+                  loop
+                  style={{ position: "absolute", inset: 0, overflow: "hidden" }}
+                >
+                  {SAMPLE_IMAGES.map((src, i) => (
+                    <SwiperSlide key={i}>
+                      <SampleSlide src={src} index={i} />
+                    </SwiperSlide>
                   ))}
+                </Swiper>
+                <div style={{ position: "absolute", bottom: 14, left: 16, zIndex: 10, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", borderRadius: 8, padding: "4px 10px" }}>
+                  <p style={{ fontWeight: "700", color: "#fff", fontSize: "12px", letterSpacing: "0.5px", margin: 0 }}>SEED <span style={{ opacity: 0.75 }}>{seed}</span></p>
                 </div>
-                <p style={{ fontWeight: "700", color: "var(--accent)", fontSize: "16px", letterSpacing: "0.5px" }}>SEED <span style={{ opacity: 0.8 }}>{seed}</span></p>
-                <p style={{ fontSize: "13px", color: "var(--subtle)", marginTop: "8px" }}>위 옵션으로 생성된 결과물 예시입니다.</p>
-              </div>
+              </>
             )}
           </div>
         </div>
