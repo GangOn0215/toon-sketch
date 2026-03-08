@@ -52,14 +52,18 @@ const SHEET_VIEW = {
 
 function buildCore(s: any, randomBit: string) {
   return [
-    `${ETHNICITY[s.ethnicity] || ""}${GENDER[s.gender]} ${AGE[s.age]},`,
-    `${RACE[s.race]} ${JOB[s.job]},`,
-    `${BODY[s.body]} build,`,
-    `${HAIR_COLOR[s.hairColor]} ${HAIR_STYLE[s.hairStyle]},`,
-    `${EYE_COLOR[s.eyeColor]} eyes, ${IMPRESSION[s.impression]} look, ${EXPR[s.expression]},`,
-    `${CLOTHING[s.clothing]} in ${MAIN_COLOR[s.mainColor]},`,
+    `${ETHNICITY[s.ethnicity] || ""}${GENDER[s.gender] || ""} ${AGE[s.age] || ""},`,
+    `${RACE[s.race] || ""} ${JOB[s.job] || ""},`,
+    s.body && BODY[s.body] ? `${BODY[s.body]} build,` : "",
+    (s.hairColor && HAIR_COLOR[s.hairColor]) || (s.hairStyle && HAIR_STYLE[s.hairStyle]) 
+      ? `${HAIR_COLOR[s.hairColor] || ""} ${HAIR_STYLE[s.hairStyle] || ""},` : "",
+    (s.eyeColor && EYE_COLOR[s.eyeColor]) || (s.impression && IMPRESSION[s.impression]) || (s.expression && EXPR[s.expression])
+      ? `${EYE_COLOR[s.eyeColor] || ""} eyes, ${IMPRESSION[s.impression] || ""} look, ${EXPR[s.expression] || ""},` : "",
+    (s.clothing && CLOTHING[s.clothing]) || (s.mainColor && MAIN_COLOR[s.mainColor])
+      ? `${CLOTHING[s.clothing] || ""} in ${MAIN_COLOR[s.mainColor] || ""},` : "",
     s.shoeType && SHOE_TYPE[s.shoeType] ? `wearing ${SHOE_COLOR[s.shoeColor] || ""} ${SHOE_TYPE[s.shoeType]},`.trim() : "",
-    `${ACC[s.acc]}, ${VIBE[s.vibe]} vibe,`,
+    (s.acc && ACC[s.acc]) || (s.vibe && VIBE[s.vibe])
+      ? `${ACC[s.acc] || ""}, ${VIBE[s.vibe] || ""} vibe,` : "",
     randomBit,
   ].filter(Boolean).join(" ");
 }
