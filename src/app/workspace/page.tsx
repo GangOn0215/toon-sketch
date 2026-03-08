@@ -14,6 +14,7 @@ import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
 import { ImageModal } from "@/components/workspace/ImageModal";
 import { TopupModal } from "@/components/workspace/TopupModal";
+import { GenerationModal } from "@/components/workspace/GenerationModal";
 
 type HistoryItem = { id: string; imageUrl: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
@@ -40,6 +41,8 @@ export default function WorkspacePage() {
   const [usage, setUsage]         = useState<{ cost: number; time: number } | null>(null);
   const [lockedSeed, setLockedSeed] = useState<number | null>(null);
   const [loading, setLoading]     = useState(false);
+  const [queueStatus, setQueueStatus] = useState<string | null>(null);
+  const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [error, setError]         = useState<string | null>(null);
   const [copied, setCopied]       = useState(false);
   const [copiedDev, setCopiedDev] = useState(false);
@@ -91,7 +94,6 @@ export default function WorkspacePage() {
   const bulkSetLocks = (keys: string[], value: boolean) => setLockedOptions(prev => { const next = { ...prev }; keys.forEach(k => { next[k] = value; }); return next; });
 
   async function handleGenerate() {
-    // 필수 선택 항목 체크 (시스템 옵션 및 주요 특징)
     const essentialKeys = ["mode", "style", "gender", "race", "age"];
     const missing = essentialKeys.filter(k => !selection[k]);
     
@@ -106,33 +108,78 @@ export default function WorkspacePage() {
     }
     
     setLoading(true);
+    setQueueStatus("starting");
+    setQueuePosition(null);
     setError(null);
+
     const targetSeed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
     const currentPrompt = buildPrompt(selection);
     setLastPrompt(currentPrompt);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({
           ...selection, seed: targetSeed,
           resolution: (userPlan === "pro" || userPlan === "premium") ? resolution : "0.5K",
-          plan: userPlan, userId: user.id,
-          referenceImage: lockedSeed ? imageUrl : null // 시드 고정 시 현재 이미지를 레퍼런스로 전달
+          plan: userPlan,
+          userId: user.id,
+          referenceImage: lockedSeed ? imageUrl : null
         }),
       });
 
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "생성 실패"); }
+      if (!res.ok) throw new Error("서버 응답 오류");
 
-      const data = await res.json();
-      setImageUrl(data.imageUrl);
-      setSeed(data.seed);
-      setUsage({ cost: data.cost, time: data.inferenceTime });
-      if (data.newBalance !== undefined) setCredits(data.newBalance);
-      const newItem: HistoryItem = { id: Date.now().toString(), imageUrl: data.imageUrl, selection: { ...selection }, seed: data.seed, timestamp: Date.now() };
-      setHistory((prev) => [newItem, ...prev]);
-    } catch (e: any) { setError(e.message || "알 수 없는 에러"); } finally { setLoading(false); }
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) throw new Error("데이터 스트림 에러");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n").filter(Boolean);
+
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            if (data.status === "deducted") {
+              setCredits(data.newBalance);
+            } else if (data.status === "queued") {
+              setQueueStatus("queued");
+              setQueuePosition(data.position);
+            } else if (data.status === "processing") {
+              setQueueStatus("processing");
+              setQueuePosition(null);
+            } else if (data.status === "completed") {
+              setImageUrl(data.imageUrl);
+              setSeed(data.seed);
+              const newItem: HistoryItem = { id: Date.now().toString(), imageUrl: data.imageUrl, selection: { ...selection }, seed: data.seed, timestamp: Date.now() };
+              setHistory((prev) => [newItem, ...prev]);
+              setQueueStatus("completed");
+            } else if (data.status === "refunded") {
+              setCredits(data.newBalance);
+              setQueueStatus("refunded");
+              setError(data.message || "생성 중 문제가 발생하여 환불되었습니다.");
+            } else if (data.status === "error") {
+              throw new Error(data.message || "생성 실패");
+            }
+          } catch (e: any) {
+            if (e.message) throw e;
+          }
+        }
+      }
+    } catch (e: any) { 
+      setError(e.message || "알 수 없는 에러"); 
+    } finally { 
+      setLoading(false); 
+    }
   }
 
   const restoreFromHistory = (item: HistoryItem) => {
@@ -190,7 +237,15 @@ export default function WorkspacePage() {
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan={userPlan} />
       {showTopupModal && <TopupModal user={user} onClose={() => setShowTopupModal(false)} />}
       
-      {error && <div style={{ position: "fixed", bottom: 20, right: 20, background: "#e53e3e", color: "#fff", padding: "12px 24px", borderRadius: "8px", zIndex: 2000 }}>{error}</div>}
+      <GenerationModal 
+        status={queueStatus} 
+        position={queuePosition} 
+        error={error} 
+        onClose={() => {
+          setQueueStatus(null);
+          setError(null);
+        }} 
+      />
     </div>
   );
 }

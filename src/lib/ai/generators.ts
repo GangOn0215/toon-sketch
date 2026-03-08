@@ -28,27 +28,44 @@ export class FalGenerator implements ImageGenerator {
     fal.config({ credentials: apiKey });
   }
 
-  async generate(options: GenerateOptions): Promise<GenerateResult> {
+  async generate(options: GenerateOptions, retries = 3): Promise<GenerateResult> {
     const { prompt, width, height, seed, referenceImage } = options;
     
-    // Nano Banana 2 모델은 image_urls 파라미터를 통해 레퍼런스 이미지를 참조할 수 있습니다.
+    // 사용자가 선호하는 Nano Banana 2 모델로 원복
     const input: any = { 
       prompt, 
       seed, 
       width, 
       height, 
-      num_inference_steps: 30 
+      num_inference_steps: 28, // 기존 퀄리티 유지를 위해 28단계 사용
     };
 
     if (referenceImage) {
       input.image_urls = [referenceImage];
     }
 
-    const result = await fal.run("fal-ai/nano-banana-2", {
-      input,
-    });
+    let attempt = 0;
+    let result: any = null;
+
+    while (attempt < retries) {
+      try {
+        result = await fal.run("fal-ai/nano-banana-2", { input });
+        break;
+      } catch (error: any) {
+        attempt++;
+        const isRateLimit = error.message?.includes("Too Many Requests") || error.message?.includes("429") || error.status === 429;
+        
+        if (isRateLimit && attempt < retries) {
+          const delay = attempt * 1500;
+          console.warn(`[Fal.ai] ⚠️ 대기열 초과. ${delay}ms 후 재시도... (${attempt}/${retries})`);
+          await new Promise(res => setTimeout(res, delay));
+        } else {
+          throw error;
+        }
+      }
+    }
     
-    const url = (result as any)?.data?.images?.[0]?.url ?? (result as any)?.images?.[0]?.url ?? "";
+    const url = result?.data?.images?.[0]?.url ?? result?.images?.[0]?.url ?? "";
     if (!url) throw new Error("Fal.ai 이미지 URL 생성 실패");
 
     const inferenceTime = (result as any)?.timings?.inference ?? 0;

@@ -6,111 +6,138 @@ import fs from "fs";
 import { createClient } from "@supabase/supabase-js";
 import { getGenerator } from "@/lib/ai/generators";
 
-// 서비스 롤 클라이언트 (서버 전용, 크레딧 차감 및 Storage 업로드용)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const getResolutionPixels = (res: string, ratio: string) => {
-  const base = res === "2K" ? 2048 : res === "1K" ? 1024 : 512;
-  if (ratio === "16:9") return { width: base, height: Math.round(base * (9/16)) };
-  if (ratio === "9:16") return { width: Math.round(base * (9/16)), height: base };
-  if (ratio === "4:3")  return { width: base, height: Math.round(base * (3/4)) };
-  if (ratio === "3:4")  return { width: Math.round(base * (3/4)), height: base };
-  return { width: base, height: base };
+const PLAN_PRIORITY: Record<string, number> = {
+  premium: 50,
+  pro: 40,
+  standard: 30,
+  mini: 20,
+  free: 10
 };
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { seed: lockedSeed, ratio, mode, resolution = "0.5K", plan = "free", userId, referenceImage } = body;
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const sendStatus = (data: any) => {
+        controller.enqueue(encoder.encode(JSON.stringify(data) + "\n"));
+      };
 
-  if (!userId) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
+      let queueItemId: string | null = null;
+      let userId: string | null = null;
+      let isDeducted = false;
 
-  // 1. 크레딧 잔액 확인
-  const { data: profile } = await supabaseAdmin.from("profiles").select("credits").eq("id", userId).single();
-  if (!profile || profile.credits < 30) return NextResponse.json({ error: "크레딧 부족" }, { status: 402 });
+      try {
+        const body = await req.json();
+        const { seed: lockedSeed, ratio, mode, resolution = "0.5K", plan = "free" } = body;
 
-  const seed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
-  const isSheet3 = mode === "캐릭터 시트 (3장)";
-  const isSheet1 = mode === "캐릭터 시트";
+        const authHeader = req.headers.get("Authorization");
+        const token = authHeader?.split(" ")[1];
+        if (!token) throw new Error("인증 필요");
 
-  const { width, height } = (isSheet3 || isSheet1)
-    ? getResolutionPixels(resolution, "16:9")
-    : getResolutionPixels(resolution, ratio || "16:9");
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+        if (authError || !user) throw new Error("인증 실패");
+        userId = user.id;
 
-  const prompt = buildPrompt(body);
+        // 1. 크레딧 확인 및 선차감
+        const { data: profile } = await supabaseAdmin.from("profiles").select("credits, plan").eq("id", userId).single();
+        if (!profile || profile.credits < 30) throw new Error("크레딧 부족");
 
-  // 워터마크 처리 헬퍼
-  async function applyWatermark(buf: Buffer, w: number, h: number): Promise<Buffer> {
-    const logoPath = path.join(process.cwd(), "public", "images", "favicon.svg");
-    if (!fs.existsSync(logoPath)) return buf;
-    const mainImage = sharp(buf);
-    const metadata = await mainImage.metadata();
-    const imgW = metadata.width || w;
-    const imgH = metadata.height || h;
-    const logoSize = Math.round(imgW * 0.06);
-    const logoBuffer = await sharp(logoPath).resize(logoSize).png().toBuffer();
-    const textSvg = `<svg width="200" height="${logoSize}"><style>.text { fill: white; font-family: sans-serif; font-weight: 800; opacity: 0.6; font-size: ${Math.round(logoSize * 0.7)}px; }</style><text x="200" y="${Math.round(logoSize * 0.75)}" text-anchor="end" class="text">툰 스케치</text></svg>`;
-    return await mainImage.composite([
-      { input: logoBuffer, top: imgH - logoSize - 20, left: imgW - logoSize - 20, blend: "over" },
-      { input: Buffer.from(textSvg), top: imgH - logoSize - 20, left: imgW - logoSize - 20 - 208, blend: "over" },
-    ]).toBuffer() as any;
-  }
+        const userPlan = profile.plan || "free";
+        const priority = PLAN_PRIORITY[userPlan] || 10;
 
-  // 워터마크 → Storage 업로드 → publicUrl
-  async function processAndUpload(buffer: Buffer, fileName: string): Promise<string> {
-    let buf = buffer;
-    if (plan === "free" || plan === "mini") buf = await applyWatermark(buf, width, height);
-    const { error } = await supabaseAdmin.storage.from("characters").upload(fileName, buf, { contentType: "image/png", upsert: true });
-    if (error) throw error;
-    return supabaseAdmin.storage.from("characters").getPublicUrl(fileName).data.publicUrl;
-  }
+        // 크레딧 선차감 로직
+        const { error: deductError } = await supabaseAdmin
+          .from("profiles")
+          .update({ credits: profile.credits - 30 })
+          .eq("id", userId);
+        
+        if (deductError) throw new Error("크레딧 차감 실패");
+        isDeducted = true;
+        sendStatus({ status: "deducted", newBalance: profile.credits - 30 });
 
-  try {
-    const ts = Date.now();
-    const newBalance = profile.credits - 30;
+        // 2. 대기열 등록
+        const { data: queueItem, error: queueError } = await supabaseAdmin
+          .from("generation_queue")
+          .insert({ user_id: userId, plan: userPlan, priority, status: "pending" })
+          .select().single();
 
-    // AI 제너레이터 인스턴스 획득 (fal.ai Nano Banana 2 전용)
-    const generator = getGenerator();
-    const result = await generator.generate({ prompt, width, height, seed, referenceImage });
-    const { buffer: imageBuffer, metadata } = result;
+        if (queueError) throw queueError;
+        queueItemId = queueItem.id;
 
-    const publicUrl = await processAndUpload(imageBuffer, `${userId}/${ts}-${seed}.png`);
+        // 3. 내 차례 기다리기
+        let isMyTurn = false;
+        while (!isMyTurn) {
+          const { count } = await supabaseAdmin
+            .from("generation_queue")
+            .select("*", { count: "exact", head: true })
+            .or(`priority.gt.${priority},and(priority.eq.${priority},created_at.lt.${queueItem.created_at})`)
+            .eq("status", "pending");
 
-    // DB 저장: 상세 성능 지표 포함
-    await supabaseAdmin.from("characters").insert({ 
-      user_id: userId, 
-      image_url: publicUrl, 
-      prompt, 
-      selection: body, 
-      seed,
-      inference_time: metadata.inferenceTime,
-      cost: metadata.cost
-    });
+          const position = (count || 0) + 1;
+          sendStatus({ status: "queued", position, plan: userPlan });
 
-    await supabaseAdmin.from("profiles").update({ credits: newBalance }).eq("id", userId);
-    
-    // 로그에 상세 사용량 기록
-    await supabaseAdmin.from("credit_logs").insert({ 
-      user_id: userId, 
-      amount: -30, 
-      current_balance: newBalance, 
-      type: "usage", 
-      description: `캐릭터 소환 (추론: ${metadata.inferenceTime.toFixed(2)}s, 비용: $${metadata.cost?.toFixed(4)})` 
-    });
+          const { count: processingCount } = await supabaseAdmin
+            .from("generation_queue")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "processing");
 
-    return NextResponse.json({ 
-      imageUrl: publicUrl, 
-      seed, 
-      prompt, 
-      newBalance,
-      inferenceTime: metadata.inferenceTime,
-      cost: metadata.cost
-    });
+          if (position === 1 && (processingCount || 0) < 3) isMyTurn = true;
+          else await new Promise(res => setTimeout(res, 2000));
+        }
 
-  } catch (e: any) {
-    console.error("[generate] error:", e);
-    return NextResponse.json({ error: e.message || "이미지 처리 중 오류가 발생했습니다." }, { status: 500 });
-  }
+        // 4. 생성 시작
+        await supabaseAdmin.from("generation_queue").update({ status: "processing" }).eq("id", queueItemId);
+        sendStatus({ status: "processing" });
+
+        const seed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
+        const prompt = buildPrompt(body);
+        const baseRes = resolution === "2K" ? 2048 : resolution === "1K" ? 1024 : 512;
+        
+        const generator = getGenerator();
+        const result = await generator.generate({ prompt, width: baseRes, height: baseRes, seed, referenceImage: body.referenceImage });
+        
+        const fileName = `${userId}/${Date.now()}-${seed}.png`;
+        await supabaseAdmin.storage.from("characters").upload(fileName, result.buffer, { contentType: "image/png" });
+        const publicUrl = supabaseAdmin.storage.from("characters").getPublicUrl(fileName).data.publicUrl;
+
+        // 5. 완료 처리
+        await Promise.all([
+          supabaseAdmin.from("characters").insert({ user_id: userId, image_url: publicUrl, prompt, selection: body, seed }),
+          supabaseAdmin.from("credit_logs").insert({ user_id: userId, amount: -30, type: "usage", description: "캐릭터 소환 성공" }),
+          supabaseAdmin.from("generation_queue").delete().eq("id", queueItemId)
+        ]);
+
+        sendStatus({ status: "completed", imageUrl: publicUrl, seed });
+        controller.close();
+
+      } catch (e: any) {
+        console.error("[generate] error:", e);
+        
+        // ❌ 작업 실패 시 환불 로직
+        if (isDeducted && userId) {
+          const { data: currentProfile } = await supabaseAdmin.from("profiles").select("credits").eq("id", userId).single();
+          const refundedBalance = (currentProfile?.credits || 0) + 30;
+          await Promise.all([
+            supabaseAdmin.from("profiles").update({ credits: refundedBalance }).eq("id", userId),
+            supabaseAdmin.from("credit_logs").insert({ user_id: userId, amount: 30, type: "refund", description: `생성 실패 환불: ${e.message}` })
+          ]);
+          sendStatus({ status: "refunded", newBalance: refundedBalance, message: e.message });
+        } else {
+          sendStatus({ status: "error", message: e.message });
+        }
+
+        if (queueItemId) await supabaseAdmin.from("generation_queue").delete().eq("id", queueItemId);
+        controller.close();
+      }
+    }
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" }
+  });
 }
