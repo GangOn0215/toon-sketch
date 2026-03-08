@@ -34,6 +34,7 @@ function CheckoutContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ function CheckoutContent() {
   }, [supabase, router]);
 
   const handlePayment = async () => {
+    if (!selectedMethod) return alert("결제 수단을 선택해주세요.");
     if (!agreed) return alert("결제 약관에 동의해주세요.");
     if (!user || !product) return alert("결제 정보가 올바르지 않습니다.");
 
@@ -58,6 +60,12 @@ function CheckoutContent() {
     try {
       const tossPayments = await loadTossPayments(clientKey);
       const customerKey = user.id.replace(/[^a-zA-Z0-9-_]/g, "_");
+
+      // 실제 연동 시 selectedMethod에 따라 분기 처리 필요
+      // 현재는 Toss SDK의 '카드' 결제를 기본으로 사용
+      const methodLabel = selectedMethod === "card" ? "카드" : 
+                         selectedMethod === "kakaopay" ? "카카오페이" :
+                         selectedMethod === "naverpay" ? "네이버페이" : "카드";
 
       if (type === "plan") {
         // [정기 결제] 카드 등록 및 빌링키 발급 요청
@@ -71,7 +79,7 @@ function CheckoutContent() {
       } else {
         // [단발 결제] 일반 상품 구매 요청
         const orderId = `PAY_${Date.now()}_${user.id.substring(0, 8)}`.toUpperCase();
-        await tossPayments.requestPayment("카드", {
+        await tossPayments.requestPayment(methodLabel, {
           amount: Number(product.price),
           orderId: orderId,
           orderName: product.name,
@@ -109,14 +117,14 @@ function CheckoutContent() {
         </header>
 
         <OrderSummary item={product} />
-        <PaymentMethods selectedMethod="card" onSelect={() => {}} />
+        <PaymentMethods selectedMethod={selectedMethod} onSelect={setSelectedMethod} />
         <CheckoutTerms agreed={agreed} onToggle={() => setAgreed(!agreed)} />
 
         <button 
           onClick={handlePayment}
           disabled={isProcessing}
           className="btn-dark"
-          style={{ width: "100%", height: "64px", fontSize: "18px", borderRadius: "20px", background: agreed ? "var(--accent)" : "var(--subtle)", color: "#fff", cursor: agreed ? "pointer" : "not-allowed" }}
+          style={{ width: "100%", height: "64px", fontSize: "18px", borderRadius: "20px", background: (agreed && selectedMethod) ? "var(--accent)" : "var(--subtle)", color: "#fff", cursor: (agreed && selectedMethod) ? "pointer" : "not-allowed" }}
         >
           {isProcessing ? "결제창으로 이동 중..." : `${Number(product.price).toLocaleString()}원 결제하기`}
         </button>
