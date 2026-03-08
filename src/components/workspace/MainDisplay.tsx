@@ -25,12 +25,17 @@ export function MainDisplay({
 }: MainDisplayProps) {
   const isSheetMode = selection.mode === "캐릭터 시트" || selection.mode === "캐릭터 시트 (3장)";
 
+  // 실시간 선택 태그 미리보기 (모든 선택된 옵션 표시)
+  const activeTags = Object.entries(selection)
+    .filter(([key, value]) => value) // 값이 있는 모든 항목 표시
+    .map(([key, value]) => ({ key, value: value as string }));
+
   return (
     <div style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, paddingRight: 20, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
 
       {/* 상단 바 */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{selection.mode}</h2>
+        <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{selection.mode || "모드 선택 대기 중"}</h2>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {usage && (
             <div style={{ fontSize: 11, color: "var(--subtle)", padding: "0 8px", borderRight: "1px solid var(--border)", display: "flex", gap: "10px" }}>
@@ -49,6 +54,19 @@ export function MainDisplay({
             </button>
           )}
         </div>
+      </div>
+
+      {/* 실시간 선택 태그 미리보기 */}
+      <div style={{ marginBottom: 20, display: "flex", flexWrap: "wrap", gap: 6, minHeight: 32 }}>
+        {activeTags.length > 0 ? (
+          activeTags.map(({ key, value }) => (
+            <span key={key} style={{ fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 100, background: "var(--al)", color: "var(--accent)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ opacity: 0.5, fontSize: 9 }}>#</span>{value}
+            </span>
+          ))
+        ) : (
+          <span style={{ fontSize: 11, color: "var(--subtle)", opacity: 0.6, fontStyle: "italic" }}>왼쪽에서 옵션을 선택하여 빌드를 시작하세요...</span>
+        )}
       </div>
 
       {/* 메인 이미지 영역 */}

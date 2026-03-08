@@ -23,14 +23,14 @@ export default function WorkspacePage() {
   const [user, setUser] = useState<any>(null);
   const [userPlan, setUserPlan] = useState<any>("free");
   const [credits, setCredits] = useState<number>(0);
-  const [resolution, setResolution] = useState<"0.5K" | "1K" | "2K">("0.5K");
+  const [resolution, setResolution] = useState<string>("");
 
   const [selection, setSelection] = useState<Record<string, string>>({
-    mode: "캐릭터 시트", ratio: "16:9", background: "단색 (화이트)", style: "애니메이션", shot: "전체 샷", pose: "기본 정자세",
-    gender: "여성", ethnicity: "없음", age: "청년", race: "인간", job: "없음",
-    body: "보통 체형", hairStyle: "단발", hairColor: "흑발", eyeColor: "흑안/갈안",
-    impression: "순한", expression: "미소", clothing: "스트릿 패션",
-    mainColor: "화이트", shoeType: "없음", shoeColor: "블랙", acc: "없음", vibe: "우아한",
+    mode: "", ratio: "", background: "", style: "", shot: "", pose: "",
+    gender: "", ethnicity: "", age: "", race: "", job: "",
+    body: "", hairStyle: "", hairColor: "", eyeColor: "",
+    impression: "", expression: "", clothing: "",
+    mainColor: "", shoeType: "", shoeColor: "", acc: "", vibe: "",
   });
   
   const [lockedOptions, setLockedOptions] = useState<Record<string, boolean>>({});
@@ -91,6 +91,15 @@ export default function WorkspacePage() {
   const bulkSetLocks = (keys: string[], value: boolean) => setLockedOptions(prev => { const next = { ...prev }; keys.forEach(k => { next[k] = value; }); return next; });
 
   async function handleGenerate() {
+    // 필수 선택 항목 체크 (시스템 옵션 및 주요 특징)
+    const essentialKeys = ["mode", "style", "gender", "race", "age"];
+    const missing = essentialKeys.filter(k => !selection[k]);
+    
+    if (missing.length > 0) {
+      setError("필수 항목(생성 모드, 화풍, 성별, 종족, 연령대)을 모두 선택해주세요.");
+      return;
+    }
+
     if (credits < 30) { 
       setShowTopupModal(true); 
       return; 
@@ -109,7 +118,8 @@ export default function WorkspacePage() {
         body: JSON.stringify({
           ...selection, seed: targetSeed,
           resolution: (userPlan === "pro" || userPlan === "premium") ? resolution : "0.5K",
-          plan: userPlan, userId: user.id
+          plan: userPlan, userId: user.id,
+          referenceImage: lockedSeed ? imageUrl : null // 시드 고정 시 현재 이미지를 레퍼런스로 전달
         }),
       });
 
