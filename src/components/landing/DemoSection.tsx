@@ -48,13 +48,17 @@ function ChipGroup({ label, options, selected, onSelect }: {
 }
 
 export function DemoSection() {
-  const [race, setRace]   = useState("엘프");
-  const [job, setJob]     = useState("마법사");
-  const [style, setStyle] = useState("웹툰스타일");
+  const [race, setRace]   = useState("");
+  const [job, setJob]     = useState("");
+  const [style, setStyle] = useState("");
   const [seed, setSeed]   = useState("#7482-ELF-MAG");
   const [loading, setLoading] = useState(false);
 
   function handleSummon() {
+    if (!race || !job || !style) {
+      alert("종족, 직업, 스타일을 모두 선택해주세요!");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       const n = Math.floor(Math.random() * 9000) + 1000;
