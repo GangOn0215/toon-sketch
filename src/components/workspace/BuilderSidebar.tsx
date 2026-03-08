@@ -234,7 +234,7 @@ export function BuilderSidebar({
 
       </div>
 
-      <div style={{ height: 40 }} />
+      <div style={{ height: 24 }} />
 
       {/* 해상도 */}
       <div style={{ marginBottom: 24, padding: "16px", background: "var(--bg2)", borderRadius: "12px", border: "1px solid var(--border)" }}>
@@ -263,11 +263,20 @@ export function BuilderSidebar({
         </div>
       </div>
 
-      {/* Seed */}
+      {/* Seed Lock (캐릭터 고정) - 생성 버튼 바로 위로 이동하여 시인성 강화 */}
       {seed !== null && (
-        <div style={{ marginBottom: 20, padding: "14px 16px", background: "var(--bg2)", borderRadius: 8, border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--subtle)", marginBottom: 4 }}>Seed</div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginBottom: 10 }}>#{seed}</div>
+        <div style={{ 
+          marginBottom: 16, padding: "16px", background: isLocked ? "var(--al)" : "var(--bg2)", 
+          borderRadius: 12, border: isLocked ? "1.5px solid var(--accent)" : "1.5px dashed var(--border)",
+          transition: "all 0.2s"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", color: isLocked ? "var(--accent)" : "var(--subtle)" }}>
+              CURRENT CHARACTER
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)" }}>#{seed}</div>
+          </div>
+          
           <button
             onClick={() => {
               if (userPlan !== "premium" && userPlan !== "pro") {
@@ -277,21 +286,26 @@ export function BuilderSidebar({
               setLockedSeed(isLocked ? null : seed);
             }}
             style={{
-              fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 6, border: "1.5px solid",
-              cursor: "pointer", transition: "all .15s",
-              borderColor: isLocked ? "var(--accent)" : "var(--border)",
-              background: isLocked ? "var(--al)" : "transparent",
-              color: isLocked ? "var(--accent)" : (userPlan !== "premium" && userPlan !== "pro" ? "var(--subtle)" : "var(--muted)"),
-              opacity: (userPlan !== "premium" && userPlan !== "pro" && !isLocked) ? 0.5 : 1
+              width: "100%", padding: "10px", borderRadius: 8, border: "none",
+              fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all .2s",
+              background: isLocked ? "var(--accent)" : "var(--bg)",
+              color: isLocked ? "#fff" : "var(--text)",
+              boxShadow: isLocked ? "0 4px 12px rgba(var(--accent-rgb), 0.3)" : "none"
             }}
           >
-            {isLocked ? "🔒 캐릭터 고정 중" : "이 캐릭터 유지하기"}
-            {(userPlan !== "premium" && userPlan !== "pro") && <span style={{ fontSize: "9px", marginLeft: "6px", color: "var(--accent)" }}>Pro</span>}
+            {isLocked ? "🔒 이 캐릭터 고정 중" : "✨ 이 캐릭터 외형 유지하기"}
+            {(userPlan !== "premium" && userPlan !== "pro") && (
+              <span style={{ fontSize: 9, marginLeft: 6, opacity: 0.7 }}>PRO</span>
+            )}
           </button>
+          
+          <p style={{ fontSize: 10, color: "var(--subtle)", marginTop: 8, textAlign: "center", lineHeight: 1.4 }}>
+            {isLocked ? "새로 소환해도 이 캐릭터의 얼굴과 특징이 유지됩니다." : "현재 캐릭터의 특징을 다음 소환에도 사용합니다."}
+          </p>
         </div>
       )}
 
-      <button className="btn-dark" onClick={handleGenerate} disabled={loading} style={{ width: "100%", opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40 }}>
+      <button className="btn-dark" onClick={handleGenerate} disabled={loading} style={{ width: "100%", height: 56, fontSize: 16, fontWeight: 700, opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40, boxShadow: "0 10px 20px -10px var(--accent)" }}>
         {loading ? "생성 중..." : "✦ 캐릭터 소환 (30🪙)"}
       </button>
     </aside>
