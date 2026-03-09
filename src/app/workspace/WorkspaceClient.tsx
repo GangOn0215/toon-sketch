@@ -9,12 +9,16 @@ import { UserMenu } from "@/components/UserMenu";
 import { PlanBadge } from "@/components/PlanBadge";
 import { createClient } from "@/utils/supabase/client";
 
+import dynamic from "next/dynamic";
+
 // Workspace Components
 import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
-import { ImageModal } from "@/components/workspace/ImageModal";
-import { TopupModal } from "@/components/workspace/TopupModal";
-import { GenerationModal } from "@/components/workspace/GenerationModal";
+
+// Dynamic Imports for Modals (Reduced initial JS)
+const ImageModal = dynamic(() => import("@/components/workspace/ImageModal").then(mod => mod.ImageModal), { ssr: false });
+const TopupModal = dynamic(() => import("@/components/workspace/TopupModal").then(mod => mod.TopupModal), { ssr: false });
+const GenerationModal = dynamic(() => import("@/components/workspace/GenerationModal").then(mod => mod.GenerationModal), { ssr: false });
 
 type HistoryItem = { id: string; imageUrl: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
