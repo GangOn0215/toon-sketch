@@ -241,7 +241,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
         </div>
       </nav>
 
-      <main style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
+      <main className="page-fade-in" style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
         <BuilderSidebar
           selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} bulkSetLocks={bulkSetLocks}
           userPlan={userPlan} resolution={resolution} setResolution={setResolution} seed={seed}

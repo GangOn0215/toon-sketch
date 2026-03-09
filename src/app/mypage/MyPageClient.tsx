@@ -90,13 +90,19 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
         </div>
       </nav>
 
-      <main style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>
+      <main className="page-fade-in" style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "32px", fontWeight: "700", marginBottom: "40px" }}>마이페이지</h1>
 
-        <MyProfile user={user} profile={profile} />
-        <CreditTopup isTopupLoading={false} />
-        <CharacterGallery characters={characters} profile={profile} />
-        <UsageLogs logs={logs} />
+        <div className="page-fade-in stagger-1">
+          <MyProfile user={user} profile={profile} />
+        </div>
+        <div className="page-fade-in stagger-2">
+          <CreditTopup isTopupLoading={false} />
+        </div>
+        <div className="page-fade-in stagger-3">
+          <CharacterGallery characters={characters} profile={profile} />
+          <UsageLogs logs={logs} />
+        </div>
       </main>
     </div>
   );
