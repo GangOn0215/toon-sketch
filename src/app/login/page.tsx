@@ -24,6 +24,30 @@ export default function LoginPage() {
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    // 인앱 브라우저 감지 및 외부 브라우저 유도 (구글 로그인 정책 준수)
+    const ua = navigator.userAgent.toLowerCase();
+    const isKakaotalk = ua.indexOf("kakaotalk") !== -1;
+    const isLine = ua.indexOf("line") !== -1;
+    const isInApp = isKakaotalk || isLine;
+
+    if (isInApp) {
+      if (isKakaotalk) {
+        // 카카오톡은 커스텀 스키마를 통해 외부 브라우저를 열 수 있음
+        window.location.href = `kakaotalk://web/openExternalApp?url=${encodeURIComponent(window.location.href)}`;
+      } else {
+        // 기타 인앱 브라우저 처리 (일반적인 방식)
+        const newUrl = window.location.href;
+        if (ua.match(/iphone|ipad|ipod/)) {
+          // iOS는 특별한 처리가 어려우나 안내 문구라도 띄울 수 있음 (여기서는 자동 시도 생략)
+        } else {
+          // 안드로이드 의도(Intent) 스키마
+          window.location.href = `intent://${newUrl.replace(/https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+        }
+      }
+    }
+  }, []);
+
   const formatPhoneNumber = (num: string) => {
     const cleaned = num.replace(/\D/g, "");
     if (cleaned.startsWith("0")) return "+82" + cleaned.slice(1);
