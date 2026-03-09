@@ -122,7 +122,7 @@ export function BuilderSidebar({
   );
 
   return (
-    <aside style={{ borderRight: "1px solid var(--border)", paddingRight: 36, paddingTop: 48, paddingBottom: 48, display: "flex", flexDirection: "column", gap: 0, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
+    <aside className="sidebar-container" style={{ borderRight: "1px solid var(--border)", paddingRight: 36, paddingTop: 48, paddingBottom: 48, display: "flex", flexDirection: "column", gap: 0, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
       <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, marginBottom: 20 }}>캐릭터 빌더</h1>
 
       {/* 탭 */}
@@ -263,7 +263,7 @@ export function BuilderSidebar({
         </div>
       </div>
 
-      {/* Seed Lock (캐릭터 고정) - 생성 버튼 바로 위로 이동하여 시인성 강화 */}
+      {/* Seed Lock (캐릭터 고정) */}
       {seed !== null && (
         <div style={{ 
           marginBottom: 16, padding: "16px", background: isLocked ? "var(--al)" : "var(--bg2)", 
@@ -298,14 +298,15 @@ export function BuilderSidebar({
               <span style={{ fontSize: 9, marginLeft: 6, opacity: 0.7 }}>PRO</span>
             )}
           </button>
-          
-          <p style={{ fontSize: 10, color: "var(--subtle)", marginTop: 8, textAlign: "center", lineHeight: 1.4 }}>
-            {isLocked ? "새로 소환해도 이 캐릭터의 얼굴과 특징이 유지됩니다." : "현재 캐릭터의 특징을 다음 소환에도 사용합니다."}
-          </p>
         </div>
       )}
 
-      <button className="btn-dark" onClick={handleGenerate} disabled={loading} style={{ width: "100%", height: 56, fontSize: 16, fontWeight: 700, opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40, boxShadow: "0 10px 20px -10px var(--accent)" }}>
+      <button 
+        className="btn-dark workspace-summon-btn" 
+        onClick={handleGenerate} 
+        disabled={loading} 
+        style={{ width: "100%", height: 56, fontSize: 16, fontWeight: 700, opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", marginBottom: 40, boxShadow: "0 10px 20px -10px var(--accent)" }}
+      >
         {loading ? "생성 중..." : "✦ 캐릭터 소환 (30🪙)"}
       </button>
     </aside>

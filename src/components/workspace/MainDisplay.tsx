@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 interface MainDisplayProps {
   selection: any;
@@ -30,13 +31,16 @@ export function MainDisplay({
     .filter(([key, value]) => value) // 값이 있는 모든 항목 표시
     .map(([key, value]) => ({ key, value: value as string }));
 
+  // 최근 기록 6개로 제한
+  const recentHistory = history.slice(0, 6);
+
   return (
-    <div style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, paddingRight: 20, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
+    <div className="display-container" style={{ paddingLeft: 40, paddingTop: 48, paddingBottom: 48, paddingRight: 20, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
 
       {/* 상단 바 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <h2 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{selection.mode || "모드 선택 대기 중"}</h2>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           {usage && (
             <div style={{ fontSize: 11, color: "var(--subtle)", padding: "0 8px", borderRight: "1px solid var(--border)", display: "flex", gap: "10px" }}>
               <span>Cost: <strong>${usage.cost.toFixed(4)}</strong></span>
@@ -45,12 +49,12 @@ export function MainDisplay({
           )}
           {lastPrompt && (
             <button onClick={onCopyActualPrompt} style={{ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 6, border: "1.5px solid var(--border)", background: copiedDev ? "var(--al)" : "var(--bg2)", color: copiedDev ? "var(--accent)" : "var(--subtle)", cursor: "pointer", transition: "all .15s" }}>
-              {copiedDev ? "✓ 실제 프롬프트 복사됨" : "🛠 실제 프롬프트 (Dev)"}
+              {copiedDev ? "✓ 복사됨" : "🛠 프롬프트 (Dev)"}
             </button>
           )}
           {imageUrl && (
             <button onClick={onCopyVideoPrompt} style={{ fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 6, border: "1.5px solid var(--border)", background: copied ? "var(--al)" : "transparent", color: copied ? "var(--accent)" : "var(--muted)", cursor: "pointer", transition: "all .15s" }}>
-              {copied ? "✓ 복사됨" : "📋 영상 AI 프롬프트 복사"}
+              {copied ? "✓ 복사됨" : "📋 영상 AI 프롬프트"}
             </button>
           )}
         </div>
@@ -93,11 +97,17 @@ export function MainDisplay({
             <button onClick={onClearHistory} style={{ fontSize: 11, color: "var(--subtle)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>기록 지우기</button>
           </div>
           <div className="history-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
-            {history.map((item) => {
+            {recentHistory.map((item) => {
               return (
                 <div key={item.id} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s" }} onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-4px)")} onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}>
                   <div onClick={() => onImageClick(item.imageUrl)} style={{ position: "relative", aspectRatio: "1/1", background: "#000", cursor: "zoom-in" }}>
-                    <Image src={item.thumbnailUrl || item.imageUrl} alt="기록" fill style={{ objectFit: "cover", opacity: 0.8 }} />
+                    <Image 
+                      src={item.thumbnailUrl || item.imageUrl} 
+                      alt="기록" 
+                      fill 
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 200px"
+                      style={{ objectFit: "cover", opacity: 0.8 }} 
+                    />
                   </div>
                   <div onClick={() => onRestoreHistory(item)} style={{ padding: 8, cursor: "pointer" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 2 }}>{item.selection.gender} {item.selection.age}</div>
@@ -107,6 +117,19 @@ export function MainDisplay({
               );
             })}
           </div>
+          
+          {history.length > 6 && (
+            <div style={{ marginTop: 32, textAlign: "center" }}>
+              <Link 
+                href="/mypage/gallery" 
+                style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", padding: "10px 24px", borderRadius: "8px", border: "1.5px solid var(--border)", background: "var(--bg)", display: "inline-block", textDecoration: "none", transition: "all .2s" }}
+                onMouseOver={(e) => { e.currentTarget.style.background = "var(--al)"; e.currentTarget.style.borderColor = "var(--accent)"; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = "var(--bg)"; e.currentTarget.style.borderColor = "var(--border)"; }}
+              >
+                더 많은 기록 확인하기 (갤러리 이동)
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>

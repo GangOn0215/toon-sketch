@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { buildPrompt } from "../api/generate/prompt-maps";
@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 // Workspace Components
 import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
+import { Nav } from "@/components/landing/Nav";
 
 // Dynamic Imports for Modals (Reduced initial JS)
 const ImageModal = dynamic(() => import("@/components/workspace/ImageModal").then(mod => mod.ImageModal), { ssr: false });
@@ -63,6 +64,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const [modalImage, setModalImage] = useState<string | null>(null);
   
   const [showTopupModal, setShowTopupModal] = useState(false);
+  const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -192,6 +194,11 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
               };
               setHistory((prev) => [newItem, ...prev]);
               setQueueStatus("completed");
+              
+              // 결과 생성 완료 시 결과 영역으로 스크롤 (모바일 대응)
+              setTimeout(() => {
+                displayRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 100);
             } else if (data.status === "refunded") {
               setCredits(data.newBalance);
               setQueueStatus("refunded");
@@ -226,29 +233,9 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <nav>
-        <div className="nav-wrap">
-          <Link className="logo" href="/">툰 스케치<em>.</em></Link>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {authLoading ? (
-              <div style={{ width: "60px" }} />
-            ) : !user ? (
-              <button className="nav-btn ghost" onClick={() => router.push("/login")} style={{ background: "none", border: "1px solid var(--border)", padding: "6px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer", color: "var(--muted)" }}>로그인</button>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <button onClick={() => setShowTopupModal(true)} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "4px 12px", borderRadius: "8px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "700", color: "var(--text)", cursor: "pointer" }}>
-                  <span style={{ color: "#F59E0B" }}>🪙</span> {credits.toLocaleString()} <span style={{ fontSize: "10px", color: "var(--accent)", marginLeft: "4px" }}>+</span>
-                </button>
-                <PlanBadge plan={userPlan} />
-                <UserMenu user={user} profile={profile} />
-              </div>
-            )}
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Nav isLoggedIn={!!user} user={user} profile={profile} credits={credits} onTopupClick={() => setShowTopupModal(true)} />
 
-      <main className="page-fade-in" style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
+      <main className="page-fade-in workspace-main" style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
         <BuilderSidebar
           selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} bulkSetLocks={bulkSetLocks}
           userPlan={userPlan} resolution={resolution} setResolution={setResolution} seed={seed}
@@ -256,13 +243,15 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           loading={loading} handleGenerate={handleGenerate}
         />
         
-        <MainDisplay
-          selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl}
-          loading={loading} history={history} onCopyActualPrompt={copyActualPrompt}
-          onCopyVideoPrompt={copyVideoPrompt} onImageClick={setModalImage}
-          onRestoreHistory={restoreFromHistory} onClearHistory={clearHistory}
-          copiedDev={copiedDev} copied={copied}
-        />
+        <div ref={displayRef} className="display-container-wrapper" style={{ width: "100%" }}>
+          <MainDisplay
+            selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl}
+            loading={loading} history={history} onCopyActualPrompt={copyActualPrompt}
+            onCopyVideoPrompt={copyVideoPrompt} onImageClick={setModalImage}
+            onRestoreHistory={restoreFromHistory} onClearHistory={clearHistory}
+            copiedDev={copiedDev} copied={copied}
+          />
+        </div>
       </main>
 
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan={userPlan} />
