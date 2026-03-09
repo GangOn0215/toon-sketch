@@ -1,10 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
 export function GallerySection() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <section id="gallery" style={{ padding: "120px 0", background: "var(--bg2)", overflow: "hidden" }}>
       <div className="container" style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
