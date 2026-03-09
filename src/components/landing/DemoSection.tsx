@@ -12,9 +12,9 @@ const RACE_MAP: Record<string, string> = { 엘프: "ELF", 인간: "HUM", 드래�
 const JOB_MAP: Record<string, string>  = { 전사: "WAR", 마법사: "MAG", 궁수: "ARC", 암살자: "ASN" };
 
 const SAMPLE_IMAGES = ["/images/sample1.png", "/images/sample2.png", "/images/sample3.png"];
-
 function SampleSlide({ src, index }: { src: string; index: number }) {
   const [errored, setErrored] = useState(false);
+
   return (
     <div style={{ width: "100%", height: "100%", background: "var(--bg2)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
       {errored ? (
@@ -34,7 +34,6 @@ function SampleSlide({ src, index }: { src: string; index: number }) {
     </div>
   );
 }
-
 function ChipGroup({ label, options, selected, onSelect }: {
   label: string;
   options: string[];
@@ -59,7 +58,7 @@ export function DemoSection() {
   const [race, setRace]   = useState("");
   const [job, setJob]     = useState("");
   const [style, setStyle] = useState("");
-  const [seed, setSeed]   = useState("#7482-ELF-MAG");
+  const [seed, setSeed]   = useState("");
   const [loading, setLoading] = useState(false);
 
   function handleSummon() {
@@ -77,20 +76,20 @@ export function DemoSection() {
 
   return (
     <section id="demo" style={{ padding: "100px 24px", borderTop: "1px solid var(--border)", overflowX: "hidden" }}>
-      <div className="container" style={{ maxWidth: "1000px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
+      <div className="container" style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px", alignItems: "end" }}>
         <div className="reveal">
-          <h2 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "24px" }}>클릭 몇 번으로 완성되는<br />전문가급 캐릭터 시트</h2>
-          <div className="w-builder" style={{ background: "var(--bg2)", padding: "32px", borderRadius: "24px", border: "1px solid var(--border)" }}>
+          <h2 style={{ fontSize: "clamp(24px, 5vw, 32px)", fontWeight: "700", marginBottom: "24px", letterSpacing: "-0.5px" }}>클릭 몇 번으로 완성되는<br />전문가급 캐릭터 시트</h2>
+          <div className="w-builder" style={{ background: "var(--bg2)", padding: "clamp(20px, 5vw, 40px)", borderRadius: "28px", border: "1.5px solid var(--border)", boxShadow: "0 12px 40px rgba(0,0,0,0.04)" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               <ChipGroup label="종족" options={["인간", "엘프", "드래곤", "악마"]} selected={race} onSelect={setRace} />
               <ChipGroup label="직업" options={["전사", "마법사", "궁수", "암살자"]} selected={job} onSelect={setJob} />
               <ChipGroup label="스타일" options={["웹툰스타일", "애니메이션", "실사"]} selected={style} onSelect={setStyle} />
-              <button className="btn-dark" onClick={handleSummon} disabled={loading} style={{ width: "100%", height: "50px", marginTop: "12px" }}>{loading ? "소환 중..." : "캐릭터 소환하기"}</button>
+              <button className="btn-dark" onClick={handleSummon} disabled={loading} style={{ width: "100%", height: "56px", marginTop: "8px", borderRadius: "14px" }}>{loading ? "소환 중..." : "캐릭터 소환하기"}</button>
             </div>
           </div>
         </div>
-        <div className="reveal d2" style={{ position: "relative" }}>
-          <div className="summon-result" style={{ aspectRatio: "4/3", background: "var(--surface)", borderRadius: "24px", border: "1px solid var(--border)", overflow: "hidden", position: "relative" }}>
+        <div className="reveal d2" style={{ width: "100%" }}>
+          <div className="summon-result" style={{ aspectRatio: "4/3", background: "var(--surface)", borderRadius: "28px", border: "1.5px solid var(--border)", overflow: "hidden", position: "relative", boxShadow: "0 30px 60px rgba(0,0,0,0.08)" }}>
             {loading ? (
               <div style={{ width: "100%", height: "100%", background: "linear-gradient(90deg, var(--bg2) 25%, var(--surface) 50%, var(--bg2) 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />
             ) : (
@@ -108,9 +107,6 @@ export function DemoSection() {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-                <div style={{ position: "absolute", bottom: 14, left: 16, zIndex: 10, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", borderRadius: 8, padding: "4px 10px" }}>
-                  <p style={{ fontWeight: "700", color: "#fff", fontSize: "12px", letterSpacing: "0.5px", margin: 0 }}>SEED <span style={{ opacity: 0.75 }}>{seed}</span></p>
-                </div>
               </>
             )}
           </div>
