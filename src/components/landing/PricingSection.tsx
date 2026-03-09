@@ -55,9 +55,9 @@ export function PricingSection() {
     <section id="pricing" style={{ padding: "120px 24px", background: "var(--bg)", overflow: "hidden" }}>
       <div className="container" style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <span className="hero-tag reveal">Flexible Plans</span>
-          <h2 className="section-title reveal d1" style={{ fontSize: "42px", fontWeight: "700", marginTop: "16px", letterSpacing: "-1px" }}>작가를 위한 합리적인 선택</h2>
-          <p className="reveal d2" style={{ marginTop: "16px", color: "var(--subtle)", fontSize: "18px", maxWidth: "600px", margin: "16px auto 0", lineHeight: "1.6" }}>작업 규모에 맞는 플랜으로 상상을 현실로 만드세요.</p>
+          <span className={`hero-tag reveal ${mounted ? "show" : ""}`}>Flexible Plans</span>
+          <h2 className={`section-title reveal d1 ${mounted ? "show" : ""}`} style={{ fontSize: "42px", fontWeight: "700", marginTop: "16px", letterSpacing: "-1px" }}>작가를 위한 합리적인 선택</h2>
+          <p className={`reveal d2 ${mounted ? "show" : ""}`} style={{ marginTop: "16px", color: "var(--subtle)", fontSize: "18px", maxWidth: "600px", margin: "16px auto 0", lineHeight: "1.6" }}>작업 규모에 맞는 플랜으로 상상을 현실로 만드세요.</p>
         </div>
         <Swiper modules={[Pagination]} spaceBetween={30} slidesPerView={1.2} centeredSlides={true} initialSlide={2} pagination={{ clickable: true }}
           breakpoints={{ 768: { slidesPerView: 2.5 }, 1024: { slidesPerView: 3.5 }, 1280: { slidesPerView: 4.2 } }} className="pricing-swiper" style={{ padding: "40px 20px 80px", overflow: "visible" }}>
