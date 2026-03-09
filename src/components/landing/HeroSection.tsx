@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
+import Image from "next/image";
+
 interface HeroSectionProps {
   isLoggedIn: boolean;
 }
@@ -29,9 +31,17 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
           <div className="hero-main-box">
             <div className="hero-single-container">
               <div className="hero-card c1">
-                <div className="hero-image-wrap">
-                  {/* 이곳의 src를 실제 이미지 경로로 바꾸시면 됩니다 */}
-                  <img src="/images/sample.png" alt="Hero Character" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", margin: "0 auto" }} />
+                <div className="hero-image-wrap" style={{ position: "relative", width: "100%", height: "100%" }}>
+                  <Image 
+                    src="/images/sample.png" 
+                    alt="Hero Character" 
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectFit: "cover" }}
+                    // @ts-ignore
+                    fetchPriority="high"
+                  />
                 </div>
                 <span className="card-label">Character Preview</span>
               </div>

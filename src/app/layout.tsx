@@ -8,18 +8,21 @@ const fraunces = Fraunces({
   weight: ["400", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-fraunces",
+  display: "swap",
 });
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-noto",
+  display: "swap",
 });
 
 const notoSerifKR = Noto_Serif_KR({
   subsets: ["latin"],
   weight: ["600", "700"],
   variable: "--font-noto-serif",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -35,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`}>
+      <body className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
