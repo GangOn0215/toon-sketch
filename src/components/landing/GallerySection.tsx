@@ -18,6 +18,12 @@ const SHOWCASE_IMAGES = [
   '/images/sample3.png',
   '/images/sample1.png',
   '/images/sample2.png',
+  '/images/sample.png',
+  '/images/sample1.png',
+  '/images/sample2.png',
+  '/images/sample3.png',
+  '/images/sample1.png',
+  '/images/sample2.png',
 ];
 
 export function GallerySection() {
@@ -40,19 +46,19 @@ export function GallerySection() {
       </div>
       <Swiper 
         modules={[Autoplay]} 
-        spaceBetween={30} 
-        slidesPerView={2.5} 
+        spaceBetween={20} 
+        slidesPerView={1.1} 
         centeredSlides={true}
         loop={true} 
-        speed={1200} // 전환 속도를 1.2초로 느리게 (더 부드러움)
+        speed={1200} // 전환 속도를 1.2초로 느리게
         autoplay={{ 
-          delay: 4500, // 다음 이미지까지 대기 시간을 4.5초로 연장
+          delay: 4500, 
           disableOnInteraction: false 
         }} 
         breakpoints={{ 
-          768: { slidesPerView: 3.5 }, 
-          1024: { slidesPerView: 4.5 }, 
-          1440: { slidesPerView: 5.5 } 
+          768: { slidesPerView: 1.8, spaceBetween: 40 }, 
+          1024: { slidesPerView: 2.2, spaceBetween: 50 }, 
+          1440: { slidesPerView: 2.5, spaceBetween: 50 } 
         }} 
         className="showcase-swiper"
       >
