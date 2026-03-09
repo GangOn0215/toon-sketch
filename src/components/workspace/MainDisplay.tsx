@@ -23,7 +23,7 @@ export function MainDisplay({
   loading, history, onCopyActualPrompt, onCopyVideoPrompt, onImageClick, onRestoreHistory, onClearHistory,
   copiedDev, copied
 }: MainDisplayProps) {
-  const isSheetMode = selection.mode === "캐릭터 시트" || selection.mode === "캐릭터 시트 (3장)";
+  const isSheetMode = selection.mode === "캐릭터 시트";
 
   // 실시간 선택 태그 미리보기 (모든 선택된 옵션 표시)
   const activeTags = Object.entries(selection)

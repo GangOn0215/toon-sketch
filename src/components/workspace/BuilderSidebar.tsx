@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const SYSTEM_OPTIONS = {
-  mode:       { label: "생성 모드", items: ["캐릭터 시트", "캐릭터 시트 (3장)", "일반 화보"] },
+  mode:       { label: "생성 모드", items: ["캐릭터 시트", "일반 화보"] },
   ratio:      { label: "이미지 비율", items: ["16:9", "9:16", "1:1", "4:3", "3:4"] },
 };
 
@@ -192,7 +192,7 @@ export function BuilderSidebar({
 
         {activeTab === "기본" && <>
           {Object.entries(PRIMARY_OPTIONS).map(([key, { label, items }]) => {
-            const isSheetMode = selection.mode === "캐릭터 시트" || selection.mode === "캐릭터 시트 (3장)";
+            const isSheetMode = selection.mode === "캐릭터 시트";
             if (key === "background" && isSheetMode) return null;
             if (key === "pose" && isSheetMode) return null;
             return (
@@ -237,12 +237,12 @@ export function BuilderSidebar({
       <div style={{ height: 24 }} />
 
       {/* 해상도 */}
-      <div style={{ marginBottom: 24, padding: "16px", background: "var(--bg2)", borderRadius: "12px", border: "1px solid var(--border)" }}>
+      <div style={{ marginBottom: 24, marginTop: 24, padding: "16px", background: "var(--bg2)", borderRadius: "12px", border: "1px solid var(--border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--accent)", letterSpacing: "1px" }}>RESOLUTION</span>
           {(userPlan !== "pro" && userPlan !== "premium") && <span style={{ fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "2px 6px", borderRadius: "4px" }}>Pro</span>}
         </div>
-        <div style={{ display: "flex", gap: "4px", background: "var(--bg)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", gap: "4px", background: "var(--bg)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border)", }}>
           {(["0.5K", "1K", "2K"] as const).map((r) => (
             <button
               key={r}

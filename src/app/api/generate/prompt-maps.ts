@@ -44,12 +44,6 @@ export const STYLE_TEMPLATES: Record<string, { prefix: string; suffix: string }>
   다크판타지: { prefix: "DARK FANTASY, grim, moody,", suffix: "dramatic shadows" }
 };
 
-const SHEET_VIEW = {
-  front: "FRONT VIEW, facing forward, full body, orthographic,",
-  side:  "SIDE PROFILE VIEW, facing right, full body, orthographic,",
-  back:  "BACK VIEW, seen from behind, full body, orthographic,",
-};
-
 function buildCore(s: any, randomBit: string) {
   return [
     `${ETHNICITY[s.ethnicity] || ""}${GENDER[s.gender] || ""} ${AGE[s.age] || ""},`,
@@ -68,27 +62,13 @@ function buildCore(s: any, randomBit: string) {
   ].filter(Boolean).join(" ");
 }
 
-export function buildSheetViewPrompt(s: any, view: "front" | "side" | "back") {
-  const template = STYLE_TEMPLATES[s.style] || { prefix: "", suffix: "" };
-  const variations = ["soft light", "natural shadow", "sharp detail", "rich color"];
-  const randomBit = variations[Math.floor(Math.random() * variations.length)];
-  const parts = [
-    template.prefix,
-    SHEET_VIEW[view],
-    buildCore(s, randomBit),
-    template.suffix,
-    "white background, simple background, masterpiece, 8k, best quality, consistent character design",
-  ];
-  return parts.filter(Boolean).join(" ").replace(/ ,/g, ",").replace(/,,+/g, ",").trim();
-}
-
 export function buildPrompt(s: any) {
   const template = STYLE_TEMPLATES[s.style] || { prefix: "", suffix: "" };
   const variations = ["soft light", "natural shadow", "sharp detail", "rich color"];
   const randomBit = variations[Math.floor(Math.random() * variations.length)];
 
   // 캐릭터 시트 모드: REF-SHEET 3-view 단일 이미지
-  if (s.mode === "캐릭터 시트" || s.mode === "캐릭터 시트 (3장)") {
+  if (s.mode === "캐릭터 시트") {
     const parts = [
       template.prefix,
       "character reference sheet, 3-panel side-by-side layout, [LEFT: FRONT VIEW facing forward] [CENTER: SIDE PROFILE facing right] [RIGHT: BACK VIEW from behind], same character, full body, orthographic,",
