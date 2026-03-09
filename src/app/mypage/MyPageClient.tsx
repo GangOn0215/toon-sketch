@@ -13,6 +13,7 @@ import { MyProfile } from "@/components/mypage/MyProfile";
 import { CreditTopup } from "@/components/mypage/CreditTopup";
 import { CharacterGallery } from "@/components/mypage/CharacterGallery";
 import { UsageLogs } from "@/components/mypage/UsageLogs";
+import { Nav } from "@/components/landing/Nav";
 
 interface MyPageClientProps {
   initialUser: any;
@@ -79,16 +80,12 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <nav>
-        <div className="nav-wrap">
-          <Link className="logo" href="/">툰 스케치<em>.</em></Link>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <PlanBadge plan={profile?.plan || "free"} />
-            <UserMenu user={user} profile={profile} />
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Nav 
+        isLoggedIn={!!user} 
+        user={user} 
+        profile={profile} 
+        credits={profile?.credits}
+      />
 
       <main className="page-fade-in" style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "32px", fontWeight: "700", marginBottom: "40px" }}>마이페이지</h1>

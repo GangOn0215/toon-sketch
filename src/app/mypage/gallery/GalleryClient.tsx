@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
 import { PlanBadge } from "@/components/PlanBadge";
+import { Nav } from "@/components/landing/Nav";
 
 interface GalleryClientProps {
   initialUser: any;
@@ -29,16 +30,12 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-      <nav>
-        <div className="nav-wrap">
-          <Link className="logo" href="/">툰 스케치<em>.</em></Link>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <PlanBadge plan={initialProfile?.plan || "free"} />
-            <UserMenu user={initialUser} profile={initialProfile} />
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Nav 
+        isLoggedIn={!!initialUser} 
+        user={initialUser} 
+        profile={initialProfile} 
+        credits={initialProfile?.credits}
+      />
 
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "120px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
@@ -64,7 +61,13 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
               return (
                 <div key={char.id} style={{ position: "relative", borderRadius: "20px", overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s" }}>
                   <div style={{ aspectRatio: "16/9", position: "relative", filter: expired ? "blur(10px) grayscale(1)" : "none" }}>
-                    <Image src={char.thumbnail_url || char.image_url} alt="캐릭터" fill style={{ objectFit: "cover" }} />
+                    <Image 
+                      src={char.thumbnail_url || char.image_url} 
+                      alt="캐릭터" 
+                      fill 
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      style={{ objectFit: "cover" }} 
+                    />
                   </div>
                   {expired && (
                     <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", padding: "20px", textAlign: "center" }}>

@@ -27,6 +27,7 @@ function SampleSlide({ src, index }: { src: string; index: number }) {
           src={src} 
           alt={`샘플 ${index + 1}`} 
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: "cover" }}
           onError={() => setErrored(true)} 
         />
