@@ -6,6 +6,8 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
+import Image from "next/image";
+
 const RACE_MAP: Record<string, string> = { 엘프: "ELF", 인간: "HUM", 드래곤: "DRG", 악마: "DMN" };
 const JOB_MAP: Record<string, string>  = { 전사: "WAR", 마법사: "MAG", 궁수: "ARC", 암살자: "ASN" };
 
@@ -14,14 +16,20 @@ const SAMPLE_IMAGES = ["/images/sample1.png", "/images/sample2.png", "/images/sa
 function SampleSlide({ src, index }: { src: string; index: number }) {
   const [errored, setErrored] = useState(false);
   return (
-    <div style={{ width: "100%", height: "100%", background: "var(--bg2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ width: "100%", height: "100%", background: "var(--bg2)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
       {errored ? (
         <div style={{ textAlign: "center", opacity: 0.35 }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>✦</div>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--subtle)" }}>Sample {index + 1}</div>
         </div>
       ) : (
-        <img src={src} alt={`샘플 ${index + 1}`} onError={() => setErrored(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        <Image 
+          src={src} 
+          alt={`샘플 ${index + 1}`} 
+          fill
+          style={{ objectFit: "cover" }}
+          onError={() => setErrored(true)} 
+        />
       )}
     </div>
   );
