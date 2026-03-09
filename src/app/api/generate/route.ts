@@ -101,18 +101,40 @@ export async function POST(req: Request) {
         const generator = getGenerator();
         const result = await generator.generate({ prompt, width: baseRes, height: baseRes, seed, referenceImage: body.referenceImage });
         
-        const fileName = `${userId}/${Date.now()}-${seed}.png`;
-        await supabaseAdmin.storage.from("characters").upload(fileName, result.buffer, { contentType: "image/png" });
-        const publicUrl = supabaseAdmin.storage.from("characters").getPublicUrl(fileName).data.publicUrl;
+        // 썸네일 생성 (400px, WebP 포맷으로 용량 최적화)
+        const thumbBuffer = await sharp(result.buffer)
+          .resize(400, 400, { fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toBuffer();
+
+        const timestamp = Date.now();
+        const origFileName = `${userId}/${timestamp}-${seed}-orig.png`;
+        const thumbFileName = `${userId}/${timestamp}-${seed}-thumb.webp`;
+
+        // 원본 및 썸네일 업로드
+        await Promise.all([
+          supabaseAdmin.storage.from("characters").upload(origFileName, result.buffer, { contentType: "image/png" }),
+          supabaseAdmin.storage.from("characters").upload(thumbFileName, thumbBuffer, { contentType: "image/webp" })
+        ]);
+
+        const imageUrl = supabaseAdmin.storage.from("characters").getPublicUrl(origFileName).data.publicUrl;
+        const thumbnailUrl = supabaseAdmin.storage.from("characters").getPublicUrl(thumbFileName).data.publicUrl;
 
         // 5. 완료 처리
         await Promise.all([
-          supabaseAdmin.from("characters").insert({ user_id: userId, image_url: publicUrl, prompt, selection: body, seed }),
+          supabaseAdmin.from("characters").insert({ 
+            user_id: userId, 
+            image_url: imageUrl, 
+            thumbnail_url: thumbnailUrl, 
+            prompt, 
+            selection: body, 
+            seed 
+          }),
           supabaseAdmin.from("credit_logs").insert({ user_id: userId, amount: -30, type: "usage", description: "캐릭터 소환 성공" }),
           supabaseAdmin.from("generation_queue").delete().eq("id", queueItemId)
         ]);
 
-        sendStatus({ status: "completed", imageUrl: publicUrl, seed });
+        sendStatus({ status: "completed", imageUrl, thumbnailUrl, seed });
         controller.close();
 
       } catch (e: any) {
