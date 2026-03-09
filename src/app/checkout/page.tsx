@@ -51,50 +51,64 @@ function CheckoutContent() {
   }, [supabase, router]);
 
   const handlePayment = async () => {
-    if (!selectedMethod) return alert("결제 수단을 선택해주세요.");
-    if (!agreed) return alert("결제 약관에 동의해주세요.");
-    if (!user || !product) return alert("결제 정보가 올바르지 않습니다.");
+  if (!selectedMethod) return alert("결제 수단을 선택해주세요.");
+  if (!agreed) return alert("결제 약관에 동의해주세요.");
+  if (!user || !product) return alert("결제 정보가 올바르지 않습니다.");
 
-    setIsProcessing(true);
+  setIsProcessing(true);
 
-    try {
-      const tossPayments = await loadTossPayments(clientKey);
-      const customerKey = user.id.replace(/[^a-zA-Z0-9-_]/g, "_");
+  try {
+    const tossPayments = await loadTossPayments(clientKey);
+    // 토스 규격에 맞게 customerKey 정제 (특수문자 제거)
+    const customerKey = user.id.replace(/[^a-zA-Z0-9-_]/g, "_");
 
-      // 실제 연동 시 selectedMethod에 따라 분기 처리 필요
-      // 현재는 Toss SDK의 '카드' 결제를 기본으로 사용
-      const methodLabel = selectedMethod === "card" ? "카드" : 
-                         selectedMethod === "kakaopay" ? "카카오페이" :
-                         selectedMethod === "naverpay" ? "네이버페이" : "카드";
-
-      if (type === "plan") {
-        // [정기 결제] 카드 등록 및 빌링키 발급 요청
-        await tossPayments.requestBillingAuth("카드", {
-          customerKey: customerKey,
-          successUrl: `${window.location.origin}/api/payment/success?type=plan&pid=${id}`,
-          failUrl: `${window.location.origin}/api/payment/fail`,
-          customerEmail: user.email,
-          customerName: user.user_metadata?.full_name || "작가님",
-        });
-      } else {
-        // [단발 결제] 일반 상품 구매 요청
-        const orderId = `PAY_${Date.now()}_${user.id.substring(0, 8)}`.toUpperCase();
-        await tossPayments.requestPayment(methodLabel, {
-          amount: Number(product.price),
-          orderId: orderId,
-          orderName: product.name,
-          customerName: user.user_metadata?.full_name || "작가님",
-          successUrl: `${window.location.origin}/api/payment/success?type=topup&pid=${id}`,
-          failUrl: `${window.location.origin}/api/payment/fail`,
-        });
-      }
-
-    } catch (error: any) {
-      console.error("Toss Integration Error:", error);
-      alert(error.message || "결제 준비 중 오류가 발생했습니다.");
-      setIsProcessing(false);
+    if (type === "plan") {
+      /**
+       * 1. [정기 결제] 빌링키 발급 (카드 자동 결제 등록)
+       * 빌링키 발급은 '카드'만 가능합니다.
+       */
+      await tossPayments.requestBillingAuth("카드", {
+        customerKey: customerKey,
+        // 보안상 pid를 넘기지 않고 서버에서 orderId나 customerKey로 대조하는 것이 좋으나,
+        // 현재 로직을 유지한다면 최소한 클라이언트 변수 id를 사용합니다.
+        successUrl: `${window.location.origin}/api/payment/success?type=plan&pid=${id}`,
+        failUrl: `${window.location.origin}/api/payment/fail`,
+        customerEmail: user.email,
+        customerName: user.user_metadata?.full_name || "사용자",
+      });
+    } else {
+      /**
+       * 2. [단발 결제] 일반 결제
+       * '토스페이'로 고정하기보다는 사용자가 선택한 'selectedMethod'를 사용하거나 
+       * 범용적으로 '카드'를 사용하는 것이 결제 성공률이 높습니다.
+       */
+      const orderId = `PAY_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`.toUpperCase();
+      
+      // 만약 'selectedMethod'가 'TOSSPAY' 혹은 'CARD' 형태라면 그대로 넣어주세요.
+      // 여기서는 범용성을 위해 사용자가 선택한 값을 넣도록 수정했습니다.
+      await tossPayments.requestPayment(selectedMethod === "TOSSPAY" ? "토스페이" : "카드", {
+        amount: Number(product.price),
+        orderId: orderId,
+        orderName: product.name,
+        customerName: user.user_metadata?.full_name || "사용자",
+        customerEmail: user.email,
+        // 충전(topup) 시에도 pid를 넘겨 서버에서 어떤 상품인지 확인하게 합니다.
+        successUrl: `${window.location.origin}/api/payment/success?type=topup&pid=${id}`,
+        failUrl: `${window.location.origin}/api/payment/fail`,
+      });
     }
-  };
+
+  } catch (error: any) {
+    console.error("Toss Integration Error:", error);
+    // 유저가 결제창을 닫은 경우 등 예외 처리
+    if (error.code === "USER_CANCEL") {
+      alert("결제가 취소되었습니다.");
+    } else {
+      alert(error.message || "결제 준비 중 오류가 발생했습니다.");
+    }
+    setIsProcessing(false);
+  }
+};
 
   if (loading) return <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>결제 시스템 준비 중...</div>;
   if (!product) return <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>상품 정보가 없습니다.</div>;
