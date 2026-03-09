@@ -97,7 +97,7 @@ export function MainDisplay({
               return (
                 <div key={item.id} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s" }} onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-4px)")} onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}>
                   <div onClick={() => onImageClick(item.imageUrl)} style={{ position: "relative", aspectRatio: "1/1", background: "#000", cursor: "zoom-in" }}>
-                    <Image src={item.imageUrl} alt="기록" fill style={{ objectFit: "cover", opacity: 0.8 }} />
+                    <Image src={item.thumbnailUrl || item.imageUrl} alt="기록" fill style={{ objectFit: "cover", opacity: 0.8 }} />
                   </div>
                   <div onClick={() => onRestoreHistory(item)} style={{ padding: 8, cursor: "pointer" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 2 }}>{item.selection.gender} {item.selection.age}</div>

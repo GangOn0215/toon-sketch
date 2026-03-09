@@ -64,7 +64,7 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
               return (
                 <div key={char.id} style={{ position: "relative", borderRadius: "20px", overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s" }}>
                   <div style={{ aspectRatio: "16/9", position: "relative", filter: expired ? "blur(10px) grayscale(1)" : "none" }}>
-                    <Image src={char.image_url} alt="캐릭터" fill style={{ objectFit: "cover" }} />
+                    <Image src={char.thumbnail_url || char.image_url} alt="캐릭터" fill style={{ objectFit: "cover" }} />
                   </div>
                   {expired && (
                     <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", padding: "20px", textAlign: "center" }}>

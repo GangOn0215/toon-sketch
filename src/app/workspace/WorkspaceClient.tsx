@@ -20,7 +20,7 @@ const ImageModal = dynamic(() => import("@/components/workspace/ImageModal").the
 const TopupModal = dynamic(() => import("@/components/workspace/TopupModal").then(mod => mod.TopupModal), { ssr: false });
 const GenerationModal = dynamic(() => import("@/components/workspace/GenerationModal").then(mod => mod.GenerationModal), { ssr: false });
 
-type HistoryItem = { id: string; imageUrl: string; selection: Record<string, string>; seed: number; timestamp: number; };
+type HistoryItem = { id: string; imageUrl: string; thumbnailUrl?: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
 interface WorkspaceClientProps {
   initialUser: any;
@@ -182,7 +182,14 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
             } else if (data.status === "completed") {
               setImageUrl(data.imageUrl);
               setSeed(data.seed);
-              const newItem: HistoryItem = { id: Date.now().toString(), imageUrl: data.imageUrl, selection: { ...selection }, seed: data.seed, timestamp: Date.now() };
+              const newItem: HistoryItem = { 
+                id: Date.now().toString(), 
+                imageUrl: data.imageUrl, 
+                thumbnailUrl: data.thumbnailUrl,
+                selection: { ...selection }, 
+                seed: data.seed, 
+                timestamp: Date.now() 
+              };
               setHistory((prev) => [newItem, ...prev]);
               setQueueStatus("completed");
             } else if (data.status === "refunded") {
