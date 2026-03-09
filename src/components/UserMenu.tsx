@@ -14,7 +14,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
   const [imgError, setImgError] = useState(false);
 
   // 외부 클릭 시 닫기
@@ -29,8 +29,18 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/"; // 세션 초기화를 위해 강제 리로드 이동
+    try {
+      setIsOpen(false);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // 클라이언트 상태 초기화를 위해 강제 리로드 및 이동
+      router.refresh(); // 서버 사이드 캐시 무효화
+      window.location.replace("/"); // 세션 초기화를 위해 히스토리 초기화하며 이동
+    } catch (error) {
+      console.error("로그아웃 중 에러 발생:", error);
+      alert("로그아웃 처리 중 에러가 발생했습니다.");
+    }
   };
 
   const avatarUrl = profile?.profile_image || user?.user_metadata?.avatar_url;
