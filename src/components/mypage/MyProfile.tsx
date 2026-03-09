@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { PlanBadge } from "@/components/PlanBadge";
+import { User } from "lucide-react";
 
 interface MyProfileProps {
   user: any;
@@ -8,11 +10,23 @@ interface MyProfileProps {
 }
 
 export function MyProfile({ user, profile }: MyProfileProps) {
+  const [imgError, setImgError] = useState(false);
+  const avatarUrl = profile?.profile_image || user?.user_metadata?.avatar_url;
+
   return (
     <section style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "24px", marginBottom: "64px" }}>
       <div style={{ background: "var(--bg2)", padding: "32px", borderRadius: "24px", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
-        <div style={{ width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden", border: "2px solid var(--border)" }}>
-          <img src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.email}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="User" />
+        <div style={{ width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden", border: "2px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}>
+          {(!avatarUrl || imgError) ? (
+            <User size={32} color="var(--muted)" />
+          ) : (
+            <img 
+              src={avatarUrl} 
+              style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+              alt="User" 
+              onError={() => setImgError(true)}
+            />
+          )}
         </div>
         <div>
           <div style={{ fontSize: "18px", fontWeight: "700" }}>{user?.user_metadata?.full_name || "작가님"}</div>

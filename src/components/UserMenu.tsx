@@ -3,16 +3,19 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "lucide-react";
 
 interface UserMenuProps {
   user: any;
+  profile?: any;
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, profile }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  const [imgError, setImgError] = useState(false);
 
   // 외부 클릭 시 닫기
   useEffect(() => {
@@ -30,6 +33,8 @@ export function UserMenu({ user }: UserMenuProps) {
     window.location.href = "/"; // 세션 초기화를 위해 강제 리로드 이동
   };
 
+  const avatarUrl = profile?.profile_image || user?.user_metadata?.avatar_url;
+
   return (
     <div style={{ position: "relative" }} ref={dropdownRef}>
       {/* 프로필 이미지 (트리거) */}
@@ -38,14 +43,20 @@ export function UserMenu({ user }: UserMenuProps) {
         style={{ 
           width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", 
           border: isOpen ? "2px solid var(--accent)" : "1px solid var(--border)", 
-          cursor: "pointer", background: "var(--bg2)", transition: "all 0.2s"
+          cursor: "pointer", background: "var(--bg2)", transition: "all 0.2s",
+          display: "flex", alignItems: "center", justifyContent: "center"
         }}
       >
-        <img 
-          src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.email}`} 
-          alt="User Profile" 
-          style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-        />
+        {(!avatarUrl || imgError) ? (
+          <User size={20} color="var(--muted)" />
+        ) : (
+          <img 
+            src={avatarUrl} 
+            alt="User Profile" 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+            onError={() => setImgError(true)}
+          />
+        )}
       </div>
 
       {/* 드롭다운 메뉴 */}
