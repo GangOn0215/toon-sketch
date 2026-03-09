@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 // Landing Components
@@ -22,7 +22,7 @@ export default function HomeClient({ initialUser, initialPlan }: HomeClientProps
   const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser);
   const [user, setUser] = useState<any>(initialUser);
   const [plan, setPlan] = useState(initialPlan);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
