@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface CharacterGalleryProps {
   characters: any[];
@@ -9,8 +10,13 @@ interface CharacterGalleryProps {
 }
 
 export function CharacterGallery({ characters, profile }: CharacterGalleryProps) {
+  const router = useRouter();
   const isPro = profile?.plan === "pro" || profile?.plan === "premium";
   const isStandard = profile?.plan === "standard";
+
+  // 최근 8개만 표시
+  const previewCharacters = characters.slice(0, 8);
+  const hasMore = characters.length > 8;
 
   const isExpired = (dateStr: string) => {
     if (isPro) return false;
@@ -25,16 +31,28 @@ export function CharacterGallery({ characters, profile }: CharacterGalleryProps)
     <section style={{ marginBottom: "64px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <h2 style={{ fontSize: "20px", fontWeight: "700" }}>나의 캐릭터 보관함</h2>
-        {!isPro && <Link href="/#pricing" style={{ fontSize: "13px", color: "var(--accent)", fontWeight: "600" }}>영구 보관 플랜으로 업그레이드 →</Link>}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {!isPro && <Link href="/#pricing" style={{ fontSize: "13px", color: "var(--accent)", fontWeight: "600" }}>영구 보관 플랜으로 업그레이드 →</Link>}
+          {hasMore && (
+            <button 
+              onClick={() => router.push("/mypage/gallery")}
+              style={{ background: "var(--bg2)", border: "1px solid var(--border)", padding: "6px 14px", borderRadius: "100px", fontSize: "13px", fontWeight: "700", cursor: "pointer", color: "var(--text)", transition: "all 0.2s" }}
+              onMouseOver={(e) => (e.currentTarget.style.background = "var(--border)")}
+              onMouseOut={(e) => (e.currentTarget.style.background = "var(--bg2)")}
+            >
+              전체 보기 ({characters.length})
+            </button>
+          )}
+        </div>
       </div>
 
-      {characters.length === 0 ? (
+      {previewCharacters.length === 0 ? (
         <div style={{ padding: "60px", textAlign: "center", background: "var(--bg2)", borderRadius: "24px", border: "1px dashed var(--border)", color: "var(--subtle)" }}>
           아직 생성된 캐릭터가 없습니다.
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "20px" }}>
-          {characters.map((char) => {
+          {previewCharacters.map((char) => {
             const expired = isExpired(char.created_at);
             return (
               <div key={char.id} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)" }}>
