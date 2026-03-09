@@ -28,9 +28,27 @@ export function ImageModal({ modalImage, onClose, plan }: ImageModalProps) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ position: "relative", width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}
+        style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}
       >
-        <button onClick={onClose} style={{ position: "absolute", top: 0, right: 0, background: "none", border: "none", color: "#fff", fontSize: 30, cursor: "pointer", opacity: 0.7, lineHeight: 1 }}>×</button>
+        <button 
+          onClick={onClose} 
+          style={{ 
+            position: "absolute", 
+            top: 0, 
+            right: 0, 
+            background: "none", 
+            border: "none", 
+            color: "#000", // 검정색으로 변경
+            fontSize: 36, 
+            cursor: "pointer", 
+            opacity: 1, 
+            lineHeight: 1, 
+            padding: "10px",
+            textShadow: "0 0 10px rgba(255,255,255,0.5)" // 흰색 후광 추가로 가독성 확보
+          }}
+        >
+          ×
+        </button>
 
         <img
           src={modalImage}

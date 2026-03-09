@@ -121,6 +121,44 @@ nav {
   transition: color .18s;
 }
 .nav-menu a:hover { color: var(--text); }
+
+.nav-actions-desktop { display: flex; align-items: center; gap: 12px; }
+
+.mobile-menu-btn {
+  display: none;
+  background: none; border: none; color: var(--text);
+  cursor: pointer; padding: 4px; align-items: center; justify-content: center;
+}
+
+/* Mobile Nav Overlay */
+.mobile-nav-overlay {
+  position: fixed; top: 58px; left: 0; right: 0; height: calc(100vh - 58px);
+  background: var(--bg); z-index: 99;
+  display: flex; flex-direction: column;
+  padding: 40px 24px;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  border-top: 1px solid var(--border2);
+}
+.mobile-nav-overlay.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.mobile-nav-menu {
+  list-style: none; display: flex; flex-direction: column; gap: 32px;
+  text-align: center; margin: 0; padding: 0;
+}
+.mobile-nav-menu a {
+  font-size: 24px; font-weight: 700; color: var(--text);
+  text-decoration: none; display: block;
+}
+.mobile-nav-divider {
+  height: 1px; background: var(--border2); margin: 8px 0; list-style: none;
+}
+
 .nav-btn {
   padding: 7px 18px; border-radius: 6px;
   background: var(--text); color: var(--bg);
@@ -381,17 +419,49 @@ nav {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 960px) {
-  .hero-split { grid-template-columns: 1fr; padding: 60px 24px; text-align: center; gap: 48px; }
-  .hero-content { text-align: center; }
-  .hero-sub { margin: 0 auto 40px; }
-  .hero-actions { justify-content: center; }
-  .hero-main-box { max-width: 460px; margin: 0 auto; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .hero-feats { grid-template-columns: repeat(2, 2fr); }
-  .demo-container { grid-template-columns: 1fr; gap: 48px; text-align: center; }
+  .nav-menu, .nav-actions-desktop { display: none; }
+  .mobile-menu-btn { display: flex; }
+
+  .hero-split { grid-template-columns: 1fr; padding: 40px 24px 80px; text-align: center; gap: 48px; }
+  .hero-text { display: flex; flex-direction: column; align-items: center; }
+  .hero-tag { margin-bottom: 20px; }
+  .hero-title { font-size: clamp(36px, 10vw, 48px); letter-spacing: -1.5px; margin-bottom: 20px; }
+  .hero-sub { margin: 0 auto 32px; font-size: 16px; line-height: 1.7; }
+  .hero-actions { justify-content: center; width: 100%; }
+  .hero-actions button { flex: 1; min-width: 160px; max-width: 240px; }
+  .hero-main-box { max-width: 100%; border-radius: 24px; padding: 24px; }
+  .hero-single-container { padding: 16px; }
+  
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .hero-feats { grid-template-columns: repeat(2, 1fr); }
+  .hero-feat { padding: 20px; }
+  
+  .demo-container { grid-template-columns: 1fr; gap: 40px; text-align: center; }
   .demo-info { display: flex; flex-direction: column; align-items: center; }
-  .demo-controls { width: 100%; max-width: 450px; }
+  .demo-controls { width: 100%; max-width: 100%; padding: 24px; }
   .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── SHOWCASE SWIPER CUSTOM ── */
+.showcase-swiper {
+  padding: 60px 0 !important;
+  overflow: visible !important;
+}
+.showcase-swiper .swiper-slide {
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.2;
+  filter: blur(12px);
+  transform: scale(0.7);
+}
+.showcase-swiper .swiper-slide-active {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.3); /* 중앙 이미지를 크게 키움 */
+  z-index: 10;
+}
+.showcase-swiper .swiper-slide-active .showcase-item {
+  box-shadow: 0 40px 100px rgba(0,0,0,0.15);
+  border-color: var(--accent);
 }
 
 .summon-result .swiper { overflow: hidden; }
@@ -430,12 +500,32 @@ nav {
 }
 
 @media (max-width: 600px) {
+  .nav-wrap { padding: 0 20px; }
+  .logo { font-size: 16px; }
+  .theme-toggle-btn { margin-left: 8px; width: 32px; height: 32px; }
+  
+  #hero { padding-top: 40px; }
+  .hero-split { padding: 40px 20px 60px; }
+  .hero-actions { flex-direction: column; gap: 12px; }
+  .hero-actions button { width: 100%; max-width: 100%; }
+  
+  #pricing { padding: 60px 20px !important; }
+  .pricing-swiper { padding: 20px 0 40px !important; }
+  
   .gallery-grid { grid-template-columns: 1fr; }
-  .hero-feats { grid-template-columns: 1fr; }
-  .how-step { grid-template-columns: 1fr; gap: 16px; padding: 24px 0; }
-  .hs-title { padding-right: 0; }
-  .nav-menu { display: none; }
-  .nav-wrap { padding: 0 24px; }
-  .footer-inner { padding: 24px; flex-direction: column; align-items: flex-start; }
-  .showcase-grid { grid-template-columns: 1fr; }
+  .hero-feats { grid-template-columns: 1fr; border-top: none; }
+  .hero-feat { border-right: none; border-top: 1px solid var(--border); }
+  
+  .how-header { padding: 60px 20px 32px; }
+  .how-step { grid-template-columns: 1fr; gap: 12px; padding: 24px 0; }
+  .hs-num { font-size: 24px; }
+  .hs-title { padding-right: 0; font-size: 16px; }
+  .hs-desc { font-size: 14px; }
+  
+  .footer-inner { padding: 32px 20px; flex-direction: column; align-items: center; text-align: center; }
+  .f-links { justify-content: center; width: 100%; margin: 12px 0; }
+  
+  /* Swiper Mobile Tweaks */
+  .pricing-swiper { padding: 20px 10px 60px !important; }
+  .pricing-card { padding: 32px 24px !important; min-height: 480px !important; }
 }
