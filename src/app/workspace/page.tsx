@@ -9,7 +9,7 @@ export default async function Page() {
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("credits, plan")
+      .select("credits, plan, profile_image")
       .eq("id", user.id)
       .single();
     profile = data;
@@ -18,6 +18,7 @@ export default async function Page() {
   return (
     <WorkspaceClient 
       initialUser={user} 
+      initialProfile={profile}
       initialPlan={profile?.plan || "free"} 
       initialCredits={profile?.credits || 0}
     />

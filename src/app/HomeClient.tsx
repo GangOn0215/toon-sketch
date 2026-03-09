@@ -15,12 +15,14 @@ import { Footer } from "@/components/landing/Footer";
 
 interface HomeClientProps {
   initialUser: any;
+  initialProfile: any;
   initialPlan: string;
 }
 
-export default function HomeClient({ initialUser, initialPlan }: HomeClientProps) {
+export default function HomeClient({ initialUser, initialProfile, initialPlan }: HomeClientProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser);
   const [user, setUser] = useState<any>(initialUser);
+  const [profile, setProfile] = useState<any>(initialProfile);
   const [plan, setPlan] = useState(initialPlan);
   const supabase = useMemo(() => createClient(), []);
 
@@ -29,17 +31,15 @@ export default function HomeClient({ initialUser, initialPlan }: HomeClientProps
       if (session?.user) {
         setIsLoggedIn(true);
         setUser(session.user);
-        
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("plan")
-          .eq("id", session.user.id)
-          .single();
-        
-        if (profile?.plan) setPlan(profile.plan);
+        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+        if (profileData) {
+          setProfile(profileData);
+          setPlan(profileData.plan || "free");
+        }
       } else {
         setIsLoggedIn(false);
         setUser(null);
+        setProfile(null);
         setPlan("free");
       }
     });
@@ -59,7 +59,7 @@ export default function HomeClient({ initialUser, initialPlan }: HomeClientProps
 
   return (
     <>
-      <Nav isLoggedIn={isLoggedIn} user={{ ...user, plan }} />
+      <Nav isLoggedIn={isLoggedIn} user={{ ...user, plan }} profile={profile} />
       
       <main>
         <HeroSection isLoggedIn={isLoggedIn} />

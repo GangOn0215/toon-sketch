@@ -20,14 +20,16 @@ type HistoryItem = { id: string; imageUrl: string; selection: Record<string, str
 
 interface WorkspaceClientProps {
   initialUser: any;
+  initialProfile: any;
   initialPlan: string;
   initialCredits: number;
 }
 
-export default function WorkspaceClient({ initialUser, initialPlan, initialCredits }: WorkspaceClientProps) {
+export default function WorkspaceClient({ initialUser, initialProfile, initialPlan, initialCredits }: WorkspaceClientProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(initialUser);
+  const [profile, setProfile] = useState<any>(initialProfile);
   const [userPlan, setUserPlan] = useState<any>(initialPlan);
   const [credits, setCredits] = useState<number>(initialCredits);
   const [authLoading, setAuthLoading] = useState(false); // 초기값이 있으므로 false로 시작
@@ -62,13 +64,15 @@ export default function WorkspaceClient({ initialUser, initialPlan, initialCredi
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
-        const { data: profile } = await supabase.from("profiles").select("credits, plan").eq("id", session.user.id).single();
-        if (profile) {
-          setCredits(profile.credits || 0);
-          setUserPlan(profile.plan || "free");
+        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+        if (profileData) {
+          setProfile(profileData);
+          setCredits(profileData.credits || 0);
+          setUserPlan(profileData.plan || "free");
         }
       } else {
         setUser(null);
+        setProfile(null);
         setUserPlan("free");
         setCredits(0);
       }
@@ -225,7 +229,7 @@ export default function WorkspaceClient({ initialUser, initialPlan, initialCredi
                   <span style={{ color: "#F59E0B" }}>🪙</span> {credits.toLocaleString()} <span style={{ fontSize: "10px", color: "var(--accent)", marginLeft: "4px" }}>+</span>
                 </button>
                 <PlanBadge plan={userPlan} />
-                <UserMenu user={user} />
+                <UserMenu user={user} profile={profile} />
               </div>
             )}
             <ThemeToggle />

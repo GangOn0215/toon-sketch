@@ -9,7 +9,7 @@ export default async function Page() {
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("plan")
+      .select("*")
       .eq("id", user.id)
       .single();
     profile = data;
@@ -18,6 +18,7 @@ export default async function Page() {
   return (
     <HomeClient 
       initialUser={user} 
+      initialProfile={profile}
       initialPlan={profile?.plan || "free"} 
     />
   );

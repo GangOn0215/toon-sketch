@@ -16,16 +16,17 @@ import { UsageLogs } from "@/components/mypage/UsageLogs";
 
 interface MyPageClientProps {
   initialUser: any;
+  initialProfile: any;
 }
 
-export default function MyPageClient({ initialUser }: MyPageClientProps) {
+export default function MyPageClient({ initialUser, initialProfile }: MyPageClientProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(initialUser);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(initialProfile);
   const [logs, setLogs] = useState<any[]>([]);
   const [characters, setCharacters] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialProfile);
 
   const fetchData = useCallback(async (sessionUser: any) => {
     try {
@@ -83,7 +84,7 @@ export default function MyPageClient({ initialUser }: MyPageClientProps) {
           <Link className="logo" href="/">툰 스케치<em>.</em></Link>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <PlanBadge plan={profile?.plan || "free"} />
-            <UserMenu user={user} />
+            <UserMenu user={user} profile={profile} />
             <ThemeToggle />
           </div>
         </div>

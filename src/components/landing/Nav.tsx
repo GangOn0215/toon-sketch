@@ -9,9 +9,10 @@ import { PlanBadge } from "@/components/PlanBadge";
 interface NavProps {
   isLoggedIn: boolean;
   user: any;
+  profile?: any;
 }
 
-export function Nav({ isLoggedIn, user }: NavProps) {
+export function Nav({ isLoggedIn, user, profile }: NavProps) {
   const router = useRouter();
 
   return (
@@ -30,7 +31,7 @@ export function Nav({ isLoggedIn, user }: NavProps) {
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <PlanBadge plan={user?.plan || user?.user_metadata?.plan || "free"} />
-              <UserMenu user={user} />
+              <UserMenu user={user} profile={profile} />
             </div>
           )}
           <ThemeToggle />

@@ -10,7 +10,17 @@ export default async function Page() {
     redirect("/login");
   }
 
+  let profile = null;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    profile = data;
+  }
+
   return (
-    <MyPageClient initialUser={user} />
+    <MyPageClient initialUser={user} initialProfile={profile} />
   );
 }
