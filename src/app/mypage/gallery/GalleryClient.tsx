@@ -58,7 +58,7 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
             아직 생성된 캐릭터가 없습니다.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "24px" }}>
+          <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))", gap: "24px" }}>
             {initialCharacters.map((char) => {
               const expired = isExpired(char.created_at);
               return (

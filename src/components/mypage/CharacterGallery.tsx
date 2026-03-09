@@ -14,9 +14,9 @@ export function CharacterGallery({ characters, profile }: CharacterGalleryProps)
   const isPro = profile?.plan === "pro" || profile?.plan === "premium";
   const isStandard = profile?.plan === "standard";
 
-  // 최근 8개만 표시
-  const previewCharacters = characters.slice(0, 8);
-  const hasMore = characters.length > 8;
+  // 최근 16개 표시 (원복)
+  const previewCharacters = characters.slice(0, 16);
+  const hasMore = characters.length > 16;
 
   const isExpired = (dateStr: string) => {
     if (isPro) return false;
@@ -51,7 +51,7 @@ export function CharacterGallery({ characters, profile }: CharacterGalleryProps)
           아직 생성된 캐릭터가 없습니다.
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "20px" }}>
+        <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "20px" }}>
           {previewCharacters.map((char) => {
             const expired = isExpired(char.created_at);
             return (
