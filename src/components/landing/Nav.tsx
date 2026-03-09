@@ -29,7 +29,7 @@ export function Nav({ isLoggedIn, user }: NavProps) {
             <button className="nav-btn ghost" onClick={() => router.push("/login")} style={{ background: "none", border: "1px solid var(--border)", padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", cursor: "pointer", color: "var(--muted)" }}>로그인</button>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <PlanBadge plan={user?.user_metadata?.plan || "free"} />
+              <PlanBadge plan={user?.plan || user?.user_metadata?.plan || "free"} />
               <UserMenu user={user} />
             </div>
           )}
