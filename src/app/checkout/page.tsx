@@ -34,7 +34,7 @@ function CheckoutContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState<string>("");
+  const [selectedMethod, setSelectedMethod] = useState<string>("TOSSPAY");
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -59,40 +59,27 @@ function CheckoutContent() {
 
   try {
     const tossPayments = await loadTossPayments(clientKey);
-    // 토스 규격에 맞게 customerKey 정제 (특수문자 제거)
     const customerKey = user.id.replace(/[^a-zA-Z0-9-_]/g, "_");
 
     if (type === "plan") {
-      /**
-       * 1. [정기 결제] 빌링키 발급 (카드 자동 결제 등록)
-       * 빌링키 발급은 '카드'만 가능합니다.
-       */
+      // 멤버십 정기 결제 (빌링키 발급)
       await tossPayments.requestBillingAuth("카드", {
         customerKey: customerKey,
-        // 보안상 pid를 넘기지 않고 서버에서 orderId나 customerKey로 대조하는 것이 좋으나,
-        // 현재 로직을 유지한다면 최소한 클라이언트 변수 id를 사용합니다.
         successUrl: `${window.location.origin}/api/payment/success?type=plan&pid=${id}`,
         failUrl: `${window.location.origin}/api/payment/fail`,
         customerEmail: user.email,
         customerName: user.user_metadata?.full_name || "사용자",
       });
     } else {
-      /**
-       * 2. [단발 결제] 일반 결제
-       * '토스페이'로 고정하기보다는 사용자가 선택한 'selectedMethod'를 사용하거나 
-       * 범용적으로 '카드'를 사용하는 것이 결제 성공률이 높습니다.
-       */
+      // 일반 크레딧 충전 결제
       const orderId = `PAY_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`.toUpperCase();
       
-      // 만약 'selectedMethod'가 'TOSSPAY' 혹은 'CARD' 형태라면 그대로 넣어주세요.
-      // 여기서는 범용성을 위해 사용자가 선택한 값을 넣도록 수정했습니다.
-      await tossPayments.requestPayment(selectedMethod === "TOSSPAY" ? "토스페이" : "카드", {
+      await tossPayments.requestPayment("카드", {
         amount: Number(product.price),
         orderId: orderId,
         orderName: product.name,
         customerName: user.user_metadata?.full_name || "사용자",
         customerEmail: user.email,
-        // 충전(topup) 시에도 pid를 넘겨 서버에서 어떤 상품인지 확인하게 합니다.
         successUrl: `${window.location.origin}/api/payment/success?type=topup&pid=${id}`,
         failUrl: `${window.location.origin}/api/payment/fail`,
       });
