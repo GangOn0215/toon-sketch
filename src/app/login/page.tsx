@@ -31,14 +31,16 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser(session.user);
         router.push("/");
       }
+    });
+
+    return () => {
+      subscription.unsubscribe();
     };
-    checkUser();
   }, [supabase, router]);
 
   const handleSocialLogin = async (provider: any) => {

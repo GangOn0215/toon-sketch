@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 
 const secretKey = process.env.TOSS_SECRET_KEY || "";
 const encodedKey = Buffer.from(secretKey + ":").toString("base64");
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type"); // topup or plan
   const pid = searchParams.get("pid");   // product id
   
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(new URL("/login", req.url));
 
