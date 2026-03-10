@@ -9,7 +9,7 @@ export default async function Page() {
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("credits, plan, profile_image")
+      .select("*")
       .eq("id", user.id)
       .single();
     profile = data;

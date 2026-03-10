@@ -49,6 +49,8 @@ interface BuilderSidebarProps {
   toggleLock: (key: string) => void;
   bulkSetLocks: (keys: string[], value: boolean) => void;
   userPlan: string;
+  userCredits?: number;
+  onTopupClick?: () => void;
   resolution: string;
   setResolution: (val: any) => void;
   seed: number | null;
@@ -65,7 +67,7 @@ const TAB_KEYS: Record<Tab, Record<string, { label: string; items: string[] }>> 
 };
 
 export function BuilderSidebar({
-  selection, onSelect, lockedOptions, toggleLock, bulkSetLocks, userPlan,
+  selection, onSelect, lockedOptions, toggleLock, bulkSetLocks, userPlan, userCredits, onTopupClick,
   resolution, setResolution, seed, isLocked, setLockedSeed, loading, handleGenerate
 }: BuilderSidebarProps) {
   const [activeTab, setActiveTab] = useState<Tab>("기본");
@@ -123,7 +125,17 @@ export function BuilderSidebar({
 
   return (
     <aside className="sidebar-container" style={{ borderRight: "1px solid var(--border)", paddingRight: 36, paddingTop: 48, paddingBottom: 48, display: "flex", flexDirection: "column", gap: 0, overflowY: "auto", maxHeight: "calc(100vh - 58px)" }}>
-      <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, marginBottom: 20 }}>캐릭터 빌더</h1>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, margin: 0 }}>캐릭터 빌더</h1>
+        {typeof userCredits === "number" && (
+          <button 
+            onClick={onTopupClick}
+            style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "6px 12px", borderRadius: "10px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "800", color: "var(--text)", cursor: "pointer" }}
+          >
+            <span style={{ color: "#F59E0B" }}>🪙</span> {userCredits.toLocaleString()} <span style={{ fontSize: "11px", color: "var(--accent)" }}>+</span>
+          </button>
+        )}
+      </div>
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 4, marginBottom: 28, background: "var(--bg2)", padding: 4, borderRadius: 10, border: "1px solid var(--border)" }}>

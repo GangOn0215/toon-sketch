@@ -85,6 +85,12 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
         user={user} 
         profile={profile} 
         credits={profile?.credits}
+        onTopupClick={() => {
+          const topupSection = document.getElementById("topup-section");
+          if (topupSection) {
+            topupSection.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
       />
 
       <main className="page-fade-in" style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>

@@ -67,13 +67,19 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (profile?.credits !== undefined) {
+      setCredits(profile.credits);
+    }
+  }, [profile?.credits]);
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
         const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
         if (profileData) {
           setProfile(profileData);
-          setCredits(profileData.credits || 0);
+          setCredits(profileData.credits ?? 0);
           setUserPlan(profileData.plan || "free");
         }
       } else {
@@ -238,7 +244,8 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
       <main className="page-fade-in workspace-main" style={{ paddingTop: 58, display: "grid", gridTemplateColumns: "320px 1fr", maxWidth: 1100, margin: "0 auto", minHeight: "100vh", padding: "58px 32px 0", gap: 0 }}>
         <BuilderSidebar
           selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} bulkSetLocks={bulkSetLocks}
-          userPlan={userPlan} resolution={resolution} setResolution={setResolution} seed={seed}
+          userPlan={userPlan} userCredits={credits} onTopupClick={() => setShowTopupModal(true)}
+          resolution={resolution} setResolution={setResolution} seed={seed}
           isLocked={lockedSeed !== null && lockedSeed === seed} setLockedSeed={setLockedSeed}
           loading={loading} handleGenerate={handleGenerate}
         />

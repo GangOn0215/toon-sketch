@@ -59,7 +59,20 @@ export default function HomeClient({ initialUser, initialProfile, initialPlan }:
 
   return (
     <>
-      <Nav isLoggedIn={isLoggedIn} user={{ ...user, plan }} profile={profile} />
+      <Nav 
+        isLoggedIn={isLoggedIn} 
+        user={{ ...user, plan }} 
+        profile={profile} 
+        credits={profile?.credits} 
+        onTopupClick={() => {
+          const pricingSection = document.getElementById("pricing");
+          if (pricingSection) {
+            pricingSection.scrollIntoView({ behavior: "smooth" });
+          } else {
+            window.location.href = "/#pricing";
+          }
+        }}
+      />
       
       <main>
         <HeroSection isLoggedIn={isLoggedIn} />
