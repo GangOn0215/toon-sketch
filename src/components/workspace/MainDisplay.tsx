@@ -78,14 +78,14 @@ export function MainDisplay({
         onClick={() => imageUrl && onImageClick(imageUrl)}
         style={{
           width: "100%",
-          aspectRatio: isSheetMode ? "16/9" : (selection.ratio?.replace(":", "/") || "16/9"),
+          aspectRatio: isSheetMode ? "16/9" : (selection.ratio ? selection.ratio.replace(":", "/") : "1/1"),
           borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)",
           background: "var(--bg2)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
           cursor: imageUrl ? "zoom-in" : "default"
         }}
       >
         {loading ? <Skeleton /> : imageUrl ? (
-          <Image src={imageUrl} alt="캐릭터 생성 이미지" fill sizes="(max-width: 1100px) 70vw, 720px" style={{ objectFit: "contain" }} priority />
+          <Image src={imageUrl} alt="캐릭터 생성 이미지" fill sizes="(max-width: 1100px) 100vw, 800px" style={{ objectFit: "contain" }} priority />
         ) : <EmptyState />}
       </div>
 

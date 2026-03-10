@@ -96,10 +96,51 @@ export async function POST(req: Request) {
 
         const seed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
         const prompt = buildPrompt(body);
-        const baseRes = resolution === "2K" ? 2048 : resolution === "1K" ? 1024 : 512;
+        
+        // 해상도 기준값 (짧은 변 기준)
+        const baseRes = resolution === "2K" ? 1024 : resolution === "1K" ? 768 : 512;
+        
+        let width = baseRes;
+        let height = baseRes;
+
+        // 비율 계산 로직
+        if (mode === "캐릭터 시트") {
+          // 캐릭터 시트는 3면도를 위해 가로가 긴 16:9 비율로 고정
+          width = Math.round((baseRes * 1.777) / 64) * 64;
+          height = baseRes;
+        } else {
+          // 일반 화보는 선택한 비율 적용
+          switch (ratio) {
+            case "16:9":
+              width = Math.round((baseRes * 1.777) / 64) * 64;
+              height = baseRes;
+              break;
+            case "9:16":
+              width = baseRes;
+              height = Math.round((baseRes * 1.777) / 64) * 64;
+              break;
+            case "4:3":
+              width = Math.round((baseRes * 1.333) / 64) * 64;
+              height = baseRes;
+              break;
+            case "3:4":
+              width = baseRes;
+              height = Math.round((baseRes * 1.333) / 64) * 64;
+              break;
+            default: // 1:1 포함
+              width = baseRes;
+              height = baseRes;
+          }
+        }
         
         const generator = getGenerator();
-        const result = await generator.generate({ prompt, width: baseRes, height: baseRes, seed, referenceImage: body.referenceImage });
+        const result = await generator.generate({ 
+          prompt, 
+          width, 
+          height, 
+          seed, 
+          referenceImage: body.referenceImage 
+        });
         
         // 썸네일 생성 (400px, WebP 포맷으로 용량 최적화)
         const thumbBuffer = await sharp(result.buffer)
