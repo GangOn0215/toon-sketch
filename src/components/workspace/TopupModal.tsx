@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
 import { PRODUCTS } from "@/lib/constants/products";
+import { X } from "lucide-react";
 
 interface TopupModalProps {
   user: any;
@@ -45,14 +46,34 @@ export function TopupModal({ user, onClose }: TopupModalProps) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }} onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
       <div style={{ background: "var(--bg)", width: "100%", maxWidth: "480px", borderRadius: "24px", overflow: "hidden", position: "relative", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }} onClick={e => e.stopPropagation()}>
         
         {/* 헤더 */}
         <div style={{ padding: "32px 32px 24px", borderBottom: "1px solid var(--border)", textAlign: "center", position: "relative" }}>
           <h2 style={{ fontSize: "24px", fontWeight: "700" }}>크레딧 충전</h2>
           <p style={{ color: "var(--subtle)", fontSize: "14px", marginTop: "8px" }}>캐릭터 소환을 계속하기 위해 크레딧이 필요합니다.</p>
-          <button onClick={onClose} style={{ position: "absolute", top: "24px", right: "24px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "50%", width: "32px", height: "32px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button 
+            onClick={onClose} 
+            style={{ 
+              position: "absolute", 
+              top: "20px", 
+              right: "20px", 
+              background: "var(--bg2)", 
+              border: "1px solid var(--border)", 
+              borderRadius: "50%", 
+              width: "36px", 
+              height: "36px", 
+              cursor: "pointer", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center",
+              color: "var(--muted)",
+              transition: "all 0.2s"
+            }}
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* 패키지 선택 */}
