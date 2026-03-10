@@ -9,9 +9,9 @@ export function UsageLogs({ logs }: UsageLogsProps) {
   const tdStyle: React.CSSProperties = { padding: "12px 16px", color: "var(--text)" };
 
   return (
-    <section>
+    <section className="usage-section">
       <h2 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "20px" }}>최근 이용 내역</h2>
-      <div style={{ background: "var(--bg2)", borderRadius: "20px", border: "1px solid var(--border)", overflow: "hidden" }}>
+      <div className="table-container" style={{ background: "var(--bg2)", borderRadius: "20px", border: "1px solid var(--border)", overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left" }}>

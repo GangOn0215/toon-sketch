@@ -28,10 +28,10 @@ export function CharacterGallery({ characters, profile }: CharacterGalleryProps)
   };
 
   return (
-    <section style={{ marginBottom: "64px" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+    <section className="gallery-section" style={{ marginBottom: "64px" }}>
+      <div className="gallery-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <h2 style={{ fontSize: "20px", fontWeight: "700" }}>나의 캐릭터 보관함</h2>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div className="gallery-header-actions" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {!isPro && <Link href="/#pricing" style={{ fontSize: "13px", color: "var(--accent)", fontWeight: "600" }}>영구 보관 플랜으로 업그레이드 →</Link>}
           {hasMore && (
             <button 

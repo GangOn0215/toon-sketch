@@ -37,15 +37,15 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
         credits={initialProfile?.credits}
       />
 
-      <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "120px 24px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
+      <main className="gallery-container" style={{ maxWidth: "1200px", margin: "0 auto", padding: "120px 24px" }}>
+        <div className="gallery-main-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
           <div>
             <Link href="/mypage" style={{ fontSize: "14px", color: "var(--accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", marginBottom: "8px" }}>
               ← 마이페이지로 돌아가기
             </Link>
             <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "32px", fontWeight: "700" }}>전체 캐릭터 보관함</h1>
           </div>
-          <div style={{ textAlign: "right" }}>
+          <div className="gallery-count" style={{ textAlign: "right" }}>
             <div style={{ fontSize: "14px", color: "var(--subtle)" }}>총 {initialCharacters.length}개의 캐릭터</div>
           </div>
         </div>
@@ -93,6 +93,29 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
           </div>
         )}
       </main>
+
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          .gallery-container {
+            padding: 100px 16px 60px !important;
+          }
+          .gallery-main-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .gallery-count {
+            text-align: left !important;
+          }
+          .gallery-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .gallery-container h1 {
+            font-size: 24px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

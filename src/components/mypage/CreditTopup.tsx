@@ -15,11 +15,11 @@ export function CreditTopup({ isTopupLoading }: CreditTopupProps) {
   ];
 
   return (
-    <section id="topup-section" style={{ marginBottom: "64px" }}>
+    <section className="topup-section" id="topup-section" style={{ marginBottom: "64px" }}>
       <h2 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "24px" }}>⚡️ 크레딧 급속 충전</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+      <div className="topup-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
         {packages.map((pkg) => (
-          <div key={pkg.id} style={{ 
+          <div key={pkg.id} className="topup-item" style={{ 
             background: "var(--bg2)", padding: "24px", borderRadius: "20px", border: pkg.hot ? "2px solid var(--accent)" : "1px solid var(--border)",
             position: "relative", textAlign: "center"
           }}>

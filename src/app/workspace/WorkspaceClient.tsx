@@ -41,11 +41,11 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const [resolution, setResolution] = useState<string>("");
 
   const [selection, setSelection] = useState<Record<string, string>>({
-    mode: "", ratio: "", background: "", style: "", shot: "", pose: "",
-    gender: "", ethnicity: "", age: "", race: "", job: "",
-    body: "", hairStyle: "", hairColor: "", eyeColor: "",
-    impression: "", expression: "", clothing: "",
-    mainColor: "", shoeType: "", shoeColor: "", acc: "", vibe: "",
+    mode: "캐릭터 시트", ratio: "1:1", background: "", style: "웹툰스타일", shot: "전체 샷", pose: "기본 정자세",
+    gender: "", ethnicity: "없음", age: "청년", race: "인간", job: "없음",
+    body: "보통 체형", hairStyle: "숏컷", hairColor: "흑발", eyeColor: "흑안/갈안",
+    impression: "순한", expression: "미소", clothing: "캐주얼",
+    mainColor: "블랙", shoeType: "스니커즈", shoeColor: "블랙", acc: "없음", vibe: "발랄한",
   });
   
   const [lockedOptions, setLockedOptions] = useState<Record<string, boolean>>({});
@@ -260,6 +260,30 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           />
         </div>
       </main>
+
+      <style jsx global>{`
+        @media (max-width: 992px) {
+          .workspace-main {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 58px 16px 0 !important;
+          }
+          .sidebar-container {
+            border-right: none !important;
+            padding-right: 0 !important;
+            max-height: none !important;
+            padding-top: 32px !important;
+            padding-bottom: 32px !important;
+            border-bottom: 1px solid var(--border) !important;
+          }
+          .display-container {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-height: none !important;
+            padding-top: 32px !important;
+          }
+        }
+      `}</style>
 
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan={userPlan} />
       {showTopupModal && <TopupModal user={user} onClose={() => setShowTopupModal(false)} />}

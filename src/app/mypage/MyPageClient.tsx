@@ -93,7 +93,7 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
         }}
       />
 
-      <main className="page-fade-in" style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>
+      <main className="page-fade-in mypage-container" style={{ maxWidth: "1000px", margin: "0 auto", padding: "120px 24px" }}>
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "32px", fontWeight: "700", marginBottom: "40px" }}>마이페이지</h1>
 
         <div className="page-fade-in stagger-1">
@@ -107,6 +107,57 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
           <UsageLogs logs={logs} />
         </div>
       </main>
+
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          .mypage-container {
+            padding: 100px 16px 60px !important;
+          }
+          .mypage-container h1 {
+            font-size: 24px !important;
+            margin-bottom: 24px !important;
+          }
+          .profile-section {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+            margin-bottom: 40px !important;
+          }
+          .profile-card, .credit-card {
+            padding: 24px !important;
+          }
+          .credit-card h2 {
+            font-size: 24px !important;
+          }
+          .topup-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .topup-section {
+            margin-bottom: 48px !important;
+          }
+          .gallery-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          .gallery-header-actions {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .gallery-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .gallery-section {
+            margin-bottom: 48px !important;
+          }
+          .table-container {
+            overflow-x: auto !important;
+          }
+          table {
+            min-width: 450px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

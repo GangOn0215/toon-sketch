@@ -1,15 +1,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 interface HeroSectionProps {
   isLoggedIn: boolean;
 }
 
+const HERO_IMAGES = [
+  "/images/sample.png",
+  "/images/sample1.png",
+  "/images/sample2.png",
+  "/images/sample3.png"
+];
+
 export function HeroSection({ isLoggedIn }: HeroSectionProps) {
   const router = useRouter();
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrentIdx((prev) => (prev + 1) % HERO_IMAGES.length);
+        setFade(true);
+      }, 500); // 페이드 아웃 시간
+    }, 4000); // 4초마다 교체
+
+    return () => clearInterval(timer);
+  }, []);
 
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -31,16 +52,23 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
           <div className="hero-main-box">
             <div className="hero-single-container">
               <div className="hero-card c1">
-                <div className="hero-image-wrap" style={{ position: "relative", width: "100%", height: "100%" }}>
+                <div 
+                  className="hero-image-wrap" 
+                  style={{ 
+                    position: "relative", 
+                    width: "100%", 
+                    height: "100%",
+                    opacity: fade ? 1 : 0,
+                    transition: "opacity 0.5s ease-in-out"
+                  }}
+                >
                   <Image 
-                    src="/images/sample.png" 
-                    alt="Hero Character" 
+                    src={HERO_IMAGES[currentIdx]} 
+                    alt="Hero Character Preview" 
                     fill
                     priority
                     sizes="(max-width: 768px) 100vw, 50vw"
                     style={{ objectFit: "cover" }}
-                    // @ts-ignore
-                    fetchPriority="high"
                   />
                 </div>
                 <span className="card-label">Character Preview</span>

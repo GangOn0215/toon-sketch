@@ -21,6 +21,9 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const avatarUrl = profile?.profile_image || user?.user_metadata?.avatar_url;
 
   // Lock scroll when mobile menu is open
   useEffect(() => {
@@ -87,8 +90,31 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
           </div>
           
           {/* Mobile Wrap: Only visible on mobile via CSS */}
-          <div className="mobile-menu-btn-wrap">
+          <div className="mobile-menu-btn-wrap" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <ThemeToggle />
+            
+            {isLoggedIn && (
+              <div 
+                onClick={() => router.push("/mypage")}
+                style={{ 
+                  width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", 
+                  border: "1px solid var(--border)", cursor: "pointer", background: "var(--bg2)",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+              >
+                {(!avatarUrl || imgError) ? (
+                  <User size={18} color="var(--muted)" />
+                ) : (
+                  <img 
+                    src={avatarUrl} 
+                    alt="Mobile Profile" 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    onError={() => setImgError(true)}
+                  />
+                )}
+              </div>
+            )}
+
             <button className="mobile-menu-btn" onClick={toggleMenu} aria-label="Toggle Menu">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -101,7 +127,7 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
         {/* Close Button Inside Menu */}
         <button 
           onClick={closeMenu}
-          style={{ position: "absolute", top: "16px", right: "20px", background: "var(--bg2)", border: "1.5px solid var(--border)", borderRadius: "50%", width: "34px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)", cursor: "pointer", zIndex: 101 }}
+          style={{ position: "absolute", top: "16px", right: "20px", background: "var(--bg2)", border: "1.5px solid var(--border)", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)", cursor: "pointer", zIndex: 101 }}
         >
           <X size={18} />
         </button>
@@ -112,8 +138,19 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
           {isLoggedIn ? (
             <div style={{ background: "var(--bg2)", borderRadius: "24px", padding: "24px", border: "1px solid var(--border2)", boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-                  <User size={24} />
+                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border)", overflow: "hidden" }}>
+                  {(!avatarUrl || imgError) ? (
+                    <div style={{ width: "100%", height: "100%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+                      <User size={24} />
+                    </div>
+                  ) : (
+                    <img 
+                      src={avatarUrl} 
+                      alt="Profile" 
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={() => setImgError(true)}
+                    />
+                  )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

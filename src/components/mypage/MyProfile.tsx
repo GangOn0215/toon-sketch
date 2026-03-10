@@ -14,8 +14,8 @@ export function MyProfile({ user, profile }: MyProfileProps) {
   const avatarUrl = profile?.profile_image || user?.user_metadata?.avatar_url;
 
   return (
-    <section style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "24px", marginBottom: "64px" }}>
-      <div style={{ background: "var(--bg2)", padding: "32px", borderRadius: "24px", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
+    <section className="profile-section" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "24px", marginBottom: "64px" }}>
+      <div className="profile-card" style={{ background: "var(--bg2)", padding: "32px", borderRadius: "24px", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "20px" }}>
         <div style={{ width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden", border: "2px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}>
           {(!avatarUrl || imgError) ? (
             <User size={32} color="var(--muted)" />
@@ -35,7 +35,7 @@ export function MyProfile({ user, profile }: MyProfileProps) {
         </div>
       </div>
 
-      <div style={{ background: "var(--accent)", padding: "32px", borderRadius: "24px", color: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="credit-card" style={{ background: "var(--accent)", padding: "32px", borderRadius: "24px", color: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: "14px", opacity: 0.8, marginBottom: "4px" }}>보유 크레딧</div>
           <div style={{ fontSize: "32px", fontWeight: "800" }}>🪙 {profile?.credits?.toLocaleString()}</div>
