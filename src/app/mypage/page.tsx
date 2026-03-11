@@ -20,7 +20,26 @@ export default async function Page() {
     profile = data;
   }
 
+  const { data: characters } = await supabase
+    .from("characters")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  const { data: logs } = await supabase
+    .from("credit_logs")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
   return (
-    <MyPageClient initialUser={user} initialProfile={profile} />
+    <MyPageClient 
+      initialUser={user} 
+      initialProfile={profile} 
+      initialCharacters={characters || []}
+      initialLogs={logs || []}
+    />
   );
 }

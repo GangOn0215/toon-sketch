@@ -18,16 +18,18 @@ import { Nav } from "@/components/landing/Nav";
 interface MyPageClientProps {
   initialUser: any;
   initialProfile: any;
+  initialCharacters: any[];
+  initialLogs: any[];
 }
 
-export default function MyPageClient({ initialUser, initialProfile }: MyPageClientProps) {
+export default function MyPageClient({ initialUser, initialProfile, initialCharacters, initialLogs }: MyPageClientProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(initialUser);
   const [profile, setProfile] = useState<any>(initialProfile);
-  const [logs, setLogs] = useState<any[]>([]);
-  const [characters, setCharacters] = useState<any[]>([]);
-  const [loading, setLoading] = useState(!initialProfile);
+  const [logs, setLogs] = useState<any[]>(initialLogs || []);
+  const [characters, setCharacters] = useState<any[]>(initialCharacters || []);
+  const [loading, setLoading] = useState(false); // 초기 데이터가 있으므로 바로 렌더링
 
   const fetchData = useCallback(async (sessionUser: any) => {
     try {
@@ -118,11 +120,14 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
         </div>
         <div className="page-fade-in stagger-3">
           <CharacterGallery characters={characters} profile={profile} />
+        </div>
+        <div className="page-fade-in stagger-4">
           <UsageLogs logs={logs} />
         </div>
       </main>
 
       <style jsx global>{`
+        .stagger-4 { animation-delay: 0.4s; }
         @media (max-width: 768px) {
           .mypage-container {
             padding: 100px 16px 60px !important;
