@@ -21,25 +21,31 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lastOtpRequestTime, setLastOtpRequestTime] = useState<number | null>(null); // #35: SMS 재전송 쿨타임
   const [redirecting, setRedirecting] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 인앱 브라우저 감지 및 외부 브라우저 유도 (구글 로그인 정책 준수)
+    // #18: 인앱 브라우저 감지 및 외부 브라우저 유도 (UX 개선용으로만 사용)
     const ua = navigator.userAgent.toLowerCase();
     const isKakaotalk = ua.indexOf("kakaotalk") !== -1;
     const isLine = ua.indexOf("line") !== -1;
     const isInApp = isKakaotalk || isLine;
 
     if (isInApp) {
-      if (isKakaotalk) {
-        window.location.href = `kakaotalk://web/openExternalApp?url=${encodeURIComponent(window.location.href)}`;
-      } else {
-        const newUrl = window.location.href;
-        if (!ua.match(/iphone|ipad|ipod/)) {
-          window.location.href = `intent://${newUrl.replace(/https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+      // 💡 UA 기반 감지는 힌트로만 사용하며, 실제 리다이렉트 시 실패할 경우를 대비한 폴백 처리
+      try {
+        if (isKakaotalk) {
+          window.location.href = `kakaotalk://web/openExternalApp?url=${encodeURIComponent(window.location.href)}`;
+        } else if (isLine) {
+          const newUrl = window.location.href;
+          if (!ua.match(/iphone|ipad|ipod/)) {
+            window.location.href = `intent://${newUrl.replace(/https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+          }
         }
+      } catch (e) {
+        console.warn("In-app browser redirection failed:", e);
       }
     }
 
@@ -86,6 +92,14 @@ export default function LoginPage() {
   const handleRequestOtp = async () => {
     setError(null);
     if (!phoneNumber) return setError("전화번호를 입력해주세요.");
+
+    // #35: SMS 재전송 쿨타임 체크 (60초)
+    const now = Date.now();
+    if (lastOtpRequestTime && now - lastOtpRequestTime < 60000) {
+      const remaining = Math.ceil((60000 - (now - lastOtpRequestTime)) / 1000);
+      return setError(`재전송 대기 시간입니다. ${remaining}초 후에 다시 시도해 주세요.`);
+    }
+
     setLoading(true);
     const formattedPhone = formatPhoneNumber(phoneNumber);
     const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
@@ -93,6 +107,7 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
+      setLastOtpRequestTime(now); // 요청 시간 기록
       setStep("otp");
       setLoading(false);
     }

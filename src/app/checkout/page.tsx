@@ -62,18 +62,41 @@ function CheckoutContent() {
     const customerKey = user.id.replace(/[^a-zA-Z0-9-_]/g, "_");
 
     if (type === "plan") {
-      // 멤버십 정기 결제 (빌링키 발급)
+      // #6: 멤버십 정기 결제 (빌링키 발급 전 주문 기록 생성)
+      const orderId = `SUBS_${Date.now()}_${user.id.substring(0, 4)}`.toUpperCase();
+      
+      const { error: orderError } = await supabase.from("orders").insert({
+        order_id: orderId,
+        user_id: user.id,
+        product_id: id,
+        amount: Number(product.price),
+        status: "pending"
+      });
+
+      if (orderError) throw new Error("주문 정보 생성에 실패했습니다.");
+
       await tossPayments.requestBillingAuth("카드", {
         customerKey: customerKey,
-        successUrl: `${window.location.origin}/api/payment/success?type=plan&pid=${id}`,
+        successUrl: `${window.location.origin}/api/payment/success?type=plan&pid=${id}&orderId=${orderId}`, // orderId 전달 추가
         failUrl: `${window.location.origin}/api/payment/fail`,
         customerEmail: user.email,
         customerName: user.user_metadata?.full_name || "사용자",
       });
     } else {
-      // 일반 크레딧 충전 결제
-      const orderId = `PAY_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`.toUpperCase();
+      // #6 & #34: 일반 크레딧 충전 결제 (보안 난수 식별자 적용)
+      const randomSegment = crypto.randomUUID().split("-")[0].toUpperCase();
+      const orderId = `PAY_${Date.now()}_${randomSegment}`;
       
+      const { error: orderError } = await supabase.from("orders").insert({
+        order_id: orderId,
+        user_id: user.id,
+        product_id: id,
+        amount: Number(product.price),
+        status: "pending"
+      });
+
+      if (orderError) throw new Error("주문 정보 생성에 실패했습니다.");
+
       await tossPayments.requestPayment("카드", {
         amount: Number(product.price),
         orderId: orderId,

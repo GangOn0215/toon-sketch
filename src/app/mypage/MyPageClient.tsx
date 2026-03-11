@@ -66,12 +66,21 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
   useEffect(() => {
     // 결제 결과 확인
     const params = new URLSearchParams(window.location.search);
-    if (params.get("payment") === "success") {
+    const paymentStatus = params.get("payment");
+    const rawMessage = params.get("message");
+
+    if (paymentStatus === "success") {
       alert("결제가 성공적으로 완료되어 크레딧이 충전되었습니다! 🎉");
       // URL 파라미터 청소
       window.history.replaceState({}, "", "/mypage");
-    } else if (params.get("payment") === "fail") {
-      alert(`결제에 실패했습니다: ${params.get("message")}`);
+    } else if (paymentStatus === "fail") {
+      // #17: URL 파라미터 메시지 검증 (XSS 방지)
+      // 특수문자 제거 및 안전한 메시지만 노출
+      const safeMessage = rawMessage 
+        ? rawMessage.replace(/[<>\"\'\&]/g, "").substring(0, 100) 
+        : "결제 처리 중 오류가 발생했습니다.";
+      
+      alert(`결제에 실패했습니다: ${safeMessage}`);
       window.history.replaceState({}, "", "/mypage");
     }
   }, []);

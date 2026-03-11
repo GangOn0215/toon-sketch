@@ -7,11 +7,22 @@ import { Footer } from "@/components/landing/Footer";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 실제 메일 발송 API가 없으므로 성공 메시지만 출력
+    if (isSubmitting) return;
+
+    // #27: 클라이언트 측 스팸 방지 (Throttling)
+    setIsSubmitting(true);
+    
+    // 실제 API 호출 시뮬레이션 (네트워크 지연)
+    await new Promise(res => setTimeout(res, 1000));
+
+    // 실제 서비스에서는 여기서 서버 API(/api/contact)를 호출하고, 
+    // 서버 측에서 IP 기반 Rate Limiting을 수행해야 합니다.
     setSubmitted(true);
+    setIsSubmitting(false);
   };
 
   return (

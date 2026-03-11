@@ -27,7 +27,20 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  // 세션 확인 (getUser는 안전한 서버 측 확인 방법임)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // #24: 보호된 경로 가드 (Missing Route Guard 해결)
+  const protectedPaths = ['/workspace', '/mypage', '/checkout']
+  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
+
+  if (isProtectedPath && !user) {
+    // 로그인되지 않은 사용자가 보호된 경로에 접근하면 로그인 페이지로 리다이렉트
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('redirect', request.nextUrl.pathname)
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }
