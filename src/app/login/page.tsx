@@ -10,6 +10,7 @@ import { createClient } from "@/utils/supabase/client";
 import { LoginSocial } from "@/components/login/LoginSocial";
 import { LoginPhone } from "@/components/login/LoginPhone";
 import { LoginOtp } from "@/components/login/LoginOtp";
+import { Footer } from "@/components/landing/Footer";
 
 type LoginStep = "social" | "phone" | "otp";
 
@@ -162,6 +163,7 @@ export default function LoginPage() {
           {step === "otp" && <LoginOtp otpCode={otpCode} setOtpCode={setOtpCode} onVerifyOtp={handleVerifyOtp} loading={loading} phoneNumber={phoneNumber} />}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

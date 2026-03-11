@@ -14,6 +14,7 @@ import { CreditTopup } from "@/components/mypage/CreditTopup";
 import { CharacterGallery } from "@/components/mypage/CharacterGallery";
 import { UsageLogs } from "@/components/mypage/UsageLogs";
 import { Nav } from "@/components/landing/Nav";
+import { Footer } from "@/components/landing/Footer";
 
 interface MyPageClientProps {
   initialUser: any;
@@ -125,6 +126,8 @@ export default function MyPageClient({ initialUser, initialProfile, initialChara
           <UsageLogs logs={logs} />
         </div>
       </main>
+
+      <Footer />
 
       <style jsx global>{`
         .stagger-4 { animation-delay: 0.4s; }

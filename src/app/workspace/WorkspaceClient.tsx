@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
 import { Nav } from "@/components/landing/Nav";
+import { Footer } from "@/components/landing/Footer";
 
 // Dynamic Imports for Modals (Reduced initial JS)
 const ImageModal = dynamic(() => import("@/components/workspace/ImageModal").then(mod => mod.ImageModal), { ssr: false });
@@ -272,6 +273,8 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           />
         </div>
       </main>
+
+      <Footer />
 
       <style jsx global>{`
         @media (max-width: 992px) {

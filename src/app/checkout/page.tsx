@@ -8,6 +8,7 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { PaymentMethods } from "@/components/checkout/PaymentMethods";
 import { CheckoutTerms } from "@/components/checkout/CheckoutTerms";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
+import { Footer } from "@/components/landing/Footer";
 
 // 토스페이먼츠 클라이언트 키 (환경 변수 사용)
 const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
@@ -156,6 +157,9 @@ function CheckoutContent() {
         <p style={{ textAlign: "center", marginTop: "24px", fontSize: "13px", color: "var(--subtle)" }}>
           안전한 결제를 위해 암호화된 통신을 사용하고 있습니다.
         </p>
+      </div>
+      <div style={{ marginTop: "80px" }}>
+        <Footer />
       </div>
     </div>
   );

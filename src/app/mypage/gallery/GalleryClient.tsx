@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
 import { PlanBadge } from "@/components/PlanBadge";
 import { Nav } from "@/components/landing/Nav";
+import { Footer } from "@/components/landing/Footer";
 
 interface GalleryClientProps {
   initialUser: any;
@@ -93,6 +94,8 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
           </div>
         )}
       </main>
+
+      <Footer />
 
       <style jsx global>{`
         @media (max-width: 768px) {
