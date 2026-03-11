@@ -131,9 +131,10 @@ export function BuilderSidebar({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: 22, fontWeight: 600, letterSpacing: -0.5, margin: 0 }}>캐릭터 빌더</h1>
         {typeof userCredits === "number" && (
-          <button 
+          <button
+            className="sidebar-credits-btn"
             onClick={onTopupClick}
-            style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "6px 12px", borderRadius: "10px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "800", color: "var(--text)", cursor: "pointer" }}
+            style={{ alignItems: "center", gap: "6px", background: "var(--bg2)", padding: "6px 12px", borderRadius: "10px", border: "1px solid var(--border)", fontSize: "13px", fontWeight: "800", color: "var(--text)", cursor: "pointer" }}
           >
             <span style={{ color: "#F59E0B" }}>🪙</span> {userCredits.toLocaleString()} <span style={{ fontSize: "11px", color: "var(--accent)" }}>+</span>
           </button>

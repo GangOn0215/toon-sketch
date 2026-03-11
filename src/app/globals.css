@@ -130,6 +130,7 @@ nav.menu-open {
 
 .nav-actions-desktop { display: flex; align-items: center; gap: 12px; }
 .mobile-floating-summon { display: none; }
+.sidebar-credits-btn { display: none; }
 
 .mobile-menu-btn-wrap {
   display: none;
@@ -552,6 +553,7 @@ nav.menu-open {
   }
   
   .summon-btn-desktop-only { display: none !important; }
+  .sidebar-credits-btn { display: flex !important; }
 
   .mobile-floating-summon {
     display: block;
