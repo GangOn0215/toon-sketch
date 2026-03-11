@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,18 +34,19 @@ export default function LoginPage() {
 
     if (isInApp) {
       if (isKakaotalk) {
-        // 카카오톡은 커스텀 스키마를 통해 외부 브라우저를 열 수 있음
         window.location.href = `kakaotalk://web/openExternalApp?url=${encodeURIComponent(window.location.href)}`;
       } else {
-        // 기타 인앱 브라우저 처리 (일반적인 방식)
         const newUrl = window.location.href;
-        if (ua.match(/iphone|ipad|ipod/)) {
-          // iOS는 특별한 처리가 어려우나 안내 문구라도 띄울 수 있음 (여기서는 자동 시도 생략)
-        } else {
-          // 안드로이드 의도(Intent) 스키마
+        if (!ua.match(/iphone|ipad|ipod/)) {
           window.location.href = `intent://${newUrl.replace(/https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
         }
       }
+    }
+
+    // auth callback 에러 처리
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'auth_callback_failed') {
+      setError("로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   }, []);
 
@@ -58,6 +60,7 @@ export default function LoginPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser(session.user);
+        setRedirecting(true);
         router.push("/");
       }
     });
@@ -72,7 +75,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: provider,
-      options: { redirectTo: `${window.location.origin}/login` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) {
       setError(error.message);
@@ -107,6 +110,16 @@ export default function LoginPage() {
       else { router.push("/"); }
     } catch (err) { setError("인증 과정에서 에러가 발생했습니다."); setLoading(false); }
   };
+
+  if (redirecting) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+        <div style={{ width: 40, height: 40, border: "3px solid var(--border)", borderTop: "3px solid var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <p style={{ color: "var(--muted)", fontSize: 15, fontWeight: 600 }}>로그인 중...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column" }}>
