@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface CharacterGalleryProps {
   characters: any[];
@@ -11,12 +12,22 @@ interface CharacterGalleryProps {
 
 export function CharacterGallery({ characters, profile }: CharacterGalleryProps) {
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const isPro = profile?.plan === "pro" || profile?.plan === "premium";
   const isStandard = profile?.plan === "standard";
 
-  // 최근 16개 표시 (원복)
-  const previewCharacters = characters.slice(0, 16);
-  const hasMore = characters.length > 16;
+  // 모바일 2개, 데스크탑 8개 제한
+  const displayLimit = isMobile ? 2 : 8;
+  const previewCharacters = characters.slice(0, displayLimit);
+  const hasMore = characters.length > displayLimit;
 
   const isExpired = (dateStr: string) => {
     if (isPro) return false;
@@ -51,7 +62,7 @@ export function CharacterGallery({ characters, profile }: CharacterGalleryProps)
           아직 생성된 캐릭터가 없습니다.
         </div>
       ) : (
-        <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "20px" }}>
+        <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "20px" }}>
           {previewCharacters.map((char) => {
             const expired = isExpired(char.created_at);
             return (
