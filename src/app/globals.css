@@ -390,7 +390,7 @@ nav.menu-open {
 .cta-note { font-size: 12px; color: var(--subtle); }
 
 /* ── FOOTER ── */
-.footer-inner { max-width: 1100px; margin: 0 auto; padding: 28px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-top: 1px solid var(--border); }
+.footer-inner { max-width: 1100px; margin: 0 auto; padding: 28px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
 .f-logo { font-family: var(--font-noto-serif), serif; font-size: 16px; font-weight: 700; color: var(--text); text-decoration: none; }
 .f-logo em { font-style: italic; color: var(--accent); }
 .f-links { display: flex; gap: 20px; }

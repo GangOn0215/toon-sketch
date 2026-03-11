@@ -4,18 +4,49 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer>
-      <div className="footer-inner">
-        <div className="f-left"><Link className="logo" href="/">툰스케치<em>.</em></Link><p>상상을 현실로 만드는 가장 빠른 방법.</p></div>
-        <div className="f-right">
-          <Link href="/terms" style={{ color: "var(--muted)", textDecoration: "none", fontSize: "14px" }}>이용약관</Link>
-          <Link href="/contact" style={{ color: "var(--muted)", textDecoration: "none", fontSize: "14px" }}>문의</Link>
+    <footer style={{ padding: "60px 24px" }}>
+      <div className="footer-inner" style={{ 
+        maxWidth: "1200px", 
+        margin: "0 auto", 
+        display: "flex", 
+        flexWrap: "wrap", 
+        justifyContent: "space-between", 
+        alignItems: "center",
+        gap: "24px"
+      }}>
+        {/* 좌측: 로고 및 카피라이트 */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <Link className="logo" href="/" style={{ margin: 0 }}>툰스케치<em>.</em></Link>
+          <span style={{ fontSize: "13px", color: "var(--subtle)", opacity: 0.8 }}>
+            © 2025 Toon-Sketch. All rights reserved.
+          </span>
         </div>
-        <div style={{ width: "100%", marginTop: "40px", paddingTop: "20px", borderTop: "1px solid var(--border2)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span className="f-copy" style={{ margin: 0 }}>© 2025 Toon-Sketch</span>
-          <Link href="/privacy" style={{ fontSize: "11px", color: "var(--subtle)", textDecoration: "none", opacity: 0.8 }}>개인정보처리방침</Link>
+
+        {/* 우측: 링크 모음 */}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <Link href="/terms" style={linkStyle}>이용약관</Link>
+          <Link href="/privacy" style={linkStyle}>개인정보처리방침</Link>
+          <Link href="/contact" style={linkStyle}>문의하기</Link>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .footer-inner {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 }
+
+const linkStyle: React.CSSProperties = { 
+  color: "var(--muted)", 
+  textDecoration: "none", 
+  fontSize: "13px", 
+  fontWeight: "500",
+  transition: "color 0.2s"
+};
