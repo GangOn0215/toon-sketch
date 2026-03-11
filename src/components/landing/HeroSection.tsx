@@ -38,14 +38,35 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
 
   return (
     <section id="hero">
+      <div className="hero-bg-orb orb-1" />
+      <div className="hero-bg-orb orb-2" />
+      <div className="hero-bg-grid" />
+      <div className="hero-bg-text" aria-hidden="true">CHARACTER</div>
+
       <div className="hero-split">
         <div className="hero-text">
           <span className="hero-tag reveal">Next-Gen Character Generator</span>
           <h1 className="hero-title reveal d1">상상하던 캐릭터,<br /><span className="italic">단번에 소환하다.</span></h1>
           <p className="hero-sub reveal d2">복잡한 프롬프트 없이 버튼 클릭 <strong>15초</strong>.<br />웹툰 캐릭터 전·측·후면 3면도를 AI가 완성합니다.</p>
           <div className="hero-actions reveal d3">
-            <button className="btn-dark" onClick={() => router.push(isLoggedIn ? "/workspace" : "/login")}>{isLoggedIn ? "지금 바로 시작하기" : "로그인하고 시작하기"}</button>
+            <button className="btn-dark btn-hero-primary" onClick={() => router.push(isLoggedIn ? "/workspace" : "/login")}>{isLoggedIn ? "지금 바로 시작하기" : "로그인하고 시작하기"}</button>
             <button className="btn-ghost" onClick={() => scrollTo("gallery")}>갤러리 보기</button>
+          </div>
+          <div className="hero-stats reveal d3">
+            <div className="hero-stat">
+              <span className="stat-num">15<em>초</em></span>
+              <span className="stat-label">생성 시간</span>
+            </div>
+            <div className="hero-stat-divider" />
+            <div className="hero-stat">
+              <span className="stat-num">3<em>면도</em></span>
+              <span className="stat-label">전·측·후 완성</span>
+            </div>
+            <div className="hero-stat-divider" />
+            <div className="hero-stat">
+              <span className="stat-num">무료</span>
+              <span className="stat-label">체험 가능</span>
+            </div>
           </div>
         </div>
         <div className="hero-visual reveal d2">

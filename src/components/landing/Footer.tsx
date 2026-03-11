@@ -4,49 +4,54 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer style={{ padding: "60px 24px" }}>
-      <div className="footer-inner" style={{ 
-        maxWidth: "1200px", 
-        margin: "0 auto", 
-        display: "flex", 
-        flexWrap: "wrap", 
-        justifyContent: "space-between", 
-        alignItems: "center",
-        gap: "24px"
-      }}>
-        {/* 좌측: 로고 및 카피라이트 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          <Link className="logo" href="/" style={{ margin: 0 }}>툰스케치<em>.</em></Link>
-          <span style={{ fontSize: "13px", color: "var(--subtle)", opacity: 0.8 }}>
-            © 2025 Toon-Sketch. All rights reserved.
-          </span>
+    <footer className="ft-footer">
+      <div className="ft-inner">
+
+        {/* ── Top grid ── */}
+        <div className="ft-top">
+
+          {/* Brand */}
+          <div className="ft-brand">
+            <Link className="ft-logo" href="/">툰스케치<em>.</em></Link>
+            <p className="ft-tagline">AI 기반 웹툰 캐릭터<br />3면도 생성 서비스</p>
+            <div className="ft-sys-tag">
+              <span className="ft-sb">[</span>
+              <span className="ft-si">SYS</span>
+              <span className="ft-sb">]</span>
+              <span className="ft-sn">TOON · SKETCH · v1.0</span>
+            </div>
+          </div>
+
+          {/* Navigate */}
+          <div className="ft-col">
+            <div className="ft-col-label">NAVIGATE</div>
+            <div className="ft-nav">
+              <a href="/#demo">데모</a>
+              <a href="/#pricing">요금제</a>
+              <a href="/#gallery">갤러리</a>
+              <a href="/#how">사용법</a>
+            </div>
+          </div>
+
+          {/* Legal */}
+          <div className="ft-col">
+            <div className="ft-col-label">LEGAL</div>
+            <div className="ft-nav">
+              <Link href="/terms">이용약관</Link>
+              <Link href="/privacy">개인정보처리방침</Link>
+              <Link href="/contact">문의하기</Link>
+            </div>
+          </div>
+
         </div>
 
-        {/* 우측: 링크 모음 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <Link href="/terms" style={linkStyle}>이용약관</Link>
-          <Link href="/privacy" style={linkStyle}>개인정보처리방침</Link>
-          <Link href="/contact" style={linkStyle}>문의하기</Link>
+        {/* ── Bottom bar ── */}
+        <div className="ft-bottom">
+          <span className="ft-copy">© 2025 Toon-Sketch. All rights reserved.</span>
+          <span className="ft-made">Made in Korea · AI Character Generation</span>
         </div>
+
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .footer-inner {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 16px !important;
-          }
-        }
-      `}</style>
     </footer>
   );
 }
-
-const linkStyle: React.CSSProperties = { 
-  color: "var(--muted)", 
-  textDecoration: "none", 
-  fontSize: "13px", 
-  fontWeight: "500",
-  transition: "color 0.2s"
-};
