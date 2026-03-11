@@ -18,87 +18,152 @@ export default function PrivacyPolicyPage() {
 
       <main style={{ flex: 1, padding: "80px 24px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", background: "var(--bg2)", padding: "48px", borderRadius: "24px", border: "1px solid var(--border)" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "40px", letterSpacing: "-1px" }}>개인정보처리방침</h1>
+          <h1 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "40px", letterSpacing: "-1px" }}>개인정보 처리방침</h1>
           
           <div className="prose" style={{ color: "var(--text)", lineHeight: "1.8", fontSize: "15px" }}>
+            <div style={{ marginBottom: "24px", color: "var(--muted)", fontSize: "14px" }}>
+              <strong>공고일자:</strong> 2026년 3월 11일 / <strong>시행일자:</strong> 2026년 3월 11일
+            </div>
+
             <p style={{ marginBottom: "24px", color: "var(--muted)" }}>
-              <strong>툰 스케치</strong>(이하 &apos;회사&apos;라고 합니다)는 고객님의 개인정보를 매우 중요하게 생각하며, 「개인정보보호법」을 준수하고 있습니다. 본 개인정보처리방침은 고객님께서 제공하시는 개인정보가 어떠한 용도와 방식으로 이용되고 있으며, 개인정보 보호를 위해 어떠한 조치가 취해지고 있는지 알려드립니다.
+              <strong>툰 스케치</strong>(이하 &quot;회사&quot;)는 이용자의 개인정보를 소중히 여기며, 개인정보보호법 등 관련 법령을 준수합니다. 본 방침을 통해 수집하는 개인정보의 항목, 이용 목적, 보유 기간 및 이용자의 권리를 안내합니다.
             </p>
 
-            <h2 style={h2Style}>1. 수집하는 개인정보의 항목 및 수집 방법</h2>
-            <p style={pStyle}>회사는 회원가입, 고객상담, 서비스 제공 등을 위해 아래와 같은 개인정보를 수집하고 있습니다.</p>
-            <ul style={ulStyle}>
-              <li style={liStyle}><strong>필수 항목:</strong> 이메일 주소, 이름(닉네임), 프로필 사진</li>
-              <li style={liStyle}><strong>추가 인증 항목:</strong> 휴대전화 번호 (보안 및 중복 가입 방지를 위한 OTP 인증 시)</li>
-              <li style={liStyle}><strong>결제 시 수집 항목:</strong> 결제 수단 정보, 결제 금액, 구매 내역</li>
-              <li style={liStyle}><strong>자동 수집 항목:</strong> 서비스 이용기록, 접속 로그, 쿠키, 접속 IP 정보, 생성 프롬프트</li>
-            </ul>
-
-            <h2 style={h2Style}>2. 개인정보의 수집 및 이용 목적</h2>
-            <p style={pStyle}>회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다.</p>
-            <ul style={ulStyle}>
-              <li style={liStyle}><strong>서비스 제공 및 요금 정산:</strong> 콘텐츠 제공, 고화질 이미지 생성, 구매 및 요금 결제</li>
-              <li style={liStyle}><strong>회원 관리:</strong> 본인확인, 부정이용 방지, 가입 의사 확인, 불만 처리 및 고지사항 전달</li>
-              <li style={liStyle}><strong>서비스 개선 및 AI 모델 고도화:</strong> 사용자가 생성한 프롬프트 및 결과물은 서비스 품질 향상 및 AI 모델 학습에 활용될 수 있습니다. <strong>(단, 사용자가 학습 제외를 요청하는 경우 회사는 이를 준수합니다.)</strong></li>
-              <li style={liStyle}><strong>마케팅 및 광고에의 활용:</strong> 신규 서비스 개발 및 특화 서비스 제공, 이벤트 및 광고성 정보 전달, 서비스 홍보를 위한 생성 결과물 활용 (선택적 동의 사항)</li>
-            </ul>
-
-            <h2 style={h2Style}>3. 개인정보의 보유 및 이용 기간</h2>
-            <p style={pStyle}>이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 관련 법령(전자상거래법 등)에 따라 보존 의무가 있는 경우 해당 기간 동안 보관합니다.</p>
-
-            <h2 style={h2Style}>4. 개인정보의 제3자 제공 및 국외 이전</h2>
-            <p style={pStyle}>회사는 이용자의 동의 없이 개인정보를 외부에 제공하지 않습니다. 단, 원활한 결제 처리를 위해 아래와 같이 정보를 제공하고 있습니다.</p>
+            <h2 style={h2Style}>제1조 (개인정보의 수집 항목 및 이용 목적)</h2>
+            <p style={pStyle}>회사는 서비스 제공을 위해 아래와 같이 개인정보를 수집합니다.</p>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>제공받는 자</th>
-                  <th style={thStyle}>목적</th>
-                  <th style={thStyle}>이전 국가</th>
-                  <th style={thStyle}>항목</th>
+                  <th style={thStyle}>서비스</th>
+                  <th style={thStyle}>처리 목적</th>
+                  <th style={thStyle}>수집 항목</th>
+                  <th style={thStyle}>필수/선택</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={tdStyle}>회원가입 (이메일)</td>
+                  <td style={tdStyle}>회원 식별, 서비스 제공, CS 처리</td>
+                  <td style={tdStyle}>이름, 이메일, 비밀번호, 휴대폰 번호</td>
+                  <td style={tdStyle}>필수</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>소셜 로그인 (카카오, 구글, 네이버)</td>
+                  <td style={tdStyle}>회원 식별, 서비스 제공</td>
+                  <td style={tdStyle}>이름, 이메일, 휴대폰 번호 (해당 시)</td>
+                  <td style={tdStyle}>필수</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>유료 결제 (토스/무통장)</td>
+                  <td style={tdStyle}>결제 처리, 입금 확인 및 환불</td>
+                  <td style={tdStyle}>결제 정보, 입금자 이름</td>
+                  <td style={tdStyle}>필수</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>고충 처리 (CS)</td>
+                  <td style={tdStyle}>민원 처리 및 답변</td>
+                  <td style={tdStyle}>이름, 이메일, 연락처</td>
+                  <td style={tdStyle}>필수</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>서비스 이용 로그</td>
+                  <td style={tdStyle}>서비스 개선, 부정이용 방지</td>
+                  <td style={tdStyle}>IP 주소, 접속 일시, 쿠키</td>
+                  <td style={tdStyle}>자동 수집</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2 style={h2Style}>제2조 (개인정보 수집 방법)</h2>
+            <p style={pStyle}>회사는 다음과 같은 방법으로 개인정보를 수집합니다.</p>
+            <ul style={ulStyle}>
+              <li style={liStyle}>회원가입 및 서비스 이용 시 이용자가 직접 입력</li>
+              <li style={liStyle}>소셜 로그인(카카오, 구글, 네이버)을 통한 제공</li>
+              <li style={liStyle}>서비스 이용 과정에서 자동 생성·수집 (쿠키, 접속 로그 등)</li>
+            </ul>
+
+            <h2 style={h2Style}>제3조 (개인정보 보유 및 이용 기간)</h2>
+            <p style={pStyle}>회사는 이용자의 개인정보를 원칙적으로 회원 탈퇴 시까지 보유합니다. 단, 관련 법령에 따라 아래 기간 동안 별도 보관합니다.</p>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>관련 법령</th>
+                  <th style={thStyle}>보유 항목</th>
+                  <th style={thStyle}>보유 기간</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={tdStyle}>전자상거래법</td>
+                  <td style={tdStyle}>계약·청약철회, 대금 결제 및 공급 기록</td>
+                  <td style={tdStyle}>5년</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>전자상거래법</td>
+                  <td style={tdStyle}>소비자 불만·분쟁 기록</td>
+                  <td style={tdStyle}>3년</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>전자상거래법</td>
+                  <td style={tdStyle}>표시·광고 기록</td>
+                  <td style={tdStyle}>6개월</td>
+                </tr>
+                <tr>
+                  <td style={tdStyle}>통신비밀보호법</td>
+                  <td style={tdStyle}>접속 로그, IP</td>
+                  <td style={tdStyle}>3개월</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2 style={h2Style}>제4조 (개인정보의 제3자 제공)</h2>
+            <p style={pStyle}>회사는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단, 다음의 경우에는 예외로 합니다.</p>
+            <ul style={ulStyle}>
+              <li style={liStyle}>이용자가 사전에 동의한 경우</li>
+              <li style={liStyle}>법령의 규정에 따라 수사기관 등이 요구하는 경우</li>
+              <li style={liStyle}>결제 처리를 위해 토스페이먼츠에 최소한의 결제 정보를 제공하는 경우</li>
+            </ul>
+
+            <h2 style={h2Style}>제5조 (개인정보 처리 위탁)</h2>
+            <p style={pStyle}>회사는 서비스 제공을 위해 아래와 같이 개인정보 처리 업무를 위탁합니다.</p>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>수탁 업체</th>
+                  <th style={thStyle}>위탁 업무</th>
+                  <th style={thStyle}>보유 기간</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td style={tdStyle}>토스페이먼츠(주)</td>
-                  <td style={tdStyle}>국내 결제 승인 및 정산</td>
-                  <td style={tdStyle}>대한민국</td>
-                  <td style={tdStyle}>결제 정보</td>
+                  <td style={tdStyle}>결제 처리 및 환불</td>
+                  <td style={tdStyle}>계약 종료 시까지</td>
                 </tr>
                 <tr>
-                  <td style={tdStyle}>Stripe Inc.</td>
-                  <td style={tdStyle}>해외 결제 승인 및 정산</td>
-                  <td style={tdStyle}>미국 (국외이전)</td>
-                  <td style={tdStyle}>카드/결제 정보</td>
+                  <td style={tdStyle}>Amazon Web Services / Fal.ai</td>
+                  <td style={tdStyle}>클라우드 서버 운영 및 AI 처리</td>
+                  <td style={tdStyle}>계약 종료 시까지</td>
                 </tr>
               </tbody>
             </table>
 
-            <h2 style={h2Style}>5. 개인정보 처리 위탁</h2>
-            <p style={pStyle}>회사는 서비스의 원활한 기술적 제공을 위해 아래와 같이 전문 업체에 개인정보 처리 업무를 위탁하고 있습니다.</p>
-            <ul style={ulStyle}>
-              <li style={liStyle}><strong>위탁 업체: Fal.ai (Fal Labs)</strong></li>
-              <li style={liStyle}><strong>위탁 업무:</strong> AI 이미지 생성 처리 및 프롬프트 분석</li>
-              <li style={liStyle}><strong>보유 및 이용 기간:</strong> 서비스 제공 목적 달성 시 또는 위탁 계약 종료 시까지</li>
-            </ul>
+            <h2 style={h2Style}>제6조 (이용자의 권리 및 행사 방법)</h2>
+            <p style={pStyle}>이용자는 언제든지 개인정보 열람·정정 요구, 동의 철회, 삭제 및 처리 정지 요구 권리를 행사할 수 있습니다. 권리 행사는 서비스 내 설정 메뉴 또는 아래 담당자에게 이메일로 신청하시면 지체 없이 처리합니다.</p>
 
-            <h2 style={h2Style}>6. 이용자의 권리와 그 행사 방법</h2>
-            <p style={pStyle}>이용자는 언제든지 자신의 개인정보 조회/수정/삭제를 요청할 수 있습니다. 특히 <strong>본인이 생성한 콘텐츠가 AI 학습에 활용되는 것을 거부할 권리</strong>가 있으며, 고객센터를 통해 해당 의사를 전달할 수 있습니다.</p>
+            <h2 style={h2Style}>제7조 (개인정보의 안전성 확보 조치)</h2>
+            <p style={pStyle}>회사는 비밀번호 암호화 저장, 접근 권한 최소화, 보안 프로그램 설치 및 정기 교육 등을 통해 개인정보를 안전하게 보호합니다.</p>
 
-            <h2 style={h2Style}>7. 개인정보의 파기 절차 및 방법</h2>
-            <p style={pStyle}>정보 주체로부터 동의받은 보유 기간이 경과하거나 처리 목적이 달성되었을 때는 해당 개인정보를 지체 없이 파기합니다. 전자적 파일은 재생할 수 없는 기술적 방법을 사용하며, 종이 문서는 분쇄하거나 소각합니다.</p>
-
-            <h2 style={h2Style}>8. 만 14세 미만 아동의 개인정보 보호</h2>
-            <p style={pStyle}>회사는 만 14세 미만 아동의 개인정보 수집 시 법정대리인의 동의를 받으며, 법정대리인은 아동의 개인정보에 대한 권리를 행사할 수 있습니다.</p>
-
-            <h2 style={h2Style}>9. 개인정보 보호책임자 및 상담</h2>
-            <p style={pStyle}>개인정보와 관련한 불만이나 문의사항은 아래 연락처로 문의해 주시기 바랍니다.</p>
-            <ul style={ulStyle}>
-              <li style={liStyle}>책임자: 정준영</li>
-              <li style={liStyle}>이메일: support@toon-sketch.com</li>
-            </ul>
+            <h2 style={h2Style}>제8조 (개인정보 보호책임자)</h2>
+            <p style={pStyle}>개인정보 관련 문의는 아래 담당자에게 연락하실 수 있습니다.</p>
+            <div style={{ background: "var(--bg)", padding: "24px", borderRadius: "16px", border: "1px solid var(--border)", marginBottom: "24px" }}>
+              <div style={{ marginBottom: "8px" }}><strong>담당자:</strong> 툰 스케치 개인정보보호 담당자 (정준영)</div>
+              <div style={{ marginBottom: "8px" }}><strong>이메일:</strong> dmsqlctnekf@gmail.com</div>
+              <div><strong>처리 기간:</strong> 접수 후 5영업일 이내</div>
+            </div>
 
             <div style={{ marginTop: "60px", paddingTop: "24px", borderTop: "1px solid var(--border)", color: "var(--muted)", fontSize: "13px" }}>
-              <p>본 방침은 2026년 3월 5일부터 시행됩니다.</p>
+              <p>※ 개인정보 침해 관련 신고·상담은 개인정보침해신고센터(privacy.kisa.or.kr / 국번없이 118)에 문의하실 수 있습니다.</p>
             </div>
           </div>
         </div>
