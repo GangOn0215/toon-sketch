@@ -73,14 +73,28 @@ export class FalGenerator implements ImageGenerator {
 
     const res = await fetch(url);
     if (!res.ok) throw new Error("Fal.ai 이미지 다운로드 실패");
-    
+
+    // #33: OOM 방지 - 파일 크기 제한 (최대 10MB)
+    const contentLength = res.headers.get("content-length");
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (contentLength && parseInt(contentLength) > MAX_SIZE) {
+      throw new Error("이미지 용량이 너무 커서 서버가 거부했습니다.");
+    }
+
+    const buffer = Buffer.from(await res.arrayBuffer());
+    if (buffer.length > MAX_SIZE) {
+      throw new Error("이미지 데이터가 한도를 초과했습니다.");
+    }
+
     return {
-      buffer: Buffer.from(await res.arrayBuffer()),
+      buffer,
       metadata: {
         inferenceTime,
         cost: estimatedCost
       }
     };
+
   }
 }
 
