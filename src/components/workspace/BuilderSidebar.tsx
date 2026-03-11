@@ -51,13 +51,12 @@ interface BuilderSidebarProps {
   userPlan: string;
   userCredits?: number;
   onTopupClick?: () => void;
-  resolution: string;
-  setResolution: (val: any) => void;
   seed: number | null;
   isLocked: boolean;
   setLockedSeed: (val: number | null) => void;
   loading: boolean;
   handleGenerate: () => void;
+  onReset: () => void;
 }
 
 const TAB_KEYS: Record<Tab, Record<string, { label: string; items: string[] }>> = {
@@ -68,7 +67,7 @@ const TAB_KEYS: Record<Tab, Record<string, { label: string; items: string[] }>> 
 
 export function BuilderSidebar({
   selection, onSelect, lockedOptions, toggleLock, bulkSetLocks, userPlan, userCredits, onTopupClick,
-  resolution, setResolution, seed, isLocked, setLockedSeed, loading, handleGenerate
+  seed, isLocked, setLockedSeed, loading, handleGenerate, onReset
 }: BuilderSidebarProps) {
   const [activeTab, setActiveTab] = useState<Tab>("기본");
   const isBasicPlan = userPlan === "free" || userPlan === "mini";
@@ -158,8 +157,9 @@ export function BuilderSidebar({
 
       {/* Step 2: 세부 설정 (모드 선택 후 활성화) */}
       <div style={{ opacity: selection.mode ? 1 : 0.5, pointerEvents: selection.mode ? "auto" : "none", transition: "all 0.3s", display: "flex", flexDirection: "column", flex: 1 }}>
-        {/* 탭 */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 28, background: "var(--bg2)", padding: 4, borderRadius: 10, border: "1px solid var(--border)" }}>
+        {/* 탭 + 초기화 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
+        <div style={{ display: "flex", flex: 1, gap: 4, background: "var(--bg2)", padding: 4, borderRadius: 10, border: "1px solid var(--border)" }}>
           {tabs.map((tab) => {
             const needsPlan = tab !== "기본" && isBasicPlan;
             return (
@@ -180,6 +180,14 @@ export function BuilderSidebar({
               </button>
             );
           })}
+        </div>
+          <button
+            onClick={onReset}
+            title="초기화"
+            style={{ flexShrink: 0, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "7px 12px", fontSize: 12, fontWeight: 700, color: "var(--muted)", cursor: "pointer", whiteSpace: "nowrap" }}
+          >
+            🔄 초기화
+          </button>
         </div>
 
         {/* 탭 액션 버튼 */}
@@ -255,33 +263,6 @@ export function BuilderSidebar({
 
         <div style={{ height: 24 }} />
 
-        {/* 해상도 */}
-        <div style={{ marginBottom: 24, marginTop: 24, padding: "16px", background: "var(--bg2)", borderRadius: "12px", border: "1px solid var(--border)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--accent)", letterSpacing: "1px" }}>RESOLUTION</span>
-            {(userPlan !== "pro" && userPlan !== "premium") && <span style={{ fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "2px 6px", borderRadius: "4px" }}>Pro</span>}
-          </div>
-          <div style={{ display: "flex", gap: "4px", background: "var(--bg)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border)", }}>
-            {(["0.5K", "1K", "2K"] as const).map((r) => (
-              <button
-                key={r}
-                disabled={(userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K"}
-                onClick={() => setResolution(r)}
-                style={{
-                  flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: "600", borderRadius: "6px", border: "none",
-                  cursor: ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? "not-allowed" : "pointer",
-                  background: resolution === r ? "var(--accent)" : "transparent",
-                  color: resolution === r ? "#fff" : ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? "var(--subtle)" : "var(--muted)",
-                  opacity: ((userPlan !== "pro" && userPlan !== "premium") && r !== "0.5K") ? 0.5 : 1,
-                  transition: "all 0.2s"
-                }}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Seed Lock (캐릭터 고정) */}
         {seed !== null && (
           <div style={{ 
@@ -320,9 +301,9 @@ export function BuilderSidebar({
           </div>
         )}
 
-        <div style={{ marginTop: 24, marginBottom: 40 }}>
-          <button 
-            className="btn-dark workspace-summon-btn" 
+        <div className="summon-btn-desktop-only" style={{ marginTop: 24, marginBottom: 40 }}>
+          <button
+            className="btn-dark workspace-summon-btn"
             onClick={handleGenerate} 
             disabled={loading} 
             style={{ width: "100%", height: 56, fontSize: 16, fontWeight: 700, opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", boxShadow: "0 10px 20px -10px var(--accent)" }}

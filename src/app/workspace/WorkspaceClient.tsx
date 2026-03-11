@@ -23,6 +23,14 @@ const GenerationModal = dynamic(() => import("@/components/workspace/GenerationM
 
 type HistoryItem = { id: string; imageUrl: string; thumbnailUrl?: string; selection: Record<string, string>; seed: number; timestamp: number; };
 
+const INITIAL_SELECTION: Record<string, string> = {
+  mode: "", ratio: "", background: "", style: "", shot: "", pose: "",
+  gender: "", ethnicity: "", age: "", race: "", job: "",
+  body: "", hairStyle: "", hairColor: "", eyeColor: "",
+  impression: "", expression: "", clothing: "",
+  mainColor: "", shoeType: "", shoeColor: "", acc: "", vibe: "",
+};
+
 interface WorkspaceClientProps {
   initialUser: any;
   initialProfile: any;
@@ -38,17 +46,14 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const [userPlan, setUserPlan] = useState<any>(initialPlan);
   const [credits, setCredits] = useState<number>(initialCredits);
   const [authLoading, setAuthLoading] = useState(false); // 초기값이 있으므로 false로 시작
-  const [resolution, setResolution] = useState<string>("");
+  const resolution = "1K";
 
-  const [selection, setSelection] = useState<Record<string, string>>({
-    mode: "캐릭터 시트", ratio: "1:1", background: "", style: "웹툰스타일", shot: "전체 샷", pose: "기본 정자세",
-    gender: "", ethnicity: "없음", age: "청년", race: "인간", job: "없음",
-    body: "보통 체형", hairStyle: "숏컷", hairColor: "흑발", eyeColor: "흑안/갈안",
-    impression: "순한", expression: "미소", clothing: "캐주얼",
-    mainColor: "블랙", shoeType: "스니커즈", shoeColor: "블랙", acc: "없음", vibe: "발랄한",
-  });
-  
+  const [selection, setSelection] = useState<Record<string, string>>(INITIAL_SELECTION);
   const [lockedOptions, setLockedOptions] = useState<Record<string, boolean>>({});
+  const resetSelection = () => {
+    setSelection({ ...INITIAL_SELECTION });
+    setLockedOptions({});
+  };
   const [imageUrl, setImageUrl]   = useState<string | null>(null);
   const [seed, setSeed]           = useState<number | null>(null);
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
@@ -119,7 +124,14 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
 
   useEffect(() => { localStorage.setItem("ts-locks", JSON.stringify(lockedOptions)); }, [lockedOptions]);
 
-  const select = (key: string, val: string) => setSelection((prev) => ({ ...prev, [key]: val }));
+  const select = (key: string, val: string) => setSelection((prev) => {
+    const next = { ...prev, [key]: val };
+    if (key === "mode" && val === "캐릭터 시트") {
+      next.ratio = "";
+      next.background = "";
+    }
+    return next;
+  });
   const toggleLock = (key: string) => setLockedOptions(prev => ({ ...prev, [key]: !prev[key] }));
   const bulkSetLocks = (keys: string[], value: boolean) => setLockedOptions(prev => { const next = { ...prev }; keys.forEach(k => { next[k] = value; }); return next; });
 
@@ -156,7 +168,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
         },
         body: JSON.stringify({
           ...selection, seed: targetSeed,
-          resolution: (userPlan === "pro" || userPlan === "premium") ? resolution : "0.5K",
+          resolution: resolution,
           plan: userPlan,
           userId: user.id,
           referenceImage: lockedSeed ? imageUrl : null
@@ -245,9 +257,9 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
         <BuilderSidebar
           selection={selection} onSelect={select} lockedOptions={lockedOptions} toggleLock={toggleLock} bulkSetLocks={bulkSetLocks}
           userPlan={userPlan} userCredits={credits} onTopupClick={() => setShowTopupModal(true)}
-          resolution={resolution} setResolution={setResolution} seed={seed}
+          seed={seed}
           isLocked={lockedSeed !== null && lockedSeed === seed} setLockedSeed={setLockedSeed}
-          loading={loading} handleGenerate={handleGenerate}
+          loading={loading} handleGenerate={handleGenerate} onReset={resetSelection}
         />
         
         <div ref={displayRef} className="display-container-wrapper" style={{ width: "100%" }}>
@@ -284,6 +296,18 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           }
         }
       `}</style>
+
+      {/* Mobile floating summon button */}
+      <div className="mobile-floating-summon">
+        <button
+          className="btn-dark"
+          onClick={handleGenerate}
+          disabled={loading}
+          style={{ width: "100%", height: 56, fontSize: 16, fontWeight: 700, borderRadius: 16, opacity: loading ? 0.65 : 1, cursor: loading ? "not-allowed" : "pointer", boxShadow: "0 8px 24px -4px rgba(0,0,0,0.25)" }}
+        >
+          {loading ? "생성 중..." : "✦ 캐릭터 소환 (30🪙)"}
+        </button>
+      </div>
 
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan={userPlan} />
       {showTopupModal && <TopupModal user={user} onClose={() => setShowTopupModal(false)} />}
