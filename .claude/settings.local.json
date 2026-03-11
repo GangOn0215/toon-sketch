@@ -10,7 +10,8 @@
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(grep -r \"dangerouslySetInnerHTML\\\\|eval\\\\|Function\\\\\\(\" /d/2026-programming/git/toon-sketch/src --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | head -20)"
     ]
   }
 }
