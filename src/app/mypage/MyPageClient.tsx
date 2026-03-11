@@ -51,17 +51,22 @@ export default function MyPageClient({ initialUser, initialProfile }: MyPageClie
   }, [supabase]);
 
   useEffect(() => {
+    // 초기 로드 시 유저가 있으면 데이터 페칭
+    if (initialUser) {
+      fetchData(initialUser);
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
         fetchData(session.user);
-      } else {
+      } else if (event === "SIGNED_OUT") {
         router.push("/login");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase, router, fetchData]);
+  }, [supabase, router, fetchData, initialUser]);
 
   useEffect(() => {
     // 결제 결과 확인
