@@ -1026,15 +1026,22 @@ nav.menu-open {
 .cta-trust-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   font-family: monospace;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--subtle);
-  line-height: 1.6;
+  line-height: 1;
 }
-.cta-trust-row em { color: var(--accent); font-style: normal; }
+.cta-trust-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+.cta-trust-row em { color: var(--accent); font-style: normal; line-height: 1; }
 
 /* Responsive */
 @media (max-width: 860px) {
