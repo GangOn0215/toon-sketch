@@ -47,8 +47,8 @@ export function CTASection({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
 
           <div className="cta-trust-row">
-            <span><em>○</em> 가입 즉시 무료 크레딧</span>
-            <span><em>○</em> 신용카드 불필요</span>
+            <span><em>✦</em> FREE CREDITS ON SIGNUP</span>
+            <span><em>✦</em> NO CREDIT CARD REQUIRED</span>
           </div>
         </div>
       </div>
