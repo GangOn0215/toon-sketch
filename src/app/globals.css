@@ -129,6 +129,7 @@ nav.menu-open {
 .nav-menu a:hover { color: var(--text); }
 
 .nav-actions-desktop { display: flex; align-items: center; gap: 12px; }
+.mobile-floating-summon { display: none; }
 
 .mobile-menu-btn-wrap {
   display: none;
@@ -550,18 +551,28 @@ nav.menu-open {
     gap: 24px !important;
   }
   
-  .workspace-summon-btn {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    border-radius: 0 !important;
-    margin-bottom: 0 !important;
-    z-index: 90 !important;
-    box-shadow: 0 -10px 20px rgba(0,0,0,0.1) !important;
-    height: 70px !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
+  .summon-btn-desktop-only { display: none !important; }
+
+  .mobile-floating-summon {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index: 90;
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
   }
+
+
+  /* TopupModal mobile */
+  .topup-overlay { align-items: center !important; padding: 32px 20px !important; }
+  .topup-modal { border-radius: 20px !important; max-height: calc(100svh - 16px) !important; }
+  .topup-header { padding: 28px 24px 20px !important; }
+  .topup-header h2 { font-size: 20px !important; }
+  .topup-packages { padding: 20px 20px !important; gap: 12px !important; }
+  .topup-pkg-item { padding: 16px 18px !important; }
+  .topup-footer { padding: 20px !important; }
 
   .sidebar-container {
     width: 100% !important;

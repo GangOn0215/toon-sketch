@@ -90,7 +90,7 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
           </div>
           
           {/* Mobile Wrap: Only visible on mobile via CSS */}
-          <div className="mobile-menu-btn-wrap" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className="mobile-menu-btn-wrap" style={{ alignItems: "center", gap: "10px" }}>
             <ThemeToggle />
             
             {isLoggedIn && (

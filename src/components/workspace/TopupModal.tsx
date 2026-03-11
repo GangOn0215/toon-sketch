@@ -46,11 +46,11 @@ export function TopupModal({ user, onClose }: TopupModalProps) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
-      <div style={{ background: "var(--bg)", width: "100%", maxWidth: "480px", borderRadius: "24px", overflow: "hidden", position: "relative", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }} onClick={e => e.stopPropagation()}>
-        
+    <div className="topup-overlay" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", overflowY: "auto" }} onClick={onClose}>
+      <div className="topup-modal" style={{ background: "var(--bg)", width: "100%", maxWidth: "480px", borderRadius: "24px", overflow: "hidden", position: "relative", boxShadow: "0 24px 60px rgba(0,0,0,0.2)", maxHeight: "90svh", display: "flex", flexDirection: "column" }} onClick={e => e.stopPropagation()}>
+
         {/* 헤더 */}
-        <div style={{ padding: "32px 32px 24px", borderBottom: "1px solid var(--border)", textAlign: "center", position: "relative" }}>
+        <div className="topup-header" style={{ padding: "32px 32px 24px", borderBottom: "1px solid var(--border)", textAlign: "center", position: "relative", flexShrink: 0 }}>
           <h2 style={{ fontSize: "24px", fontWeight: "700" }}>크레딧 충전</h2>
           <p style={{ color: "var(--subtle)", fontSize: "14px", marginTop: "8px" }}>캐릭터 소환을 계속하기 위해 크레딧이 필요합니다.</p>
           <button 
@@ -77,30 +77,28 @@ export function TopupModal({ user, onClose }: TopupModalProps) {
         </div>
 
         {/* 패키지 선택 */}
-        <div style={{ padding: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="topup-packages" style={{ padding: "24px 32px", display: "flex", flexDirection: "column", gap: "12px", overflowY: "auto" }}>
           {packages.map((pkg) => (
-            <label key={pkg.id} style={{ 
-              display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px", 
+            <label key={pkg.id} className="topup-pkg-item" style={{
+              display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px",
               borderRadius: "16px", border: selectedPkg === pkg.id ? "2px solid var(--accent)" : "1px solid var(--border)",
               background: selectedPkg === pkg.id ? "var(--al)" : "var(--bg2)", cursor: "pointer", transition: "all 0.2s"
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <input type="radio" name="topupPkg" value={pkg.id} checked={selectedPkg === pkg.id} onChange={(e) => setSelectedPkg(e.target.value)} style={{ width: "20px", height: "20px", accentColor: "var(--accent)" }} />
-                <div>
-                  <div style={{ fontWeight: "700", fontSize: "16px", color: "var(--text)" }}>{pkg.name}</div>
-                  <div style={{ fontSize: "13px", color: "var(--muted)", marginTop: "4px" }}>🪙 {pkg.amount} 크레딧</div>
+              <input type="radio" name="topupPkg" value={pkg.id} checked={selectedPkg === pkg.id} onChange={(e) => setSelectedPkg(e.target.value)} style={{ width: "18px", height: "18px", flexShrink: 0, accentColor: "var(--accent)" }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: "700", fontSize: "15px", color: "var(--text)" }}>{pkg.name}</span>
+                  {pkg.isPopular && <span style={{ fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "2px 7px", borderRadius: "100px", fontWeight: "700", flexShrink: 0 }}>BEST</span>}
                 </div>
+                <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "3px" }}>🪙 {pkg.amount} 크레딧</div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                {pkg.isPopular && <span style={{ display: "block", fontSize: "10px", background: "var(--accent)", color: "#fff", padding: "4px 8px", borderRadius: "100px", marginBottom: "4px", fontWeight: "700" }}>BEST</span>}
-                <div style={{ fontWeight: "800", fontSize: "18px" }}>{pkg.price.toLocaleString()}원</div>
-              </div>
+              <div style={{ fontWeight: "800", fontSize: "17px", flexShrink: 0 }}>{pkg.price.toLocaleString()}원</div>
             </label>
           ))}
         </div>
 
         {/* 결제 버튼 */}
-        <div style={{ padding: "24px 32px 32px", background: "var(--bg2)", borderTop: "1px solid var(--border)" }}>
+        <div className="topup-footer" style={{ padding: "20px 24px 24px", background: "var(--bg2)", borderTop: "1px solid var(--border)", flexShrink: 0 }}>
           <button 
             onClick={handlePayment}
             disabled={isProcessing}
