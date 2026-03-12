@@ -16,6 +16,7 @@ import { BuilderSidebar } from "@/components/workspace/BuilderSidebar";
 import { MainDisplay } from "@/components/workspace/MainDisplay";
 import { Nav } from "@/components/landing/Nav";
 import { Footer } from "@/components/landing/Footer";
+import { SelectedTags } from "@/components/workspace/SelectedTags";
 
 // Dynamic Imports for Modals (Reduced initial JS)
 const ImageModal = dynamic(() => import("@/components/workspace/ImageModal").then(mod => mod.ImageModal), { ssr: false });
@@ -126,15 +127,27 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   useEffect(() => { localStorage.setItem("ts-locks", JSON.stringify(lockedOptions)); }, [lockedOptions]);
 
   const select = (key: string, val: string) => setSelection((prev) => {
-    const next = { ...prev, [key]: val };
-    if (key === "mode" && val === "캐릭터 시트") {
-      next.ratio = "";
-      next.background = "";
+    // 이미 선택된 항목을 다시 클릭하면 선택 해제
+    const nextVal = prev[key] === val ? "" : val;
+    const next = { ...prev, [key]: nextVal };
+
+    // 모드 변경 시 관련 옵션 초기화/설정
+    if (key === "mode") {
+      if (nextVal === "캐릭터 시트") {
+        next.ratio = "";
+        next.background = "";
+      } else if (nextVal === "일반 화보") {
+        // 일반 화보로 전환 시 비율 기본값 설정
+        if (!next.ratio) {
+          next.ratio = "16:9"; 
+        }
+      }
     }
     return next;
   });
   const toggleLock = (key: string) => setLockedOptions(prev => ({ ...prev, [key]: !prev[key] }));
   const bulkSetLocks = (keys: string[], value: boolean) => setLockedOptions(prev => { const next = { ...prev }; keys.forEach(k => { next[k] = value; }); return next; });
+  const deselect = (key: string) => setSelection(prev => ({ ...prev, [key]: "" }));
 
   async function handleGenerate() {
     const essentialKeys = ["mode", "style", "gender", "race", "age"];
@@ -264,6 +277,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
         />
         
         <div ref={displayRef} className="display-container-wrapper" style={{ width: "100%" }}>
+          <SelectedTags selection={selection} onDeselect={deselect} />
           <MainDisplay
             selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl}
             loading={loading} history={history} onCopyActualPrompt={copyActualPrompt}

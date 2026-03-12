@@ -169,9 +169,9 @@
 | **합계** | **3** | **✅ 100% 조치 완료** |
 
 ### 24. 경로 보호 로직 부재 (Missing Route Guard) - [Critical]
-- **파일:** `middleware.ts`
+- **파일:** `src/proxy.ts`
 - **문제:** 로그인 필수 경로(`/workspace`, `/mypage`, `/checkout`)에 대한 서버 측 접근 차단 로직이 부재함. 비로그인 사용자도 URL 직접 접속 시 세션 검증 없이 페이지 내부 노출 가능.
-- **권장 수정:** 미들웨어에서 `supabase.auth.getUser()` 결과에 따라 비인가 사용자를 `/login`으로 리다이렉트하는 가드(Guard) 로직 추가.
+- **권장 수정:** 프록시(`src/proxy.ts`)에서 `supabase.auth.getUser()` 결과에 따라 비인가 사용자를 `/login`으로 리다이렉트하는 가드(Guard) 로직 추가.
 
 ### 25. Auth Callback Open Redirect - [Critical]
 - **파일:** `src/app/auth/callback/route.ts`

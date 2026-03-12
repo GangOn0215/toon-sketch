@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
   // 세션 확인 (getUser는 안전한 서버 측 확인 방법임)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // #24: 보호된 경로 가드 (Missing Route Guard 해결)
+  // 보호된 경로 가드 (Missing Route Guard 해결)
   const protectedPaths = ['/workspace', '/mypage', '/checkout']
   const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
