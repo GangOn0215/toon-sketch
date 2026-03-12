@@ -23,15 +23,15 @@ export function LoginSocial({ onLogin, loading }: LoginSocialProps) {
         <p style={{ color: "var(--subtle)", fontSize: "14px" }}>소셜 계정으로 간편하게 로그인하세요.</p>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <button onClick={() => onLogin("google")} style={btnStyle("#fff", "#111", "1px solid #e0e0e0")}>
+        <button onClick={() => onLogin("google")} style={btnStyle("rgb(255,255,255)", "rgb(17,17,17)", "1px solid rgb(224,224,224)")}>
           <img src="/images/google.svg" alt="" style={iconStyle} />
           Google로 시작하기
         </button>
-        <button onClick={() => onLogin("kakao")} style={btnStyle("#FEE500", "#000")}>
+        <button onClick={() => onLogin("kakao")} style={btnStyle("rgb(254,229,0)", "rgb(0,0,0)")}>
           <img src="/images/kakao.svg" alt="" style={iconStyle} />
           카카오로 시작하기
         </button>
-        <button onClick={() => onLogin("naver")} style={btnStyle("#03C75A", "#fff")}>
+        <button onClick={() => onLogin("naver")} style={btnStyle("rgb(3,199,90)", "rgb(255,255,255)")}>
           <img src="/images/naver.svg" alt="" style={iconStyle} />
           네이버로 시작하기
         </button>

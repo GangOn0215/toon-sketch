@@ -43,6 +43,7 @@ interface WorkspaceClientProps {
 export default function WorkspaceClient({ initialUser, initialProfile, initialPlan, initialCredits }: WorkspaceClientProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<any>(initialUser);
   const [profile, setProfile] = useState<any>(initialProfile);
   const [userPlan, setUserPlan] = useState<any>(initialPlan);
@@ -74,6 +75,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
     if (profile?.credits !== undefined) {
       setCredits(profile.credits);
     }
@@ -263,6 +265,16 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   const copyActualPrompt = () => { if (lastPrompt) { navigator.clipboard.writeText(lastPrompt); setCopiedDev(true); setTimeout(() => setCopiedDev(false), 2000); } };
   const copyVideoPrompt = () => { if (seed) { const prompt = `${selection.gender} ${selection.age}, ${selection.hairColor} ${selection.hairStyle}, seed: ${seed}`; navigator.clipboard.writeText(prompt); setCopied(true); setTimeout(() => setCopied(false), 2000); } };
 
+  if (!mounted) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg)" }} suppressHydrationWarning>
+        <Nav isLoggedIn={!!initialUser} user={initialUser} profile={initialProfile} credits={initialCredits} onTopupClick={() => {}} />
+        <div style={{ height: "calc(100vh - 58px)" }} />
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Nav isLoggedIn={!!user} user={user} profile={profile} credits={credits} onTopupClick={() => setShowTopupModal(true)} />
@@ -276,7 +288,7 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           loading={loading} handleGenerate={handleGenerate} onReset={resetSelection}
         />
         
-        <div ref={displayRef} className="display-container-wrapper" style={{ width: "100%" }}>
+        <div ref={displayRef} className="display-container-wrapper" suppressHydrationWarning style={{ width: "100%", padding: "0 16px" }}>
           <SelectedTags selection={selection} onDeselect={deselect} />
           <MainDisplay
             selection={selection} usage={usage} lastPrompt={lastPrompt} imageUrl={imageUrl}

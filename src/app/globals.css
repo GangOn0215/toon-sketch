@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* 하이드레이션 오류 방지용 전역 스타일 */
 :root {
   --bg:      #F8F3EC;
   --bg2:     #EDE5D9;

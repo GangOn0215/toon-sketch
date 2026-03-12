@@ -38,7 +38,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`} suppressHydrationWarning>
+      <head suppressHydrationWarning />
+      <body 
+        className={`${fraunces.variable} ${notoSansKR.variable} ${notoSerifKR.variable}`} 
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
