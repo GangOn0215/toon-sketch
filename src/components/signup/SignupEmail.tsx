@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface SignupEmailProps {
   onSignup: (email: string, password: string, nickname: string) => void;
@@ -111,10 +112,10 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
               style={{
                 position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)",
                 background: "none", border: "none", cursor: "pointer",
-                color: "var(--muted)", fontSize: "18px", padding: 0,
+                color: "var(--muted)", padding: 0, lineHeight: 0,
               }}
             >
-              {showPw ? "🙈" : "👁️"}
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
@@ -153,7 +154,7 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
             transition: "all 0.2s",
           }}
         >
-          {loading ? "가입 중..." : "무료로 시작하기"}
+          다음 — 휴대폰 인증
         </button>
 
         {/* 구분선 */}
