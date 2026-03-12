@@ -129,7 +129,7 @@ export default function LoginPage() {
 
   if (redirecting) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16, paddingTop: "58px" }}>
         <div style={{ width: 40, height: 40, border: "3px solid var(--border)", borderTop: "3px solid var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <p style={{ color: "var(--muted)", fontSize: 15, fontWeight: 600 }}>로그인 중...</p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -138,32 +138,166 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column" }}>
-      <nav>
-        <div className="nav-wrap">
-          <Link className="logo" href="/">툰스케치<em>.</em></Link>
-          <ThemeToggle />
-        </div>
-      </nav>
+    <>
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div className="login-card reveal show" style={{ 
-          width: "100%", maxWidth: "420px", padding: "48px 40px", 
-          background: "var(--bg2)", borderRadius: "32px", border: "1px solid var(--border)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.08)"
-        }}>
-          {error && (
-            <div style={{ padding: "12px", background: "#fff5f5", color: "#e53e3e", borderRadius: "12px", fontSize: "13px", marginBottom: "20px", border: "1px solid #feb2b2" }}>
-              ⚠️ {error}
+        .login-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 80px;
+          width: 100%;
+          max-width: 1040px;
+          margin: 0 auto;
+          align-items: center;
+          padding: 60px 48px;
+          min-height: calc(100vh - 58px);
+          box-sizing: border-box;
+        }
+        .login-copy {
+          animation: fadeUp 0.6s ease both;
+        }
+        .login-card-wrap {
+          animation: fadeUp 0.6s 0.12s ease both;
+        }
+        @media (max-width: 820px) {
+          .login-layout {
+            grid-template-columns: 1fr;
+            gap: 0;
+            padding: 40px 20px;
+            min-height: calc(100vh - 58px);
+          }
+          .login-copy { display: none; }
+        }
+      `}</style>
+
+      <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", paddingTop: "58px" }}>
+        <nav>
+          <div className="nav-wrap">
+            <Link className="logo" href="/">툰스케치<em>.</em></Link>
+            <ThemeToggle />
+          </div>
+        </nav>
+
+        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="login-layout">
+
+            {/* ── 왼쪽: 마케팅 카피 ── */}
+            <div className="login-copy">
+              {/* 배지 */}
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                padding: "5px 12px", borderRadius: "100px",
+                border: "1px solid var(--border)", background: "var(--bg2)",
+                fontSize: "11px", fontWeight: "700", letterSpacing: "0.08em",
+                color: "var(--accent)", textTransform: "uppercase",
+                marginBottom: "28px"
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />
+                AI · 웹툰 · 캐릭터 생성
+              </div>
+
+              {/* 헤드라인 */}
+              <h1 style={{
+                fontFamily: "var(--font-fraunces), serif",
+                fontSize: "clamp(36px, 4vw, 52px)",
+                fontWeight: "600",
+                lineHeight: "1.15",
+                letterSpacing: "-0.02em",
+                color: "var(--text)",
+                marginBottom: "20px",
+              }}>
+                상상을<br />
+                캐릭터로—<br />
+                <em style={{ fontStyle: "italic", color: "var(--accent)" }}>지금 바로</em><br />
+                <em style={{ fontStyle: "italic", color: "var(--accent)" }}>시작하세요.</em>
+              </h1>
+
+              {/* 서브카피 */}
+              <p style={{
+                fontSize: "15px",
+                lineHeight: "1.7",
+                color: "var(--subtle)",
+                maxWidth: "360px",
+                marginBottom: "36px",
+              }}>
+                AI가 당신의 아이디어를 웹툰 캐릭터 3면도로
+                변환합니다. 텍스트 한 줄로 정면·측면·후면을
+                한 번에 생성해보세요.
+              </p>
+
+              {/* 피처 태그 */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {["✦ 3면도 자동 생성", "✦ 무료로 시작", "✦ 10초 이내"].map((tag) => (
+                  <span key={tag} style={{
+                    padding: "6px 14px",
+                    borderRadius: "8px",
+                    background: "var(--bg2)",
+                    border: "1px solid var(--border)",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    color: "var(--muted)",
+                    letterSpacing: "0.01em",
+                  }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              {/* 구분선 */}
+              <div style={{
+                marginTop: "48px",
+                paddingTop: "32px",
+                borderTop: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}>
+                <div style={{ display: "flex" }}>
+                  {["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"].map((c, i) => (
+                    <div key={c} style={{
+                      width: 28, height: 28, borderRadius: "50%",
+                      background: c, border: "2px solid var(--bg)",
+                      marginLeft: i === 0 ? 0 : -8,
+                    }} />
+                  ))}
+                </div>
+                <p style={{ fontSize: "12px", color: "var(--muted)", fontWeight: "500" }}>
+                  이미 <strong style={{ color: "var(--text)" }}>수백 명</strong>의 크리에이터가<br />사용 중입니다
+                </p>
+              </div>
             </div>
-          )}
 
-          {step === "social" && <LoginSocial onLogin={handleSocialLogin} loading={loading} />}
-          {step === "phone" && <LoginPhone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onRequestOtp={handleRequestOtp} loading={loading} user={user} />}
-          {step === "otp" && <LoginOtp otpCode={otpCode} setOtpCode={setOtpCode} onVerifyOtp={handleVerifyOtp} loading={loading} phoneNumber={phoneNumber} />}
-        </div>
-      </main>
-      <Footer />
-    </div>
+            {/* ── 오른쪽: 로그인 카드 ── */}
+            <div className="login-card-wrap">
+              <div className="login-card reveal show" style={{
+                width: "100%", maxWidth: "420px", padding: "48px 40px",
+                background: "var(--bg2)", borderRadius: "32px",
+                border: "1px solid var(--border)",
+                boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
+                margin: "0 auto",
+              }}>
+                {error && (
+                  <div style={{ padding: "12px", background: "#fff5f5", color: "#e53e3e", borderRadius: "12px", fontSize: "13px", marginBottom: "20px", border: "1px solid #feb2b2" }}>
+                    ⚠️ {error}
+                  </div>
+                )}
+
+                {step === "social" && <LoginSocial onLogin={handleSocialLogin} loading={loading} />}
+                {step === "phone" && <LoginPhone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onRequestOtp={handleRequestOtp} loading={loading} user={user} />}
+                {step === "otp" && <LoginOtp otpCode={otpCode} setOtpCode={setOtpCode} onVerifyOtp={handleVerifyOtp} loading={loading} phoneNumber={phoneNumber} />}
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    </>
   );
 }
