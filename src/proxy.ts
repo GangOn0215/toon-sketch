@@ -30,16 +30,59 @@ export async function proxy(request: NextRequest) {
   // 세션 확인 (getUser는 안전한 서버 측 확인 방법임)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // 보호된 경로 가드 (Missing Route Guard 해결)
+  const pathname = request.nextUrl.pathname
+
+  // ── 일반 유저 보호 경로 가드 ──
   const protectedPaths = ['/workspace', '/mypage', '/checkout']
-  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
 
   if (isProtectedPath && !user) {
-    // 로그인되지 않은 사용자가 보호된 경로에 접근하면 로그인 페이지로 리다이렉트
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    url.searchParams.set('redirect', request.nextUrl.pathname)
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
+  }
+
+  // ── 관리자 경로 가드 ──
+  const isAdminPath = pathname.startsWith('/admin')
+  const isAdminLoginPage = pathname === '/admin/login'
+
+  if (isAdminPath && !isAdminLoginPage) {
+    // 비로그인 → /admin/login 으로
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      return NextResponse.redirect(url)
+    }
+
+    // role 체크: profiles 테이블의 role 컬럼 확인
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      // 관리자 권한 없음 → 홈으로
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // 이미 로그인한 관리자가 /admin/login 접근 → /admin 으로
+  if (isAdminLoginPage && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role === 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
