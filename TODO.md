@@ -15,12 +15,22 @@
 ### 🔐 인증 (Auth)
 - [x] 8. 로그인 페이지 2컬럼 레이아웃 + 마케팅 카피 추가
 - [x] 9. 이메일 회원가입 페이지 (`/signup`) 신규 생성
-- [ ] 10. NICE 본인확인 API 연동
-  - [ ] 10-1. NICE 액세스 토큰 발급 API 라우트 (`/api/auth/nice/request`)
-  - [ ] 10-2. NICE 팝업 컴포넌트 (`NiceVerification`) 구현
-  - [ ] 10-3. NICE 콜백 처리 API 라우트 (`/api/auth/nice/callback`)
-  - [ ] 10-4. 복호화 결과(이름/생년월일/성별)를 `profiles` 테이블에 저장
-  - [ ] 10-5. 회원가입 플로우에 본인인증 단계 통합
+- [~] 10. NICE 본인확인 API → **보류** (연간 50~220만원, 사업자 계약 필요)
+  - NICE 파일 생성 완료 상태로 보존 (추후 필요 시 사용)
+- [x] 10-A. 회원가입 3단계 플로우 구현 (정보입력 → 휴대폰 인증 → OTP)
+- [x] 10-B. CoolSMS(SOLAPI) 기반 SMS OTP 발송 (`/api/auth/phone/send`)
+  - Redis OTP 저장 (3분 TTL) + 재전송 쿨다운 60초 + 중복번호 차단
+  - 일일 발송 횟수 제한 10회 (24시간 TTL)
+  - 번호 형식 검증 (010 11자리 / 구형 번호 10~11자리)
+  - 입력 중 실시간 하이픈 자동 포맷 (010-XXXX-XXXX)
+  - 입력 중 실시간 유효성 피드백 (빨간 테두리 + 안내 문구)
+- [x] 10-C. OTP 검증 API (`/api/auth/phone/verify`) + verifiedToken 발급 (5회 초과 차단)
+- [ ] 10-D. Supabase `profiles` 테이블 `phone` 컬럼 추가 (`UNIQUE`)
+  ```sql
+  ALTER TABLE profiles ADD COLUMN phone text UNIQUE;
+  ```
+- [x] 10-E. CoolSMS 환경변수 설정 완료 (`COOLSMS_API_KEY`, `COOLSMS_API_SECRET`, `COOLSMS_FROM_NUMBER`)
+- [ ] 10-F. SOLAPI 발신번호 승인 확인 (오류코드 3059 — 변작된 발신번호 해결)
 
 ### 🛡️ 관리자 페이지 (Admin)
 - [x] 11. `/admin`, `/admin/login` 페이지 신규 생성 (SaaS 어드민 스타일)
