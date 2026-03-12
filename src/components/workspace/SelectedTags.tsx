@@ -18,26 +18,41 @@ export function SelectedTags({ selection, onDeselect }: SelectedTagsProps) {
 
   return (
     <div
+      suppressHydrationWarning
       style={{
-        padding: "12px 16px",
-        background: "var(--bg2)",
+        padding: "16px",
+        background: "var(--bg)",
         border: "1px solid var(--border)",
-        borderRadius: "12px",
-        marginBottom: "16px",
+        borderRadius: "16px",
+        marginBottom: "24px",
+        marginTop: "32px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
       }}
     >
-      <h3
+      <div
         style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: 1.5,
-          textTransform: "uppercase",
-          color: "var(--subtle)",
-          margin: "0 0 10px 0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "12px",
         }}
       >
-        Selected Tags
-      </h3>
+        <h3
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            textTransform: "uppercase",
+            color: "var(--subtle)",
+            margin: 0,
+          }}
+        >
+          Selected Tags
+        </h3>
+        <span style={{ fontSize: 11, color: "var(--subtle)", fontWeight: 500 }}>
+          {selectedItems.length} items
+        </span>
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
         {selectedItems.map(([key, value]) => (
           <div
