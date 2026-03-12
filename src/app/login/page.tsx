@@ -90,6 +90,22 @@ export default function LoginPage() {
     }
   };
 
+  const handleEmailLogin = async (email: string, password: string) => {
+    setError(null);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      } else if (error.message.includes("Email not confirmed")) {
+        setError("이메일 인증이 완료되지 않았습니다. 메일함을 확인해주세요.");
+      } else {
+        setError(error.message);
+      }
+      setLoading(false);
+    }
+  };
+
   const handleRequestOtp = async () => {
     setError(null);
     if (!phoneNumber) return setError("전화번호를 입력해주세요.");
@@ -287,22 +303,10 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                {step === "social" && (
-                  <>
-                    <LoginSocial onLogin={handleSocialLogin} loading={loading} />
-                    <div style={{ marginTop: "20px", textAlign: "center" }}>
-                      <div style={{ height: "1px", background: "var(--border)", margin: "0 0 16px" }} />
-                      <p style={{ fontSize: "14px", color: "var(--muted)" }}>
-                        계정이 없으신가요?{" "}
-                        <a href="/signup" style={{ color: "var(--accent)", fontWeight: "700", textDecoration: "none" }}>
-                          이메일로 회원가입
-                        </a>
-                      </p>
-                    </div>
-                  </>
-                )}
+                {step === "social" && <LoginSocial onLogin={handleSocialLogin} onEmailLogin={handleEmailLogin} loading={loading} />}
                 {step === "phone" && <LoginPhone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onRequestOtp={handleRequestOtp} loading={loading} user={user} />}
                 {step === "otp" && <LoginOtp otpCode={otpCode} setOtpCode={setOtpCode} onVerifyOtp={handleVerifyOtp} loading={loading} phoneNumber={phoneNumber} />}
+
               </div>
             </div>
 

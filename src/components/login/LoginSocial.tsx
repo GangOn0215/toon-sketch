@@ -1,11 +1,14 @@
 "use client";
 
+import { LoginEmail } from "./LoginEmail";
+
 interface LoginSocialProps {
   onLogin: (provider: string) => void;
+  onEmailLogin: (email: string, password: string) => void;
   loading: boolean;
 }
 
-export function LoginSocial({ onLogin, loading }: LoginSocialProps) {
+export function LoginSocial({ onLogin, onEmailLogin, loading }: LoginSocialProps) {
   const btnStyle = (bg: string, color: string, border?: string) => ({
     width: "100%", height: "54px", display: "flex", alignItems: "center", justifyContent: "center",
     position: "relative" as const, padding: "0 24px", borderRadius: "14px", fontSize: "15px",
@@ -22,19 +25,45 @@ export function LoginSocial({ onLogin, loading }: LoginSocialProps) {
         <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "28px", fontWeight: "600", marginBottom: "12px" }}>시작하기</h1>
         <p style={{ color: "var(--subtle)", fontSize: "14px" }}>소셜 계정으로 간편하게 로그인하세요.</p>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <button onClick={() => onLogin("google")} style={btnStyle("rgb(255,255,255)", "rgb(17,17,17)", "1px solid rgb(224,224,224)")}>
-          <img src="/images/google.svg" alt="" style={iconStyle} />
-          Google로 시작하기
-        </button>
-        <button onClick={() => onLogin("kakao")} style={btnStyle("rgb(254,229,0)", "rgb(0,0,0)")}>
-          <img src="/images/kakao.svg" alt="" style={iconStyle} />
-          카카오로 시작하기
-        </button>
-        <button onClick={() => onLogin("naver")} style={btnStyle("rgb(3,199,90)", "rgb(255,255,255)")}>
-          <img src="/images/naver.svg" alt="" style={iconStyle} />
-          네이버로 시작하기
-        </button>
+      <LoginEmail onLogin={onEmailLogin} loading={loading} />
+
+      {/* 회원가입 링크 */}
+      <p style={{ textAlign: "center", fontSize: "14px", color: "var(--muted)", margin: "16px 0 0" }}>
+        계정이 없으신가요?{" "}
+        <a href="/signup" style={{ color: "var(--accent)", fontWeight: "700", textDecoration: "none" }}>
+          이메일로 회원가입
+        </a>
+      </p>
+
+      {/* 구분선 */}
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "16px 0 12px" }}>
+        <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+        <span style={{ fontSize: "12px", color: "var(--muted)", whiteSpace: "nowrap" }}>소셜로 시작하기</span>
+        <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+      </div>
+
+      <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+        {[
+          { provider: "google", bg: "rgb(255,255,255)", color: "rgb(17,17,17)", border: "1px solid rgb(224,224,224)", icon: "/images/google.svg", label: "Google" },
+          { provider: "kakao",  bg: "rgb(254,229,0)",   color: "rgb(0,0,0)",    border: undefined,                   icon: "/images/kakao.svg",  label: "Kakao" },
+          { provider: "naver",  bg: "rgb(3,199,90)",    color: "rgb(255,255,255)", border: undefined,                icon: "/images/naver.svg",  label: "Naver" },
+        ].map(({ provider, bg, color, border, icon, label }) => (
+          <button
+            key={provider}
+            onClick={() => onLogin(provider)}
+            disabled={loading}
+            title={label}
+            style={{
+              width: "48px", height: "48px", display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: "50%", background: bg, color, border: border || "none",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1, transition: "all 0.2s",
+              flexShrink: 0,
+            }}
+          >
+            <img src={icon} alt={label} style={{ width: 20, height: 20, objectFit: "contain" }} />
+          </button>
+        ))}
       </div>
     </div>
   );
