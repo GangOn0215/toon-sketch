@@ -53,13 +53,14 @@ export function CTASection({ isLoggedIn }: { isLoggedIn: boolean }) {
             <span><em>✦</em> FREE CREDITS ON SIGNUP</span>
             <span style={{ position: "relative" }}>
               <em>✦</em> NO CREDIT CARD REQUIRED
-              <button 
+              <button
                 onClick={() => setShowTooltip(!showTooltip)}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
-                style={{ 
-                  background: "none", border: "none", padding: 0, color: "var(--accent)", 
-                  cursor: "pointer", display: "inline-flex", alignItems: "center", marginLeft: "4px"
+                style={{
+                  background: "none", border: "none", padding: 0, color: "var(--accent)",
+                  cursor: "pointer", display: "inline-flex", alignItems: "center",
+                  position: "absolute", left: "calc(100% + 4px)", top: "50%", transform: "translateY(-50%)"
                 }}
                 aria-label="안내"
               >
