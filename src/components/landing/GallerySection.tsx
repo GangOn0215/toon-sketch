@@ -32,7 +32,22 @@ export function GallerySection() {
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { 
+    setMounted(true); 
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      const els = document.querySelectorAll("#gallery .reveal");
+      const obs = new IntersectionObserver(
+        (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("show"); }),
+        { threshold: 0.1 }
+      );
+      els.forEach((el) => obs.observe(el));
+      return () => obs.disconnect();
+    }
+  }, [mounted]);
+
   if (!mounted) return null;
 
   const total = SHOWCASE_IMAGES.length;
@@ -49,7 +64,7 @@ export function GallerySection() {
             <span className="gs-sys-bracket">]</span>
             <span className="gs-sys-name">CHARACTER · ARCHIVE · GALLERY</span>
           </div>
-          <h2 className="gs-title">
+          <h2 className="gs-title reveal d1">
             수천 명의 작가가 선택한<br /><em>캐릭터 디자인</em>
           </h2>
         </div>
@@ -63,54 +78,56 @@ export function GallerySection() {
       </div>
 
       {/* ── Swiper ── */}
-      <Swiper
-        modules={[Autoplay]}
-        spaceBetween={20}
-        slidesPerView={1.1}
-        centeredSlides
-        loop
-        speed={1200}
-        autoplay={{ delay: 4500, disableOnInteraction: false }}
-        onSlideChange={(s) => setActiveIdx(s.realIndex)}
-        breakpoints={{
-          768:  { slidesPerView: 1.8, spaceBetween: 32 },
-          1024: { slidesPerView: 2.2, spaceBetween: 40 },
-          1440: { slidesPerView: 2.5, spaceBetween: 40 },
-        }}
-        className="gs-swiper"
-      >
-        {SHOWCASE_IMAGES.map((src, i) => (
-          <SwiperSlide key={i}>
-            {({ isActive }) => (
-              <div
-                className={`gs-slide${isActive ? " active" : ""}`}
-                onClick={() => isActive && setModalImage(src)}
-              >
-                <Image
-                  src={src}
-                  alt={`Showcase ${i + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 40vw"
-                  style={{ objectFit: "cover" }}
-                />
+      <div className="reveal d3">
+        <Swiper
+          modules={[Autoplay]}
+          spaceBetween={20}
+          slidesPerView={1.1}
+          centeredSlides
+          loop
+          speed={1200}
+          autoplay={{ delay: 4500, disableOnInteraction: false }}
+          onSlideChange={(s) => setActiveIdx(s.realIndex)}
+          breakpoints={{
+            768:  { slidesPerView: 1.8, spaceBetween: 32 },
+            1024: { slidesPerView: 2.2, spaceBetween: 40 },
+            1440: { slidesPerView: 2.5, spaceBetween: 40 },
+          }}
+          className="gs-swiper"
+        >
+          {SHOWCASE_IMAGES.map((src, i) => (
+            <SwiperSlide key={i}>
+              {({ isActive }) => (
+                <div
+                  className={`gs-slide${isActive ? " active" : ""}`}
+                  onClick={() => isActive && setModalImage(src)}
+                >
+                  <Image
+                    src={src}
+                    alt={`Showcase ${i + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 40vw"
+                    style={{ objectFit: "cover" }}
+                  />
 
-                {/* Faded index number */}
-                <span className="gs-idx" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+                  {/* Faded index number */}
+                  <span className="gs-idx" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
 
-                {/* Active: bottom info bar */}
-                {isActive && (
-                  <div className="gs-info">
-                    <span>CHARACTER SHEET</span>
-                    <span>AI GENERATED · 클릭해서 확대</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </SwiperSlide>
-        ))}
-      </Swiper>
+                  {/* Active: bottom info bar */}
+                  {isActive && (
+                    <div className="gs-info">
+                      <span>CHARACTER SHEET</span>
+                      <span>AI GENERATED · 클릭해서 확대</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       <ImageModal modalImage={modalImage} onClose={() => setModalImage(null)} plan="pro" />
     </section>

@@ -74,9 +74,9 @@ const PLANS: Plan[] = [
   },
 ];
 
-function PlanCard({ plan, onClick }: { plan: Plan; onClick: () => void }) {
+function PlanCard({ plan, onClick, delayClass }: { plan: Plan; onClick: () => void; delayClass?: string }) {
   return (
-    <div className={`ps-card${plan.featured ? " featured" : ""}`}>
+    <div className={`ps-card reveal ${delayClass || ""} ${plan.featured ? " featured" : ""}`}>
       {plan.featured && <div className="ps-featured-badge">강력 추천</div>}
 
       <div className="ps-card-inner">
@@ -114,7 +114,23 @@ function PlanCard({ plan, onClick }: { plan: Plan; onClick: () => void }) {
 export function PricingSection() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => { 
+    setMounted(true); 
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      const els = document.querySelectorAll("#pricing .reveal");
+      const obs = new IntersectionObserver(
+        (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("show"); }),
+        { threshold: 0.1 }
+      );
+      els.forEach((el) => obs.observe(el));
+      return () => obs.disconnect();
+    }
+  }, [mounted]);
+
   if (!mounted) return null;
 
   return (
@@ -122,26 +138,31 @@ export function PricingSection() {
       <div className="ps-inner">
 
         {/* ── Header ── */}
-        <div className={`ps-header reveal ${mounted ? "show" : ""}`}>
+        <div className="ps-header reveal">
           <div className="ps-sys-tag">
             <span className="ps-sys-bracket">[</span>
             <span className="ps-sys-id">SYS</span>
             <span className="ps-sys-bracket">]</span>
             <span className="ps-sys-name">PRICING · SELECT · PLAN</span>
           </div>
-          <h2 className="ps-title">작가를 위한<br /><em>합리적인 선택</em></h2>
-          <p className="ps-sub">작업 규모에 맞는 플랜으로 상상을 현실로 만드세요.</p>
+          <h2 className="ps-title reveal d1">작가를 위한<br /><em>합리적인 선택</em></h2>
+          <p className="ps-sub reveal d2">작업 규모에 맞는 플랜으로 상상을 현실로 만드세요.</p>
         </div>
 
         {/* ── Desktop: CSS Grid (≥1024px) ── */}
         <div className="ps-grid-desktop">
-          {PLANS.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} onClick={() => router.push(plan.href)} />
+          {PLANS.map((plan, i) => (
+            <PlanCard 
+              key={plan.id} 
+              plan={plan} 
+              onClick={() => router.push(plan.href)} 
+              delayClass={`d${(i % 3) + 1}`} 
+            />
           ))}
         </div>
 
         {/* ── Mobile/Tablet: Swiper (<1024px) ── */}
-        <div className="ps-swiper-wrap">
+        <div className="ps-swiper-wrap reveal d2">
           <Swiper
             modules={[Pagination]}
             spaceBetween={12}
@@ -164,7 +185,7 @@ export function PricingSection() {
         </div>
 
         {/* ── Footnote ── */}
-        <div className={`ps-footnote reveal d3 ${mounted ? "show" : ""}`}>
+        <div className="ps-footnote reveal d3">
           <p><span className="ps-fn-code">FREE / MINI</span> — 생성 기록은 브라우저 로컬 저장소 사용. 캐시 삭제 시 복구 불가.</p>
           <p><span className="ps-fn-code">STANDARD↑</span> — 서버에 안전하게 보관. 기기 무관하게 열람 가능.</p>
         </div>

@@ -29,11 +29,11 @@ function Slide({ src, index }: { src: string; index: number }) {
   );
 }
 
-function StatRow({ code, label, options, selected, onSelect }: {
-  code: string; label: string; options: string[]; selected: string; onSelect: (v: string) => void;
+function StatRow({ code, label, options, selected, onSelect, delayClass }: {
+  code: string; label: string; options: string[]; selected: string; onSelect: (v: string) => void; delayClass?: string;
 }) {
   return (
-    <div className="ds-row">
+    <div className={`ds-row reveal ${delayClass || ""}`}>
       <div className="ds-row-head">
         <span className="ds-row-code">{code}</span>
         <span className="ds-row-label">{label}</span>
@@ -83,18 +83,18 @@ export function DemoSection() {
             <span className="ds-sys-bracket">]</span>
             <span className="ds-sys-name">CHARACTER · GEN · DEMO</span>
           </div>
-          <h2 className="ds-title">
+          <h2 className="ds-title reveal d1">
             클릭 몇 번으로 완성되는<br />
             <em>전문가급 캐릭터 시트</em>
           </h2>
-          <p className="ds-sub">종족, 직업, 스타일을 선택하면 AI가 15초 만에 고화질 3면도를 완성합니다.</p>
+          <p className="ds-sub reveal d2">종족, 직업, 스타일을 선택하면 AI가 15초 만에 고화질 3면도를 완성합니다.</p>
         </div>
 
         {/* ── Two-column layout ── */}
         <div className="ds-grid">
 
           {/* LEFT: Config terminal */}
-          <div className="ds-config reveal">
+          <div className="ds-config reveal d1">
             <div className="ds-config-bar">
               <span className="ds-bar-label">CONFIG</span>
               <span className={`ds-bar-status ${ready ? "ready" : ""}`}>
@@ -103,13 +103,13 @@ export function DemoSection() {
             </div>
 
             <div className="ds-config-body">
-              <StatRow code="01" label="종족" options={["인간", "엘프", "드래곤", "악마"]}    selected={race}  onSelect={setRace} />
-              <StatRow code="02" label="직업" options={["전사", "마법사", "궁수", "암살자"]}  selected={job}   onSelect={setJob} />
-              <StatRow code="03" label="스타일" options={["웹툰스타일", "애니메이션", "실사"]} selected={style} onSelect={setStyle} />
+              <StatRow code="01" label="종족" options={["인간", "엘프", "드래곤", "악마"]}    selected={race}  onSelect={setRace} delayClass="d1" />
+              <StatRow code="02" label="직업" options={["전사", "마법사", "궁수", "암살자"]}  selected={job}   onSelect={setJob} delayClass="d2" />
+              <StatRow code="03" label="스타일" options={["웹툰스타일", "애니메이션", "실사"]} selected={style} onSelect={setStyle} delayClass="d3" />
             </div>
 
             <button
-              className={`ds-exec-btn${loading ? " loading" : ""}${!ready && !loading ? " dim" : ""}`}
+              className={`ds-exec-btn reveal d3 ${loading ? " loading" : ""}${!ready && !loading ? " dim" : ""}`}
               onClick={handleSummon}
               disabled={loading}
             >
@@ -121,7 +121,7 @@ export function DemoSection() {
           </div>
 
           {/* RIGHT: Output viewer */}
-          <div className="ds-viewer reveal d2">
+          <div className="ds-viewer reveal d3">
             <div className="ds-viewer-bar top">
               <span className="ds-bar-label">OUTPUT</span>
               {seed
