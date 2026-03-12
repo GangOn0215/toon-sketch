@@ -213,7 +213,7 @@ export default function LoginPage() {
                 color: "var(--accent)", textTransform: "uppercase",
                 marginBottom: "28px"
               }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />
                 AI · 웹툰 · 캐릭터 생성
               </div>
 
@@ -274,11 +274,16 @@ export default function LoginPage() {
                 gap: "10px",
               }}>
                 <div style={{ display: "flex" }}>
-                  {["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"].map((c, i) => (
-                    <div key={c} style={{
-                      width: 28, height: 28, borderRadius: "50%",
-                      background: c, border: "2px solid var(--bg)",
-                      marginLeft: i === 0 ? 0 : -8,
+                  {[
+                    { c: "rgb(255, 107, 107)" },
+                    { c: "rgb(78, 205, 196)" },
+                    { c: "rgb(69, 183, 209)" },
+                    { c: "rgb(150, 206, 180)" }
+                  ].map((item, i) => (
+                    <div key={item.c} style={{
+                      width: "28px", height: "28px", borderRadius: "50%",
+                      background: item.c, border: "2px solid var(--bg)",
+                      marginLeft: i === 0 ? "0px" : "-8px",
                     }} />
                   ))}
                 </div>

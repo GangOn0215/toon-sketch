@@ -44,15 +44,16 @@ export function LoginSocial({ onLogin, onEmailLogin, loading }: LoginSocialProps
 
       <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
         {[
-          { provider: "google", bg: "rgb(255,255,255)", color: "rgb(17,17,17)", border: "1px solid rgb(224,224,224)", icon: "/images/google.svg", label: "Google" },
-          { provider: "kakao",  bg: "rgb(254,229,0)",   color: "rgb(0,0,0)",    border: undefined,                   icon: "/images/kakao.svg",  label: "Kakao" },
-          { provider: "naver",  bg: "rgb(3,199,90)",    color: "rgb(255,255,255)", border: undefined,                icon: "/images/naver.svg",  label: "Naver" },
-        ].map(({ provider, bg, color, border, icon, label }) => (
+          { provider: "google", bg: "rgb(255, 255, 255)", color: "rgb(17, 17, 17)", border: "1px solid rgb(224, 224, 224)", icon: "/images/google.svg", label: "Google", imgWidth: 20 },
+          { provider: "kakao",  bg: "rgb(254, 229, 0)",   color: "rgb(0, 0, 0)",    border: "1px solid rgba(0, 0, 0, 0.05)", icon: "/images/kakao.png",  label: "Kakao",  imgWidth: 35 },
+          { provider: "naver",  bg: "rgb(5, 172, 79)",    color: "rgb(255, 255, 255)", border: "1px solid rgba(0, 0, 0, 0.05)", icon: "/images/naver.png",  label: "Naver",  imgWidth: 35 },
+        ].map(({ provider, bg, color, border, icon, label, imgWidth }) => (
           <button
             key={provider}
             onClick={() => onLogin(provider)}
             disabled={loading}
             title={label}
+            suppressHydrationWarning
             style={{
               width: "48px", height: "48px", display: "flex", alignItems: "center", justifyContent: "center",
               borderRadius: "50%", background: bg, color, border: border || "none",
@@ -61,7 +62,7 @@ export function LoginSocial({ onLogin, onEmailLogin, loading }: LoginSocialProps
               flexShrink: 0,
             }}
           >
-            <img src={icon} alt={label} style={{ width: 20, height: 20, objectFit: "contain" }} />
+            <img src={icon} alt={label} style={{ width: `${imgWidth}px`, height: "auto", objectFit: "contain" }} />
           </button>
         ))}
       </div>

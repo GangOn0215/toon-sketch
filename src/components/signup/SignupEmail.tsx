@@ -69,7 +69,7 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {/* 닉네임 */}
-        <div>
+        <div suppressHydrationWarning>
           <label style={labelStyle}>닉네임</label>
           <input
             type="text"
@@ -78,11 +78,12 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
             onChange={(e) => setNickname(e.target.value)}
             style={inputStyle}
             maxLength={20}
+            suppressHydrationWarning
           />
         </div>
 
         {/* 이메일 */}
-        <div>
+        <div suppressHydrationWarning>
           <label style={labelStyle}>이메일</label>
           <input
             type="email"
@@ -91,13 +92,14 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
             autoComplete="email"
+            suppressHydrationWarning
           />
         </div>
 
         {/* 비밀번호 */}
-        <div>
+        <div suppressHydrationWarning>
           <label style={labelStyle}>비밀번호</label>
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }} suppressHydrationWarning>
             <input
               type={showPw ? "text" : "password"}
               placeholder="8자 이상"
@@ -105,6 +107,7 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
               onChange={(e) => setPassword(e.target.value)}
               style={{ ...inputStyle, paddingRight: "48px" }}
               autoComplete="new-password"
+              suppressHydrationWarning
             />
             <button
               type="button"
@@ -121,7 +124,7 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
         </div>
 
         {/* 비밀번호 확인 */}
-        <div>
+        <div suppressHydrationWarning>
           <label style={labelStyle}>비밀번호 확인</label>
           <input
             type={showPw ? "text" : "password"}
@@ -130,13 +133,14 @@ export function SignupEmail({ onSignup, loading }: SignupEmailProps) {
             onChange={(e) => setConfirm(e.target.value)}
             style={{
               ...inputStyle,
-              borderColor: confirm && confirm !== password ? "#e53e3e" : undefined,
+              borderColor: confirm && confirm !== password ? "rgb(229, 62, 62)" : undefined,
             }}
             autoComplete="new-password"
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            suppressHydrationWarning
           />
           {confirm && confirm !== password && (
-            <p style={{ fontSize: "12px", color: "#e53e3e", marginTop: "4px" }}>비밀번호가 일치하지 않습니다.</p>
+            <p style={{ fontSize: "12px", color: "rgb(229, 62, 62)", marginTop: "4px" }}>비밀번호가 일치하지 않습니다.</p>
           )}
         </div>
 
