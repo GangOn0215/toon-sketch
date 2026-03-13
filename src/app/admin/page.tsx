@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import UserManagement from "@/components/admin/UserManagement";
+import PaymentManagement from "@/components/admin/PaymentManagement";
+import GenerationMonitoring from "@/components/admin/GenerationMonitoring";
 
 type MenuKey = "dashboard" | "users" | "generations" | "payments" | "plans" | "logs";
 
@@ -46,9 +49,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     const fmt = () => new Date().toLocaleString("ko-KR", { hour12: false });
-    setNow(fmt());
+    const handle = requestAnimationFrame(() => setNow(fmt()));
     const timer = setInterval(() => setNow(fmt()), 1000);
-    return () => clearInterval(timer);
+    return () => {
+      cancelAnimationFrame(handle);
+      clearInterval(timer);
+    };
   }, []);
 
   // 클라이언트 측 2차 권한 체크
@@ -66,7 +72,7 @@ export default function AdminPage() {
       if (profile?.role !== "admin") router.replace("/");
     };
     checkAuth();
-  }, []);
+  }, [router, supabase]);
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -596,7 +602,13 @@ export default function AdminPage() {
               </>
             )}
 
-            {active !== "dashboard" && (
+            {active === "users" && <UserManagement />}
+
+            {active === "payments" && <PaymentManagement />}
+
+            {active === "generations" && <GenerationMonitoring />}
+
+            {active !== "dashboard" && active !== "users" && active !== "payments" && active !== "generations" && (
               <>
                 <div className="page-header">
                   <div className="page-title">{activeMenu?.label}</div>
