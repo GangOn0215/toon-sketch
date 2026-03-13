@@ -26,10 +26,10 @@ export function Footer() {
           <div className="ft-col">
             <div className="ft-col-label">NAVIGATE</div>
             <div className="ft-nav">
-              <a href="/#demo">데모</a>
-              <a href="/#pricing">요금제</a>
-              <a href="/#gallery">갤러리</a>
-              <a href="/#how">사용법</a>
+              <Link href="/#demo">데모</Link>
+              <Link href="/#pricing">요금제</Link>
+              <Link href="/#gallery">갤러리</Link>
+              <Link href="/#how">사용법</Link>
             </div>
           </div>
 

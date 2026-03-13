@@ -62,10 +62,10 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
           
           {/* Desktop Menu */}
           <ul className="nav-menu">
-            <li><a href="/#demo">데모</a></li>
-            <li><a href="/#pricing">요금제</a></li>
-            <li><a href="/#gallery">갤러리</a></li>
-            <li><a href="/#how">사용법</a></li>
+            <li><Link href="/#demo">데모</Link></li>
+            <li><Link href="/#pricing">요금제</Link></li>
+            <li><Link href="/#gallery">갤러리</Link></li>
+            <li><Link href="/#how">사용법</Link></li>
           </ul>
         </div>
 
@@ -201,15 +201,15 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
             <Link href="/" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
               <Home size={18} color="var(--accent)" /> <span style={{ fontSize: "14px", fontWeight: "600" }}>홈으로</span>
             </Link>
-            <a href="/#gallery" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
+            <Link href="/#gallery" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
               <Image size={18} color="var(--accent)" /> <span style={{ fontSize: "14px", fontWeight: "600" }}>갤러리</span>
-            </a>
-            <a href="/#pricing" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
+            </Link>
+            <Link href="/#pricing" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
               <CreditCard size={18} color="var(--accent)" /> <span style={{ fontSize: "14px", fontWeight: "600" }}>요금제</span>
-            </a>
-            <a href="/#how" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
+            </Link>
+            <Link href="/#how" onClick={closeMenu} style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--bg2)", padding: "16px", borderRadius: "16px", textDecoration: "none", color: "var(--text)", border: "1px solid var(--border2)" }}>
               <HelpCircle size={18} color="var(--accent)" /> <span style={{ fontSize: "14px", fontWeight: "600" }}>사용법</span>
-            </a>
+            </Link>
           </div>
 
           {/* 4. Bottom Section (Enhanced Logout) */}
