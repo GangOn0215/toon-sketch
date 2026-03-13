@@ -6,7 +6,7 @@
 - [ ] 2. Supabase `profiles` 테이블 스키마 업데이트
   - `phone` (text, UNIQUE) 컬럼 추가
   - `role` (text, DEFAULT 'user') 컬럼 추가
-- [ ] 3. SMS OTP 실제 발송 테스트 및 회원가입 연동 완료
+- [x] 3. 이메일 인증 없는 즉시 가입 플로우 구현 완료
 - [ ] 4. 관리자 계정 권한 수동 설정 (SQL) 및 접근 테스트
 
 ### 🛡️ 관리자 페이지 (Admin)

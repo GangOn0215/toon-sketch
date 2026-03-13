@@ -94,6 +94,11 @@ export default function SignupPage() {
     setDoneEmail(email);
     setDone(true);
     setLoading(false);
+
+    // 이메일 인증이 꺼져 있으면 즉시 세션이 생성되므로 2초 후 홈으로 이동
+    setTimeout(() => {
+      router.push("/");
+    }, 2000);
   };
 
   // 2단계: OTP 발송 (CoolSMS)
@@ -185,24 +190,23 @@ export default function SignupPage() {
     if (done) {
       return (
         <div style={{ textAlign: "center", padding: "16px 0" }}>
-          <div style={{ fontSize: "52px", marginBottom: "20px" }}>📬</div>
+          <div style={{ fontSize: "52px", marginBottom: "20px" }}>🎉</div>
           <h2 style={{ fontSize: "22px", fontWeight: "700", marginBottom: "12px", color: "var(--text)" }}>
-            인증 메일을 확인해주세요
+            회원가입 완료!
           </h2>
           <p style={{ fontSize: "14px", color: "var(--subtle)", lineHeight: "1.7", marginBottom: "8px" }}>
-            <strong style={{ color: "var(--text)" }}>{doneEmail}</strong>으로<br />
-            인증 링크를 보내드렸습니다.
+            <strong style={{ color: "var(--text)" }}>{doneEmail}</strong> 계정으로<br />
+            가입이 성공적으로 완료되었습니다.
           </p>
           <p style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "32px" }}>
-            메일의 링크를 클릭하면 가입이 완료됩니다.<br />
-            스팸 폴더도 확인해보세요.
+            잠시 후 메인 페이지로 이동합니다.
           </p>
-          <Link href="/login" style={{
+          <Link href="/" style={{
             display: "inline-block", padding: "14px 32px",
             borderRadius: "14px", background: "var(--accent)", color: "#fff",
             fontSize: "15px", fontWeight: "700", textDecoration: "none",
           }}>
-            로그인 페이지로
+            메인으로 바로가기
           </Link>
         </div>
       );
