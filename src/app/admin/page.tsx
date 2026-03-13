@@ -3,41 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { RefreshCw } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import PaymentManagement from "@/components/admin/PaymentManagement";
 import GenerationMonitoring from "@/components/admin/GenerationMonitoring";
 
 type MenuKey = "dashboard" | "users" | "generations" | "payments" | "plans" | "logs";
-
-const MENU: { key: MenuKey; label: string; icon: string; badge?: number }[] = [
-  { key: "dashboard",   label: "대시보드",      icon: "▦" },
-  { key: "users",       label: "유저 관리",      icon: "👤", badge: 3 },
-  { key: "generations", label: "생성 모니터링",  icon: "🎨" },
-  { key: "payments",    label: "결제 관리",      icon: "💳", badge: 1 },
-  { key: "plans",       label: "플랜 설정",      icon: "📦" },
-  { key: "logs",        label: "보안 로그",      icon: "🔒", badge: 7 },
-];
-
-const STATS = [
-  { label: "오늘 신규 가입",  value: "24",       delta: "+12%", up: true,  sub: "어제 대비" },
-  { label: "오늘 생성 수",    value: "1,847",    delta: "+8%",  up: true,  sub: "어제 대비" },
-  { label: "오늘 매출",       value: "₩284,000", delta: "-3%",  up: false, sub: "어제 대비" },
-  { label: "크레딧 소진",     value: "9,230",    delta: "+21%", up: true,  sub: "어제 대비" },
-];
-
-const RECENT_USERS = [
-  { id: "u_9f2a", email: "kim***@gmail.com",  plan: "FREE",  credits: 10,  joined: "2026-03-12 09:14" },
-  { id: "u_8e1b", email: "lee***@naver.com",   plan: "PRO",   credits: 240, joined: "2026-03-12 08:52" },
-  { id: "u_7c3d", email: "par***@kakao.com",   plan: "BASIC", credits: 50,  joined: "2026-03-12 08:31" },
-  { id: "u_6b4f", email: "cho***@gmail.com",   plan: "FREE",  credits: 10,  joined: "2026-03-12 07:49" },
-  { id: "u_5a5e", email: "jeo***@outlook.com", plan: "PRO",   credits: 240, joined: "2026-03-12 07:02" },
-];
-
-const GEN_STATS = [
-  { label: "성공", count: 1712, total: 1847, color: "#22c55e" },
-  { label: "대기", count: 98,   total: 1847, color: "#f59e0b" },
-  { label: "실패", count: 37,   total: 1847, color: "#ef4444" },
-];
 
 export default function AdminPage() {
   const router = useRouter();
@@ -46,11 +17,30 @@ export default function AdminPage() {
   const [signingOut, setSigningOut] = useState(false);
   const [now, setNow] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // 실시간 통계 데이터 가져오기
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      const res = await fetch("/api/admin/stats");
+      const data = await res.json();
+      if (res.ok) setStats(data);
+    } catch (err) {
+      console.error("[AdminPage] Fetch stats error:", err);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fmt = () => new Date().toLocaleString("ko-KR", { hour12: false });
     const handle = requestAnimationFrame(() => setNow(fmt()));
     const timer = setInterval(() => setNow(fmt()), 1000);
+    
+    fetchStats(); // 초기 로드
+
     return () => {
       cancelAnimationFrame(handle);
       clearInterval(timer);
@@ -80,7 +70,23 @@ export default function AdminPage() {
     router.push("/admin/login");
   };
 
-  const activeMenu = MENU.find(m => m.key === active);
+  const MENU_WITH_STATS = [
+    { key: "dashboard",   label: "대시보드",      icon: "▦" },
+    { key: "users",       label: "유저 관리",      icon: "👤", badge: stats?.totalUsers },
+    { key: "generations", label: "생성 모니터링",  icon: "🎨", badge: stats?.todayGenerations > 0 ? `+${stats.todayGenerations}` : undefined },
+    { key: "payments",    label: "결제 관리",      icon: "💳", badge: stats?.pendingOrders > 0 ? stats.pendingOrders : undefined, isWarning: true },
+    { key: "plans",       label: "플랜 설정",      icon: "📦" },
+    { key: "logs",        label: "보안 로그",      icon: "🔒" },
+  ];
+
+  const DASHBOARD_STATS = [
+    { label: "오늘 신규 가입",  value: stats?.todayUsers?.toLocaleString() || "0", delta: "Today", up: true,  sub: "데이터베이스 기준" },
+    { label: "오늘 생성 수",    value: stats?.todayGenerations?.toLocaleString() || "0", delta: "Today", up: true,  sub: "데이터베이스 기준" },
+    { label: "오늘 매출",       value: `₩${stats?.todayRevenue?.toLocaleString() || "0"}`, delta: "Today", up: true, sub: "데이터베이스 기준" },
+    { label: "전체 사용자",     value: stats?.totalUsers?.toLocaleString() || "0", delta: "Total", up: true,  sub: "데이터베이스 기준" },
+  ];
+
+  const activeMenu = MENU_WITH_STATS.find(m => m.key === active);
 
   return (
     <>
@@ -164,13 +170,14 @@ export default function AdminPage() {
         .sb-badge {
           font-size: 10px;
           font-weight: 700;
-          background: #ef4444;
+          background: #3b82f6;
           color: #fff;
           border-radius: 10px;
           padding: 1px 6px;
           min-width: 18px;
           text-align: center;
         }
+        .sb-badge.warning { background: #ef4444; }
 
         .sb-footer {
           padding: 12px 16px;
@@ -427,6 +434,9 @@ export default function AdminPage() {
           transition: all 0.2s;
         }
 
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
         @media (max-width: 1100px) {
           .stat-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -454,15 +464,15 @@ export default function AdminPage() {
           </div>
           <div className="sb-nav">
             <div className="sb-section-label">메뉴</div>
-            {MENU.map(item => (
+            {MENU_WITH_STATS.map(item => (
               <div
                 key={item.key}
                 className={`sb-item ${active === item.key ? "active" : ""}`}
-                onClick={() => { setActive(item.key); setMobileOpen(false); }}
+                onClick={() => { setActive(item.key as MenuKey); setMobileOpen(false); }}
               >
                 <span className="sb-item-icon">{item.icon}</span>
                 <span className="sb-item-label">{item.label}</span>
-                {item.badge && <span className="sb-badge">{item.badge}</span>}
+                {item.badge !== undefined && <span className={`sb-badge ${item.isWarning ? 'warning' : ''}`}>{item.badge}</span>}
               </div>
             ))}
           </div>
@@ -485,15 +495,15 @@ export default function AdminPage() {
 
           <div className="sb-nav">
             <div className="sb-section-label">메뉴</div>
-            {MENU.map(item => (
+            {MENU_WITH_STATS.map(item => (
               <div
                 key={item.key}
                 className={`sb-item ${active === item.key ? "active" : ""}`}
-                onClick={() => setActive(item.key)}
+                onClick={() => setActive(item.key as MenuKey)}
               >
                 <span className="sb-item-icon">{item.icon}</span>
                 <span className="sb-item-label">{item.label}</span>
-                {item.badge && <span className="sb-badge">{item.badge}</span>}
+                {item.badge !== undefined && <span className={`sb-badge ${item.isWarning ? 'warning' : ''}`}>{item.badge}</span>}
               </div>
             ))}
           </div>
@@ -516,7 +526,10 @@ export default function AdminPage() {
                 Admin / <span>{activeMenu?.label}</span>
               </div>
             </div>
-            <div className="tb-right">
+            <div className="tb-right" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <button onClick={fetchStats} disabled={statsLoading} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", alignItems: "center" }}>
+                <RefreshCw size={14} className={statsLoading ? "spin" : ""} />
+              </button>
               <span className="tb-time">{now}</span>
             </div>
           </header>
@@ -526,77 +539,31 @@ export default function AdminPage() {
               <>
                 <div className="page-header">
                   <div className="page-title">대시보드</div>
-                  <div className="page-sub">서비스 전반 현황을 확인하세요.</div>
+                  <div className="page-sub">서비스 전반 현황을 실시간으로 확인하세요.</div>
                 </div>
 
                 {/* Stat 카드 */}
                 <div className="stat-grid">
-                  {STATS.map(s => (
+                  {DASHBOARD_STATS.map(s => (
                     <div key={s.label} className="stat-card">
                       <div className="stat-label">{s.label}</div>
                       <div className="stat-value">{s.value}</div>
-                      <span className={`stat-delta ${s.up ? "up" : "down"}`}>
-                        {s.up ? "↑" : "↓"} {s.delta}
+                      <span className={`stat-delta up`}>
+                        {s.delta}
                       </span>
                       <div className="stat-sub">{s.sub}</div>
                     </div>
                   ))}
                 </div>
 
-                {/* 최근 가입자 */}
+                {/* 하단 섹션 (준비 중인 통계) */}
                 <div className="panel">
                   <div className="panel-head">
-                    <span className="panel-title">최근 가입자</span>
-                    <span className="panel-meta">최근 24시간 · {RECENT_USERS.length}명</span>
+                    <span className="panel-title">시스템 현황</span>
+                    <span className="panel-meta">Last updated: {stats?.timestamp ? new Date(stats.timestamp).toLocaleTimeString() : "N/A"}</span>
                   </div>
-                  <table className="adm-table">
-                    <thead>
-                      <tr>
-                        <th>UID</th>
-                        <th>이메일</th>
-                        <th>플랜</th>
-                        <th>크레딧</th>
-                        <th>가입일시</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {RECENT_USERS.map(u => (
-                        <tr key={u.id}>
-                          <td><span className="uid-text">{u.id}</span></td>
-                          <td>{u.email}</td>
-                          <td>
-                            <span className={`plan-badge plan-${u.plan.toLowerCase()}`}>
-                              {u.plan}
-                            </span>
-                          </td>
-                          <td>{u.credits}</td>
-                          <td>{u.joined}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* 생성 현황 */}
-                <div className="panel">
-                  <div className="panel-head">
-                    <span className="panel-title">생성 현황</span>
-                    <span className="panel-meta">오늘 총 {GEN_STATS.reduce((a, g) => a + g.count, 0).toLocaleString()}건</span>
-                  </div>
-                  <div className="gen-body">
-                    {GEN_STATS.map(g => {
-                      const pct = ((g.count / g.total) * 100).toFixed(1);
-                      return (
-                        <div key={g.label} className="gen-row">
-                          <span className="gen-label">{g.label}</span>
-                          <div className="gen-track">
-                            <div className="gen-fill" style={{ width: `${pct}%`, background: g.color }} />
-                          </div>
-                          <span className="gen-count">{g.count.toLocaleString()}</span>
-                          <span className="gen-pct" style={{ color: g.color }}>{pct}%</span>
-                        </div>
-                      );
-                    })}
+                  <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>
+                    <p style={{ fontSize: "14px" }}>그래프 및 상세 통계는 현재 준비 중입니다.</p>
                   </div>
                 </div>
               </>
