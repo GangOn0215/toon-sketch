@@ -30,36 +30,41 @@ function validatePhone(num: string): boolean {
   return /^(010\d{8}|01[16789]\d{7,8})$/.test(cleaned);
 }
 
-async function sendCoolSms(to: string, otp: string): Promise<void> {
-  const apiKey = process.env.COOLSMS_API_KEY!;
-  const apiSecret = process.env.COOLSMS_API_SECRET!;
-  const from = process.env.COOLSMS_FROM_NUMBER!.replace(/\D/g, "");
+async function sendNcpSms(to: string, otp: string): Promise<void> {
+  const accessKey = process.env.NCP_ACCESS_KEY!;
+  const secretKey = process.env.NCP_SECRET_KEY!;
+  const serviceId = process.env.NCP_SMS_SERVICE_ID!;
+  const from = process.env.NCP_SMS_FROM_NUMBER!.replace(/\D/g, "");
 
-  const date = new Date().toISOString();
-  const salt = crypto.randomBytes(16).toString("hex");
+  const timestamp = String(Date.now());
+  const method = "POST";
+  const url = `/sms/v2/services/${serviceId}/messages`;
+
   const signature = crypto
-    .createHmac("sha256", apiSecret)
-    .update(date + salt)
-    .digest("hex");
+    .createHmac("sha256", secretKey)
+    .update(`${method} ${url}\n${timestamp}\n${accessKey}`)
+    .digest("base64");
 
-  const res = await fetch("https://api.solapi.com/messages/v4/send", {
+  const res = await fetch(`https://sens.apigw.ntruss.com${url}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `HMAC-SHA256 apiKey=${apiKey}, date=${date}, salt=${salt}, signature=${signature}`,
+      "x-ncp-apigw-timestamp": timestamp,
+      "x-ncp-iam-access-key": accessKey,
+      "x-ncp-apigw-signature-v2": signature,
     },
     body: JSON.stringify({
-      message: {
-        to,
-        from,
-        text: `[툰스케치] 인증번호 ${otp}를 입력해주세요. (3분 내 유효)`,
-      },
+      type: "SMS",
+      from,
+      content: `[툰스케치] 인증번호 ${otp}를 입력해주세요. (3분 내 유효)`,
+      messages: [{ to }],
     }),
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err?.errorMessage || "SMS 발송 실패");
+  const data = await res.json();
+  console.log("[NCP SENS 응답]", JSON.stringify(data));
+  if (data.statusCode !== "202") {
+    throw new Error(data.statusName || "SMS 발송 실패");
   }
 }
 
@@ -137,7 +142,7 @@ export async function POST(request: NextRequest) {
     }
 
     // SMS 발송
-    await sendCoolSms(formatted, otp);
+    await sendNcpSms(formatted, otp);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

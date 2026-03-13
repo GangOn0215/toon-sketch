@@ -62,59 +62,35 @@ export default function SignupPage() {
     return /^(010\d{8}|01[16789]\d{7,8})$/.test(cleaned);
   };
 
-  // 1단계 완료 → 즉시 가입 (본인인증 임시 비활성화)
+  // 1단계 완료 → 즉시 가입 (발신번호 심사 완료 전 임시 비활성화)
   const handleFormNext = async (email: string, password: string, nickname: string) => {
-    console.log("🚀 회원가입 시도:", { email, nickname });
     setLoading(true);
     setError(null);
-
     try {
       const { data, error: signupError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            email: email, // 이메일 저장 추가
-            nickname: nickname,
-            full_name: nickname,
-            phone: null,
-            phone_verified: false,
-          },
+          data: { email, nickname, full_name: nickname, phone: null, phone_verified: false },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-
-      console.log("📦 Supabase 응답 데이터:", data);
-
       if (signupError) {
-        console.error("❌ Supabase 가입 에러:", signupError);
-        if (signupError.message.includes("already registered")) {
-          setError("이미 사용 중인 이메일입니다. 로그인 페이지를 이용해주세요.");
-        } else {
-          setError(signupError.message);
-        }
+        setError(signupError.message.includes("already registered") ? "이미 사용 중인 이메일입니다." : signupError.message);
         setLoading(false);
         return;
       }
-
       if (!data.user) {
-        console.warn("⚠️ 유저 데이터가 반환되지 않았습니다.");
-        setError("회원가입 요청은 성공했으나 유저 생성에 실패했습니다. (중복 계정 여부 확인 필요)");
+        setError("회원가입에 실패했습니다. 다시 시도해주세요.");
         setLoading(false);
         return;
       }
-
-      console.log("✅ 회원가입 성공! 유저 ID:", data.user.id);
       setDoneEmail(email);
       setDone(true);
       setLoading(false);
-
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
-    } catch (err) {
-      console.error("🔥 예상치 못한 오류 발생:", err);
-      setError("회원가입 처리 중 알 수 없는 오류가 발생했습니다.");
+      setTimeout(() => router.push("/"), 2000);
+    } catch {
+      setError("알 수 없는 오류가 발생했습니다.");
       setLoading(false);
     }
   };
