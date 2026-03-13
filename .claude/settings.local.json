@@ -11,7 +11,25 @@
       "Bash(npx tsc:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(grep -r \"dangerouslySetInnerHTML\\\\|eval\\\\|Function\\\\\\(\" /d/2026-programming/git/toon-sketch/src --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | head -20)"
+      "Bash(grep -r \"dangerouslySetInnerHTML\\\\|eval\\\\|Function\\\\\\(\" /d/2026-programming/git/toon-sketch/src --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | head -20)",
+      "Bash(cd \"D:\\\\Porgramming_2025\\\\git\\\\toon-sketch\" && npm run build 2>&1)",
+      "Bash(cd \"D:\\\\Porgramming_2025\\\\git\\\\toon-sketch\" && npm run build 2>&1 | tail -30)",
+      "Bash(cd \"D:\\\\Porgramming_2025\\\\git\\\\toon-sketch\" && npm run build 2>&1 | tail -20)",
+      "Bash(cd \"D:\\\\Porgramming_2025\\\\git\\\\toon-sketch\" && npm run build 2>&1 | tail -10)",
+      "Bash(cd \"D:\\\\Porgramming_2025\\\\git\\\\toon-sketch\" && npm run build 2>&1 | tail -15)",
+      "Bash(git reset:*)",
+      "WebSearch",
+      "WebFetch(domain:www.twilio.com)",
+      "WebFetch(domain:coolsms.zendesk.com)",
+      "WebFetch(domain:www.sent.dm)",
+      "WebFetch(domain:developers.coolsms.co.kr)",
+      "WebFetch(domain:emitrr.com)",
+      "WebFetch(domain:developers.solapi.com)",
+      "WebFetch(domain:coolsms.co.kr)",
+      "WebFetch(domain:help.twilio.com)",
+      "WebFetch(domain:guide.solapi.com)",
+      "WebFetch(domain:solapi.com)",
+      "Bash(npm run:*)"
     ]
   }
 }
