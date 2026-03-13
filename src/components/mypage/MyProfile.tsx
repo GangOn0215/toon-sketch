@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { PlanBadge } from "@/components/PlanBadge";
 import { User } from "lucide-react";
 
@@ -40,7 +41,7 @@ export function MyProfile({ user, profile }: MyProfileProps) {
           <div style={{ fontSize: "14px", opacity: 0.8, marginBottom: "4px" }}>보유 크레딧</div>
           <div style={{ fontSize: "32px", fontWeight: "800" }}>🪙 {profile?.credits?.toLocaleString()}</div>
         </div>
-        <button className="btn-dark" style={{ background: "#fff", color: "var(--accent)", padding: "12px 20px" }}>자동 충전 설정</button>
+        <Link href="/pricing" className="btn-dark" style={{ background: "#fff", color: "var(--accent)", padding: "12px 20px" }}>구독</Link>
       </div>
     </section>
   );

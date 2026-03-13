@@ -7,7 +7,7 @@ interface CheckoutTermsProps {
 
 export function CheckoutTerms({ agreed, onToggle }: CheckoutTermsProps) {
   return (
-    <div style={{ padding: "0 12px", marginBottom: "32px" }}>
+    <div style={{ padding: "0 12px", marginTop: "24px", marginBottom: "32px" }}>
       <label style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer" }}>
         <input 
           type="checkbox" 

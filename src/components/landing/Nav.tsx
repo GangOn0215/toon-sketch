@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
 import { PlanBadge } from "@/components/PlanBadge";
@@ -19,7 +19,9 @@ interface NavProps {
 
 export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = useMemo(() => createClient(), []);
+  const hideNavMenu = pathname.startsWith("/mypage") || pathname.startsWith("/workspace");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -63,12 +65,14 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
           <Link className="logo" href="/" onClick={closeMenu}>툰 스케치<em>.</em></Link>
           
           {/* Desktop Menu */}
-          <ul className="nav-menu">
-            <li><Link href="/#demo">데모</Link></li>
-            <li><Link href="/#pricing">요금제</Link></li>
-            <li><Link href="/#gallery">갤러리</Link></li>
-            <li><Link href="/#how">사용법</Link></li>
-          </ul>
+          {!hideNavMenu && (
+            <ul className="nav-menu">
+              <li><Link href="/#demo">데모</Link></li>
+              <li><Link href="/#pricing">요금제</Link></li>
+              <li><Link href="/#gallery">갤러리</Link></li>
+              <li><Link href="/#how">사용법</Link></li>
+            </ul>
+          )}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

@@ -18,16 +18,6 @@ interface GalleryClientProps {
 export default function GalleryClient({ initialUser, initialProfile, initialCharacters }: GalleryClientProps) {
   const router = useRouter();
   const isPro = initialProfile?.plan === "pro" || initialProfile?.plan === "premium";
-  const isStandard = initialProfile?.plan === "standard";
-
-  const isExpired = (dateStr: string) => {
-    if (isPro) return false;
-    if (!isStandard) return true;
-    const created = new Date(dateStr);
-    const now = new Date();
-    const diff = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return diff > 7;
-  };
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
@@ -58,23 +48,34 @@ export default function GalleryClient({ initialUser, initialProfile, initialChar
         ) : (
           <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))", gap: "24px" }}>
             {initialCharacters.map((char) => {
-              const expired = isExpired(char.created_at);
+              const expired = char._expired === true;
               return (
                 <div key={char.id} style={{ position: "relative", borderRadius: "20px", overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg2)", transition: "transform 0.2s" }}>
-                  <div style={{ aspectRatio: "16/9", position: "relative", filter: expired ? "blur(10px) grayscale(1)" : "none" }}>
-                    <Image 
-                      src={char.thumbnail_url || char.image_url} 
-                      alt="캐릭터" 
-                      fill 
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: "cover" }} 
-                    />
+                  <div style={{ aspectRatio: "16/9", position: "relative" }}>
+                    {expired ? (
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #2a1f3d 0%, #1a1525 40%, #0f0d1a 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 30% 40%, rgba(200,57,26,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(120,80,200,0.1) 0%, transparent 50%)" }} />
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={{ opacity: 0.15 }}>
+                          <circle cx="32" cy="22" r="12" fill="white" />
+                          <path d="M8 56c0-13.255 10.745-24 24-24s24 10.745 24 24" fill="white" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <Image
+                        src={char.thumbnail_url || char.image_url}
+                        alt="캐릭터"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        style={{ objectFit: "cover" }}
+                      />
+                    )}
                   </div>
                   {expired && (
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", padding: "20px", textAlign: "center" }}>
-                      <div style={{ fontSize: "24px", marginBottom: "12px" }}>🔒</div>
-                      <div style={{ fontSize: "14px", fontWeight: "700" }}>{initialProfile?.plan === "standard" ? "보관 기간 만료" : "Pro 플랜 전용 기능"}</div>
-                      <Link href="/#pricing" style={{ fontSize: "12px", color: "var(--accent)", marginTop: "12px", background: "#fff", padding: "6px 12px", borderRadius: "80px", textDecoration: "none", fontWeight: "700" }}>업그레이드</Link>
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", padding: "20px", textAlign: "center" }}>
+                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔒</div>
+                      <div style={{ fontSize: "14px", fontWeight: "700", marginBottom: "4px" }}>{initialProfile?.plan === "standard" ? "보관 기간 만료" : "Pro 플랜 전용 기능"}</div>
+                      <div style={{ fontSize: "12px", opacity: 0.7, marginBottom: "12px" }}>{initialProfile?.plan === "standard" ? "7일 보관 기간이 지났어요" : "이미지를 보려면 플랜을 업그레이드하세요"}</div>
+                      <Link href="/pricing" style={{ fontSize: "12px", color: "#fff", background: "var(--accent)", padding: "6px 14px", borderRadius: "80px", textDecoration: "none", fontWeight: "700" }}>업그레이드</Link>
                     </div>
                   )}
                   <div style={{ padding: "16px" }}>
