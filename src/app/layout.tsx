@@ -3,6 +3,7 @@ import { Fraunces, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
         >
           {children}
           <SpeedInsights />
+          <Analytics/>
         </ThemeProvider>
       </body>
     </html>
