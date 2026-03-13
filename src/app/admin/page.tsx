@@ -447,14 +447,40 @@ export default function AdminPage() {
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+        .chart-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+        .system-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 16px;
+        }
+        .fal-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          gap: 16px;
+          padding: 20px;
+        }
+
         @media (max-width: 1100px) {
           .stat-grid { grid-template-columns: repeat(2, 1fr); }
+          .fal-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
           .adm-sidebar { display: none; }
           .mob-hamburger { display: flex; }
           .adm-content { padding: 16px; }
           .stat-grid { grid-template-columns: 1fr 1fr; }
+          .chart-grid { grid-template-columns: 1fr; }
+          .system-grid { grid-template-columns: 1fr; }
+          .fal-grid { grid-template-columns: 1fr 1fr; padding: 16px; }
+        }
+        @media (max-width: 480px) {
+          .stat-grid { grid-template-columns: 1fr; }
+          .fal-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -587,7 +613,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* 차트 */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+                <div className="chart-grid">
 
                   {[
                     { title: "일별 방문자 (7일)", dataKey: "pageViews", name: "방문자", color: "#93c5fd" },
@@ -624,7 +650,7 @@ export default function AdminPage() {
                     <span className="panel-title">시스템 현황</span>
                     <span className="panel-meta">Last updated: {stats?.timestamp ? new Date(stats.timestamp).toLocaleTimeString() : "N/A"}</span>
                   </div>
-                  <div style={{ padding: "20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+                  <div style={{ padding: "20px" }} className="system-grid">
 
                     {/* 유료 전환율 */}
                     <div style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #e2e8f0" }}>
@@ -677,7 +703,7 @@ export default function AdminPage() {
                       {stats?.falCost ? `$1 = ₩${stats.falCost.usdToKrw.toLocaleString()} · 생성당 $${stats.falCost.costPerGen}` : "환율 로딩 중..."}
                     </span>
                   </div>
-                  <div style={{ padding: "20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
+                  <div className="fal-grid">
                     {[
                       { label: "오늘 비용 (USD)", value: stats?.falCost ? `$${stats.falCost.todayUsd.toFixed(2)}` : "—", color: "#dc2626" },
                       { label: "오늘 비용 (KRW)", value: stats?.falCost ? `₩${stats.falCost.todayKrw.toLocaleString()}` : "—", color: "#dc2626" },

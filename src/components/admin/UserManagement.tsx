@@ -156,36 +156,44 @@ export default function UserManagement() {
         .badge-pro { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
         .badge-basic { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
         .badge-free { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-        .search-input { padding: 10px 14px 10px 38px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 14px; width: 320px; outline: none; transition: border-color 0.15s; }
+        .search-input { padding: 10px 14px 10px 38px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 14px; width: 320px; max-width: 100%; outline: none; transition: border-color 0.15s; }
         .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         .pagination-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font-size: 13px; font-weight: 500; color: #475569; display: flex; align-items: center; gap: 4px; }
         .pagination-btn:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
         .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .um-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+        .um-header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .um-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .pagination-wrap { padding: 16px 20px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        @media (max-width: 768px) {
+          .search-input { width: 100%; }
+          .um-header-actions { width: 100%; }
+          .um-header-actions > div { flex: 1; }
+        }
       `}</style>
 
       {/* Header Section */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+      <div className="um-header">
         <div>
           <h1 style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.02em" }}>유저 관리</h1>
           <p style={{ fontSize: "14px", color: "#64748b", marginTop: "4px" }}>
             전체 <strong style={{ color: "#0f172a" }}>{users.length}명</strong>의 사용자가 가입되어 있습니다.
           </p>
         </div>
-        
-        <div style={{ display: "flex", gap: "12px" }}>
+        <div className="um-header-actions">
           <div style={{ position: "relative" }}>
             <Search size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
-            <input 
-              type="text" 
-              placeholder="유저 이름, 이메일, ID 검색..." 
+            <input
+              type="text"
+              placeholder="유저 이름, 이메일, ID 검색..."
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
               className="search-input"
             />
           </div>
-          <button 
-            onClick={fetchUsers} 
-            className="action-btn" 
+          <button
+            onClick={fetchUsers}
+            className="action-btn"
             style={{ padding: "0 14px", height: "42px", display: "flex", alignItems: "center", gap: "8px", fontWeight: "600" }}
           >
             <RefreshCw size={16} className={loading ? "spin" : ""} />
@@ -196,7 +204,8 @@ export default function UserManagement() {
 
       {/* Table Section */}
       <div className="admin-card">
-        <table className="adm-table" style={{ borderBottom: "1px solid #f1f5f9" }}>
+        <div className="um-table-wrap">
+        <table className="adm-table" style={{ borderBottom: "1px solid #f1f5f9", minWidth: "700px" }}>
           <thead>
             <tr>
               <th style={{ width: "30%" }}>
@@ -327,9 +336,10 @@ export default function UserManagement() {
             ))}
           </tbody>
         </table>
+        </div>
 
         {/* Pagination Footer */}
-        <div style={{ padding: "16px 20px", background: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="pagination-wrap">
           <div style={{ fontSize: "13px", color: "#64748b" }}>
             {filteredAndSortedUsers.length > 0 ? (
               <>
