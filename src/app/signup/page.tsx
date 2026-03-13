@@ -74,6 +74,7 @@ export default function SignupPage() {
         password,
         options: {
           data: {
+            email: email, // 이메일 저장 추가
             nickname: nickname,
             full_name: nickname,
             phone: null,
