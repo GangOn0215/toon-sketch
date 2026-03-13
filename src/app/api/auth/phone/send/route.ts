@@ -33,7 +33,7 @@ function validatePhone(num: string): boolean {
 async function sendCoolSms(to: string, otp: string): Promise<void> {
   const apiKey = process.env.COOLSMS_API_KEY!;
   const apiSecret = process.env.COOLSMS_API_SECRET!;
-  const from = process.env.COOLSMS_FROM_NUMBER!;
+  const from = process.env.COOLSMS_FROM_NUMBER!.replace(/\D/g, "");
 
   const date = new Date().toISOString();
   const salt = crypto.randomBytes(16).toString("hex");

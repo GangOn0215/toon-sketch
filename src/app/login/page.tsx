@@ -53,7 +53,10 @@ export default function LoginPage() {
     // auth callback 에러 처리
     const params = new URLSearchParams(window.location.search);
     if (params.get('error') === 'auth_callback_failed') {
-      setError("로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+      const handle = requestAnimationFrame(() => {
+        setError("로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+      });
+      return () => cancelAnimationFrame(handle);
     }
   }, []);
 

@@ -33,7 +33,8 @@ export function GallerySection() {
   const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => { 
-    setMounted(true); 
+    const handle = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(handle);
   }, []);
 
   useEffect(() => {
