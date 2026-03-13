@@ -29,7 +29,13 @@
       "WebFetch(domain:help.twilio.com)",
       "WebFetch(domain:guide.solapi.com)",
       "WebFetch(domain:solapi.com)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(ls node_modules/tailwindcss/package.json 2>/dev/null && node -e \"const p = require\\('./node_modules/tailwindcss/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(cd D:/DEV_2025/git/toon-sketch && node -e \"\nconst lock = require\\('./package-lock.json'\\);\nconst deps = lock.packages['node_modules/tailwindcss'];\nconsole.log\\('lock tailwindcss:', deps?.version\\);\nconst p = require\\('./node_modules/tailwindcss/package.json'\\);\nconsole.log\\('installed tailwindcss:', p.version\\);\nconst p2 = require\\('./node_modules/@tailwindcss/postcss/package.json'\\);\nconsole.log\\('installed @tailwindcss/postcss:', p2.version\\);\n\")",
+      "Bash(cd D:/DEV_2025/git/toon-sketch && node -e \"const s = require\\('sharp'\\); console.log\\('sharp version:', s.versions.sharp\\); s\\({ create: { width: 10, height: 10, channels: 3, background: '#fff' } }\\).png\\(\\).toBuffer\\(\\).then\\(\\(\\) => console.log\\('sharp OK'\\)\\).catch\\(e => console.error\\('sharp ERROR:', e.message\\)\\)\")",
+      "Bash(cd D:/DEV_2025/git/toon-sketch && find src -name \"*.ts\" -o -name \"*.tsx\" | xargs grep -l \"characters\\\\|thumbnail_url\\\\|image_url\" 2>/dev/null | grep -v node_modules)",
+      "Bash(cd D:/DEV_2025/git/toon-sketch && find src -name \"*.tsx\" | xargs grep -l \"pricing\\\\|구독\\\\|플랜\\\\|plan\\\\|payment\\\\|결제\" 2>/dev/null | grep -v node_modules)",
+      "Bash(powershell.exe -c \"\\(New-Object Media.SoundPlayer 'C:\\\\Windows\\\\Media\\\\tada.wav'\\).PlaySync\\(\\)\")"
     ]
   }
 }
