@@ -64,41 +64,58 @@ export default function SignupPage() {
 
   // 1단계 완료 → 즉시 가입 (본인인증 임시 비활성화)
   const handleFormNext = async (email: string, password: string, nickname: string) => {
+    console.log("🚀 회원가입 시도:", { email, nickname });
     setLoading(true);
     setError(null);
 
-    const { error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          nickname: nickname,
-          full_name: nickname,
-          phone: null, // 본인인증 비활성화로 인한 null 처리
-          phone_verified: false,
+    try {
+      const { data, error: signupError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            nickname: nickname,
+            full_name: nickname,
+            phone: null,
+            phone_verified: false,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+      });
 
-    if (signupError) {
-      if (signupError.message.includes("already registered")) {
-        setError("이미 사용 중인 이메일입니다. 로그인 페이지를 이용해주세요.");
-      } else {
-        setError(signupError.message);
+      console.log("📦 Supabase 응답 데이터:", data);
+
+      if (signupError) {
+        console.error("❌ Supabase 가입 에러:", signupError);
+        if (signupError.message.includes("already registered")) {
+          setError("이미 사용 중인 이메일입니다. 로그인 페이지를 이용해주세요.");
+        } else {
+          setError(signupError.message);
+        }
+        setLoading(false);
+        return;
       }
+
+      if (!data.user) {
+        console.warn("⚠️ 유저 데이터가 반환되지 않았습니다.");
+        setError("회원가입 요청은 성공했으나 유저 생성에 실패했습니다. (중복 계정 여부 확인 필요)");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ 회원가입 성공! 유저 ID:", data.user.id);
+      setDoneEmail(email);
+      setDone(true);
       setLoading(false);
-      return;
+
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
+    } catch (err) {
+      console.error("🔥 예상치 못한 오류 발생:", err);
+      setError("회원가입 처리 중 알 수 없는 오류가 발생했습니다.");
+      setLoading(false);
     }
-
-    setDoneEmail(email);
-    setDone(true);
-    setLoading(false);
-
-    // 이메일 인증이 꺼져 있으면 즉시 세션이 생성되므로 2초 후 홈으로 이동
-    setTimeout(() => {
-      router.push("/");
-    }, 2000);
   };
 
   // 2단계: OTP 발송 (CoolSMS)
