@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
 import { PlanBadge } from "@/components/PlanBadge";
-import { Menu, X, Rocket, User, LogOut, Image, HelpCircle, CreditCard, Home } from "lucide-react";
+import { Menu, X, Rocket, User, LogOut, Image, HelpCircle, CreditCard, Home, Shield } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 interface NavProps {
@@ -53,6 +53,8 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
       console.error("Logout error:", error);
     }
   };
+
+  const isAdmin = profile?.role === "admin";
 
   return (
     <nav className={isMenuOpen ? "menu-open" : ""}>
@@ -180,20 +182,37 @@ export function Nav({ isLoggedIn, user, profile, credits, onTopupClick }: NavPro
 
           {/* 2. Main Action Card (Toned Down) */}
           {isLoggedIn && (
-            <Link href="/workspace" onClick={closeMenu} style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg2)", color: "var(--text)", padding: "20px 24px", borderRadius: "20px", border: "1.5px solid var(--border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{ padding: "10px", background: "var(--al)", borderRadius: "12px", color: "var(--accent)" }}>
-                  <Rocket size={24} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <Link href="/workspace" onClick={closeMenu} style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg2)", color: "var(--text)", padding: "20px 24px", borderRadius: "20px", border: "1.5px solid var(--border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div style={{ padding: "10px", background: "var(--al)", borderRadius: "12px", color: "var(--accent)" }}>
+                    <Rocket size={24} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "17px", fontWeight: "800" }}>워크스페이스</div>
+                    <div style={{ fontSize: "12px", color: "var(--subtle)" }}>캐릭터 소환하러 가기</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: "17px", fontWeight: "800" }}>워크스페이스</div>
-                  <div style={{ fontSize: "12px", color: "var(--subtle)" }}>캐릭터 소환하러 가기</div>
+                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--bg)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--subtle)" }}>
+                  <span style={{ fontSize: "18px" }}>→</span>
                 </div>
-              </div>
-              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--bg)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--subtle)" }}>
-                <span style={{ fontSize: "18px" }}>→</span>
-              </div>
-            </Link>
+              </Link>
+
+              {isAdmin && (
+                <Link href="/admin" onClick={closeMenu} style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg2)", color: "var(--accent)", padding: "16px 24px", borderRadius: "20px", border: "1.5px solid var(--accent)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div style={{ padding: "8px", background: "rgba(var(--accent-rgb), 0.1)", borderRadius: "10px" }}>
+                      <Shield size={20} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "15px", fontWeight: "800" }}>관리자 대시보드</div>
+                      <div style={{ fontSize: "11px", opacity: 0.8 }}>시스템 및 유저 관리</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "14px" }}>관리자 전용 →</div>
+                </Link>
+              )}
+            </div>
           )}
 
           {/* 3. Link Grid */}

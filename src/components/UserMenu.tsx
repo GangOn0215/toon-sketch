@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { User } from "lucide-react";
+import { User, Shield } from "lucide-react";
 
 interface UserMenuProps {
   user: any;
@@ -16,6 +16,8 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   const router = useRouter();
   const supabase = createClient();
   const [imgError, setImgError] = useState(false);
+
+  const isAdmin = profile?.role === "admin";
 
   // 외부 클릭 시 닫기
   useEffect(() => {
@@ -94,6 +96,16 @@ export function UserMenu({ user, profile }: UserMenuProps) {
             👤 마이페이지
           </button>
           
+          {isAdmin && (
+            <button 
+              onClick={() => { router.push("/admin"); setIsOpen(false); }}
+              style={{ ...itemStyle, color: "var(--accent)" }}
+            >
+              <Shield size={14} style={{ marginRight: "6px", display: "inline-block", verticalAlign: "middle" }} /> 
+              관리자 페이지
+            </button>
+          )}
+
           <button 
             onClick={() => { router.push("/workspace"); setIsOpen(false); }}
             style={itemStyle}
