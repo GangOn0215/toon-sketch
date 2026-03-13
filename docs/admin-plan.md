@@ -118,11 +118,16 @@ role: 'user' | 'admin' | 'superadmin'
 ## 🗄️ Supabase 설정 필요 사항
 
 ```sql
--- profiles 테이블에 role 컬럼 추가
-ALTER TABLE profiles ADD COLUMN role text DEFAULT 'user';
+-- 1. profiles 테이블에 role 컬럼 추가 (관리자 권한)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role text DEFAULT 'user';
 
--- 관리자 계정 지정
-UPDATE profiles SET role = 'admin' WHERE id = '관리자_user_id';
+-- 2. profiles 테이블에 phone 컬럼 추가 (휴대폰 인증 정보)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone text UNIQUE;
+
+-- 3. 관리자 계정 지정 (예시)
+-- UPDATE profiles SET role = 'admin' WHERE id = '관리자_user_id';
+-- 또는 이메일 기준
+-- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';
 ```
 
 ---
