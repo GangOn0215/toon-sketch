@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
+import { PageViewTracker } from "@/components/PageViewTracker"
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <PageViewTracker />
           <SpeedInsights />
           <Analytics/>
         </ThemeProvider>

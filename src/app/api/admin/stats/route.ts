@@ -36,23 +36,67 @@ export async function GET() {
       { count: pendingOrders },
       { count: todayUsers },
       { count: todayGenerations },
-      { data: todayPayments }
+      { count: totalGenerations },
+      { count: freeUsers },
+      { count: paidUsers },
+      { count: zeroCreditsUsers },
+      { data: todayPayments },
+      { data: totalPayments },
     ] = await Promise.all([
       supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }),
       supabaseAdmin.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
-      supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).gte("updated_at", todayStr), // created_at 부재로 updated_at 활용
+      supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).gte("updated_at", todayStr),
       supabaseAdmin.from("characters").select("*", { count: "exact", head: true }).gte("created_at", todayStr),
-      supabaseAdmin.from("orders").select("amount").eq("status", "completed").gte("created_at", todayStr)
+      supabaseAdmin.from("characters").select("*", { count: "exact", head: true }),
+      supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).or("plan.eq.free,plan.is.null"),
+      supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).not("plan", "in", '("free")').not("plan", "is", null),
+      supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).or("credits.eq.0,credits.is.null"),
+      supabaseAdmin.from("orders").select("amount").eq("status", "completed").gte("created_at", todayStr),
+      supabaseAdmin.from("orders").select("amount").eq("status", "completed"),
     ]);
 
     const todayRevenue = todayPayments?.reduce((sum, o) => sum + Number(o.amount), 0) || 0;
+    const totalRevenue = totalPayments?.reduce((sum, o) => sum + Number(o.amount), 0) || 0;
+    const total = totalUsers || 1;
+    const paidRate = Math.round(((paidUsers || 0) / total) * 100);
+
+    // fal.ai 비용 계산 ($0.08 per generation)
+    const FAL_COST_PER_GEN = 0.08;
+    const totalFalCostUsd = (totalGenerations || 0) * FAL_COST_PER_GEN;
+    const todayFalCostUsd = (todayGenerations || 0) * FAL_COST_PER_GEN;
+
+    // 실시간 USD/KRW 환율 조회
+    let usdToKrw = 1350; // 기본값 (API 실패 시 fallback)
+    try {
+      const rateRes = await fetch("https://open.er-api.com/v6/latest/USD", { next: { revalidate: 3600 } });
+      if (rateRes.ok) {
+        const rateData = await rateRes.json();
+        usdToKrw = rateData?.rates?.KRW || 1350;
+      }
+    } catch {
+      // fallback 값 사용
+    }
 
     return NextResponse.json({
       totalUsers: totalUsers || 0,
       pendingOrders: pendingOrders || 0,
       todayUsers: todayUsers || 0,
       todayGenerations: todayGenerations || 0,
-      todayRevenue: todayRevenue || 0,
+      totalGenerations: totalGenerations || 0,
+      todayRevenue,
+      totalRevenue,
+      freeUsers: freeUsers || 0,
+      paidUsers: paidUsers || 0,
+      paidRate,
+      zeroCreditsUsers: zeroCreditsUsers || 0,
+      falCost: {
+        totalUsd: totalFalCostUsd,
+        todayUsd: todayFalCostUsd,
+        totalKrw: Math.round(totalFalCostUsd * usdToKrw),
+        todayKrw: Math.round(todayFalCostUsd * usdToKrw),
+        usdToKrw: Math.round(usdToKrw),
+        costPerGen: FAL_COST_PER_GEN,
+      },
       timestamp: new Date().toISOString()
     });
   } catch (err: any) {

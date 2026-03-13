@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { RefreshCw } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import UserManagement from "@/components/admin/UserManagement";
 import PaymentManagement from "@/components/admin/PaymentManagement";
 import GenerationMonitoring from "@/components/admin/GenerationMonitoring";
@@ -19,14 +20,21 @@ export default function AdminPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [period, setPeriod] = useState<7 | 30 | 365>(7);
 
   // 실시간 통계 데이터 가져오기
   const fetchStats = async () => {
     setStatsLoading(true);
     try {
-      const res = await fetch("/api/admin/stats");
-      const data = await res.json();
-      if (res.ok) setStats(data);
+      const [statsRes, analyticsRes] = await Promise.all([
+        fetch("/api/admin/stats"),
+        fetch(`/api/admin/analytics?period=${period}`),
+      ]);
+      const statsData = await statsRes.json();
+      const analyticsData = await analyticsRes.json();
+      if (statsRes.ok) setStats(statsData);
+      if (analyticsRes.ok) setChartData(analyticsData.chartData || []);
     } catch (err) {
       console.error("[AdminPage] Fetch stats error:", err);
     } finally {
@@ -46,6 +54,8 @@ export default function AdminPage() {
       clearInterval(timer);
     };
   }, []);
+
+  useEffect(() => { fetchStats(); }, [period]);
 
   // 클라이언트 측 2차 권한 체크
   useEffect(() => {
@@ -556,16 +566,132 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                {/* 하단 섹션 (준비 중인 통계) */}
+                {/* 차트 기간 선택 */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>기간</span>
+                  {([7, 30, 365] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      style={{
+                        padding: "5px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+                        border: period === p ? "none" : "1px solid #e2e8f0",
+                        background: period === p ? "#3b82f6" : "#fff",
+                        color: period === p ? "#fff" : "#64748b",
+                        cursor: "pointer", transition: "all 0.15s",
+                      }}
+                    >
+                      {p === 7 ? "1주일" : p === 30 ? "1개월" : "1년"}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 차트 */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+
+                  {[
+                    { title: "일별 방문자 (7일)", dataKey: "pageViews", name: "방문자", color: "#93c5fd" },
+                    { title: "일별 생성 수 (7일)", dataKey: "generations", name: "생성", color: "#3b82f6" },
+                    { title: "일별 신규 가입 (7일)", dataKey: "signups", name: "신규 가입", color: "#86efac" },
+                    { title: "일별 매출 (7일)", dataKey: "revenue", name: "매출", color: "#16a34a", isCurrency: true },
+                  ].map(({ title, dataKey, name, color, isCurrency }) => (
+                    <div key={dataKey} className="panel" style={{ marginBottom: 0 }}>
+                      <div className="panel-head">
+                        <span className="panel-title">{title}</span>
+                      </div>
+                      <div style={{ padding: "16px" }}>
+                        <ResponsiveContainer width="100%" height={180}>
+                          <BarChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                            <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={isCurrency ? (v) => `₩${(v/1000).toFixed(0)}k` : undefined} />
+                            <Tooltip
+                              contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}
+                              formatter={(value) => isCurrency ? `₩${Number(value).toLocaleString()}` : value}
+                            />
+                            <Bar dataKey={dataKey} name={name} fill={color} radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  ))}
+
+                </div>
+
+                {/* 시스템 현황 */}
                 <div className="panel">
                   <div className="panel-head">
                     <span className="panel-title">시스템 현황</span>
                     <span className="panel-meta">Last updated: {stats?.timestamp ? new Date(stats.timestamp).toLocaleTimeString() : "N/A"}</span>
                   </div>
-                  <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>
-                    <p style={{ fontSize: "14px" }}>그래프 및 상세 통계는 현재 준비 중입니다.</p>
+                  <div style={{ padding: "20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+
+                    {/* 유료 전환율 */}
+                    <div style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: 600 }}>유료 전환율</div>
+                      <div style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", marginBottom: "8px" }}>{stats?.paidRate ?? "—"}%</div>
+                      <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "99px", overflow: "hidden", marginBottom: "8px" }}>
+                        <div style={{ height: "100%", width: `${stats?.paidRate || 0}%`, background: "#3b82f6", borderRadius: "99px", transition: "width 0.6s ease" }} />
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#64748b" }}>
+                        유료 <strong style={{ color: "#0f172a" }}>{stats?.paidUsers ?? 0}</strong>명 · 무료 <strong style={{ color: "#0f172a" }}>{stats?.freeUsers ?? 0}</strong>명
+                      </div>
+                    </div>
+
+                    {/* 크레딧 소진 유저 */}
+                    <div style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: 600 }}>크레딧 소진 유저</div>
+                      <div style={{ fontSize: "28px", fontWeight: 800, color: (stats?.zeroCreditsUsers > 0) ? "#dc2626" : "#0f172a", marginBottom: "8px" }}>
+                        {stats?.zeroCreditsUsers ?? "—"}명
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#64748b" }}>크레딧 0 → 결제 유도 대상</div>
+                      <div style={{ marginTop: "8px", fontSize: "11px", color: "#94a3b8" }}>
+                        전체 유저의 {stats?.totalUsers ? Math.round((stats.zeroCreditsUsers / stats.totalUsers) * 100) : 0}%
+                      </div>
+                    </div>
+
+                    {/* 누적 생성 / 매출 */}
+                    <div style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: 600 }}>누적 현황</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "13px", color: "#64748b" }}>총 생성 수</span>
+                          <span style={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}>{stats?.totalGenerations?.toLocaleString() ?? "—"}</span>
+                        </div>
+                        <div style={{ height: "1px", background: "#e2e8f0" }} />
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "13px", color: "#64748b" }}>누적 매출</span>
+                          <span style={{ fontSize: "15px", fontWeight: 700, color: "#16a34a" }}>₩{stats?.totalRevenue?.toLocaleString() ?? "—"}</span>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
+
+                {/* fal.ai 비용 패널 */}
+                <div className="panel">
+                  <div className="panel-head">
+                    <span className="panel-title">fal.ai 비용 현황</span>
+                    <span className="panel-meta">
+                      {stats?.falCost ? `$1 = ₩${stats.falCost.usdToKrw.toLocaleString()} · 생성당 $${stats.falCost.costPerGen}` : "환율 로딩 중..."}
+                    </span>
+                  </div>
+                  <div style={{ padding: "20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
+                    {[
+                      { label: "오늘 비용 (USD)", value: stats?.falCost ? `$${stats.falCost.todayUsd.toFixed(2)}` : "—", color: "#dc2626" },
+                      { label: "오늘 비용 (KRW)", value: stats?.falCost ? `₩${stats.falCost.todayKrw.toLocaleString()}` : "—", color: "#dc2626" },
+                      { label: "누적 비용 (USD)", value: stats?.falCost ? `$${stats.falCost.totalUsd.toFixed(2)}` : "—", color: "#0f172a" },
+                      { label: "누적 비용 (KRW)", value: stats?.falCost ? `₩${stats.falCost.totalKrw.toLocaleString()}` : "—", color: "#0f172a" },
+                    ].map(({ label, value, color }) => (
+                      <div key={label} style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: 600 }}>{label}</div>
+                        <div style={{ fontSize: "22px", fontWeight: 800, color }}>{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </>
             )}
 
