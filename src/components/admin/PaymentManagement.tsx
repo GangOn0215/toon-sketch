@@ -36,15 +36,17 @@ export default function PaymentManagement() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*, profiles(email, nickname)")
-        .order("created_at", { ascending: false });
+      // API Route를 통해 데이터 가져오기 (RLS 우회)
+      const res = await fetch("/api/admin/payments");
+      const data = await res.json();
 
-      if (error) throw error;
+      if (!res.ok) {
+        throw new Error(data.error || "결제 내역을 가져오지 못했습니다.");
+      }
+
       setOrders(data || []);
-    } catch (err) {
-      console.error("[PaymentManagement] fetch error:", err);
+    } catch (err: any) {
+      console.error("[PaymentManagement] fetch error catch:", err.message || err);
     } finally {
       setLoading(false);
     }
