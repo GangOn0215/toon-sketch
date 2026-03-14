@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ExternalLink } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import UserManagement from "@/components/admin/UserManagement";
 import PaymentManagement from "@/components/admin/PaymentManagement";
@@ -499,7 +499,13 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="sb-nav">
-            <div className="sb-section-label">메뉴</div>
+            <div className="sb-section-label">사이트 바로가기</div>
+            <div className="sb-item" onClick={() => router.push("/")}>
+              <span className="sb-item-icon"><ExternalLink size={14} /></span>
+              <span className="sb-item-label">사용자 페이지</span>
+            </div>
+
+            <div className="sb-section-label" style={{ marginTop: "12px" }}>메뉴</div>
             {MENU_WITH_STATS.map(item => (
               <div
                 key={item.key}
@@ -530,7 +536,13 @@ export default function AdminPage() {
           </div>
 
           <div className="sb-nav">
-            <div className="sb-section-label">메뉴</div>
+            <div className="sb-section-label">사이트 바로가기</div>
+            <div className="sb-item" onClick={() => router.push("/")}>
+              <span className="sb-item-icon"><ExternalLink size={14} /></span>
+              <span className="sb-item-label">사용자 페이지</span>
+            </div>
+
+            <div className="sb-section-label" style={{ marginTop: "12px" }}>메뉴</div>
             {MENU_WITH_STATS.map(item => (
               <div
                 key={item.key}
