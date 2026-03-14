@@ -1,0 +1,3 @@
+# config.yaml 예시
+behavior:
+  yolo_mode: true  # false에서 true로 변경
