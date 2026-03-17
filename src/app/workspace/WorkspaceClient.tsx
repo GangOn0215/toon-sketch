@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { buildPrompt } from "../api/generate/prompt-maps";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserMenu } from "@/components/UserMenu";
@@ -82,14 +83,25 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
   }, [profile?.credits]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (!supabase?.auth) return;
+
+    const authListener = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       if (session?.user) {
         setUser(session.user);
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-        if (profileData) {
-          setProfile(profileData);
-          setCredits(profileData.credits ?? 0);
-          setUserPlan(profileData.plan || "free");
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+            
+          if (profileData && !profileError) {
+            setProfile(profileData);
+            setCredits(profileData.credits ?? 0);
+            setUserPlan(profileData.plan || "free");
+          }
+        } catch (err) {
+          console.error("Profile fetch error:", err);
         }
       } else {
         setUser(null);
@@ -100,7 +112,9 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
       setAuthLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      authListener.data?.subscription?.unsubscribe();
+    };
   }, [supabase]);
 
   useEffect(() => {
@@ -136,13 +150,11 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
     // 모드 변경 시 관련 옵션 초기화/설정
     if (key === "mode") {
       if (nextVal === "캐릭터 시트") {
-        next.ratio = "";
+        next.ratio = "16:9"; // 캐릭터 시트는 16:9 고정
         next.background = "";
       } else if (nextVal === "일반 화보") {
-        // 일반 화보로 전환 시 비율 기본값 설정
-        if (!next.ratio) {
-          next.ratio = "16:9"; 
-        }
+        // 캐릭터 시트에서 일반 화보로 넘어오거나 처음 선택 시 1:1로 초기화
+        next.ratio = "1:1"; 
       }
     }
     return next;
@@ -171,7 +183,14 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
     setError(null);
 
     const targetSeed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
-    const currentPrompt = buildPrompt(selection);
+    
+    // #비율 누락 방지: 값이 없으면 모드별 기본값 강제 할당
+    const finalSelection = { ...selection };
+    if (!finalSelection.ratio) {
+      finalSelection.ratio = selection.mode === "캐릭터 시트" ? "16:9" : "1:1";
+    }
+
+    const currentPrompt = buildPrompt(finalSelection);
     setLastPrompt(currentPrompt);
 
     try {
@@ -183,7 +202,8 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
           "Authorization": `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({
-          ...selection, seed: targetSeed,
+          ...finalSelection, // 보정된 데이터 전송
+          seed: targetSeed,
           resolution: resolution,
           plan: userPlan,
           userId: user.id,
@@ -197,58 +217,65 @@ export default function WorkspaceClient({ initialUser, initialProfile, initialPl
       const decoder = new TextDecoder();
       if (!reader) throw new Error("데이터 스트림 에러");
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter(Boolean);
+          const chunk = decoder.decode(value);
+          const lines = chunk.split("\n").filter(Boolean);
 
-        for (const line of lines) {
-          try {
-            const data = JSON.parse(line);
-            if (data.status === "deducted") {
-              setCredits(data.newBalance);
-            } else if (data.status === "queued") {
-              setQueueStatus("queued");
-              setQueuePosition(data.position);
-            } else if (data.status === "processing") {
-              setQueueStatus("processing");
-              setQueuePosition(null);
-            } else if (data.status === "completed") {
-              setImageUrl(data.imageUrl);
-              setSeed(data.seed);
-              const newItem: HistoryItem = { 
-                id: Date.now().toString(), 
-                imageUrl: data.imageUrl, 
-                thumbnailUrl: data.thumbnailUrl,
-                selection: { ...selection }, 
-                seed: data.seed, 
-                timestamp: Date.now() 
-              };
-              setHistory((prev) => [newItem, ...prev]);
-              setQueueStatus("completed");
-              
-              // 결과 생성 완료 시 결과 영역으로 스크롤 (모바일 대응)
-              setTimeout(() => {
-                displayRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 100);
-            } else if (data.status === "refunded") {
-              setCredits(data.newBalance);
-              setQueueStatus("refunded");
-              setError(data.message || "생성 중 문제가 발생하여 환불되었습니다.");
-            } else if (data.status === "error") {
-              throw new Error(data.message || "생성 실패");
+          for (const line of lines) {
+            try {
+              const data = JSON.parse(line);
+              if (data.status === "deducted") {
+                setCredits(data.newBalance);
+              } else if (data.status === "queued") {
+                setQueueStatus("queued");
+                setQueuePosition(data.position);
+              } else if (data.status === "processing") {
+                setQueueStatus("processing");
+                setQueuePosition(null);
+              } else if (data.status === "completed") {
+                setImageUrl(data.imageUrl);
+                setSeed(data.seed);
+                const newItem: HistoryItem = { 
+                  id: Date.now().toString(), 
+                  imageUrl: data.imageUrl, 
+                  thumbnailUrl: data.thumbnailUrl,
+                  selection: { ...selection }, 
+                  seed: data.seed, 
+                  timestamp: Date.now() 
+                };
+                setHistory((prev) => [newItem, ...prev]);
+                setQueueStatus("completed");
+                
+                // 결과 생성 완료 시 결과 영역으로 스크롤 (모바일 대응)
+                setTimeout(() => {
+                  displayRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              } else if (data.status === "refunded") {
+                setCredits(data.newBalance);
+                setQueueStatus("refunded");
+                setError(data.message || "생성 중 문제가 발생하여 환불되었습니다.");
+              } else if (data.status === "error") {
+                throw new Error(data.message || "생성 실패");
+              }
+            } catch (e: any) {
+              if (e.message) throw e;
             }
-          } catch (e: any) {
-            if (e.message) throw e;
           }
         }
+      } finally {
+        reader.releaseLock();
       }
     } catch (e: any) { 
       setError(e.message || "알 수 없는 에러"); 
+      setQueueStatus("error"); // 에러 발생 시 상태 업데이트하여 모달 닫기 버튼 활성화
     } finally { 
       setLoading(false); 
+      // 생성 완료나 에러 발생 시 3초 후 상태 메시지 초기화 (선택 사항)
+      // setTimeout(() => setQueueStatus(null), 3000); 
     }
   }
 
