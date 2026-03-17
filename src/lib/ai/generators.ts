@@ -4,6 +4,7 @@ export interface GenerateOptions {
   prompt: string;
   width: number;
   height: number;
+  aspect_ratio?: string;
   seed: number;
   referenceImage?: string; // 캐릭터 일관성을 위한 레퍼런스 이미지 URL
 }
@@ -29,7 +30,7 @@ export class FalGenerator implements ImageGenerator {
   }
 
   async generate(options: GenerateOptions, retries = 3): Promise<GenerateResult> {
-    const { prompt, width, height, seed, referenceImage } = options;
+    const { prompt, width, height, aspect_ratio, seed, referenceImage } = options;
     
     // 사용자가 선호하는 Nano Banana 2 모델로 원복
     const input: any = { 
@@ -37,6 +38,8 @@ export class FalGenerator implements ImageGenerator {
       seed, 
       width, 
       height, 
+      image_size: { width, height }, // 명시적 이미지 사이즈 지정
+      aspect_ratio: aspect_ratio, // aspect_ratio 파라미터 추가
       num_inference_steps: 28, // 기존 퀄리티 유지를 위해 28단계 사용
     };
 

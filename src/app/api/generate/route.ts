@@ -53,6 +53,8 @@ export async function POST(req: Request) {
       try {
         const body = await req.json();
         const { seed: lockedSeed, ratio, mode, resolution = "0.5K", plan = "free" } = body;
+        const seed = lockedSeed ?? Math.floor(Math.random() * 1000000);
+        const prompt = buildPrompt(body);
 
         // #16: 토큰 형식 검증
         const authHeader = req.headers.get("Authorization");
@@ -161,42 +163,47 @@ export async function POST(req: Request) {
         await supabaseAdmin.from("generation_queue").update({ status: "processing" }).eq("id", queueItemId);
         sendStatus({ status: "processing" });
 
-        const seed = lockedSeed ?? Math.floor(Math.random() * 2_000_000);
-        const prompt = buildPrompt(body);
+        // 비율 및 해상도 계산 (공백 제거로 안전성 확보)
+        const currentMode = mode?.trim();
+        const currentRatio = ratio?.trim();
         
         // 해상도 기준값 (짧은 변 기준)
         const baseRes = resolution === "2K" ? 1024 : resolution === "1K" ? 768 : 512;
         
         let width = baseRes;
         let height = baseRes;
+        let aspect_ratio = "1:1"; // 모델 전달용 파라미터
 
-        // 비율 계산 로직
-        if (mode === "캐릭터 시트") {
-          // 캐릭터 시트는 3면도를 위해 가로가 긴 16:9 비율로 고정
+        if (currentMode === "캐릭터 시트") {
           width = Math.round((baseRes * 1.777) / 64) * 64;
           height = baseRes;
+          aspect_ratio = "16:9";
         } else {
-          // 일반 화보는 선택한 비율 적용
-          switch (ratio) {
+          switch (currentRatio) {
             case "16:9":
               width = Math.round((baseRes * 1.777) / 64) * 64;
               height = baseRes;
+              aspect_ratio = "16:9";
               break;
             case "9:16":
               width = baseRes;
               height = Math.round((baseRes * 1.777) / 64) * 64;
+              aspect_ratio = "9:16";
               break;
             case "4:3":
               width = Math.round((baseRes * 1.333) / 64) * 64;
               height = baseRes;
+              aspect_ratio = "4:3";
               break;
             case "3:4":
               width = baseRes;
               height = Math.round((baseRes * 1.333) / 64) * 64;
+              aspect_ratio = "3:4";
               break;
-            default: // 1:1 포함
+            default:
               width = baseRes;
               height = baseRes;
+              aspect_ratio = "1:1";
           }
         }
         
@@ -205,6 +212,7 @@ export async function POST(req: Request) {
           prompt, 
           width, 
           height, 
+          aspect_ratio, // 파라미터 추가 전송
           seed, 
           referenceImage: body.referenceImage 
         });
