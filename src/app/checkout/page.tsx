@@ -74,7 +74,10 @@ function CheckoutContent() {
         status: "pending"
       });
 
-      if (orderError) throw new Error("주문 정보 생성에 실패했습니다.");
+      if (orderError) {
+        console.error("Order Creation Error:", orderError);
+        throw new Error(`주문 정보 생성에 실패했습니다: ${orderError.message}`);
+      }
 
       await tossPayments.requestBillingAuth("카드", {
         customerKey: customerKey,
@@ -96,7 +99,10 @@ function CheckoutContent() {
         status: "pending"
       });
 
-      if (orderError) throw new Error("주문 정보 생성에 실패했습니다.");
+      if (orderError) {
+        console.error("Order Creation Error:", orderError);
+        throw new Error(`주문 정보 생성에 실패했습니다: ${orderError.message}`);
+      }
 
       await tossPayments.requestPayment("카드", {
         amount: Number(product.price),
@@ -110,16 +116,27 @@ function CheckoutContent() {
     }
 
   } catch (error: any) {
-    console.error("Toss Integration Error:", error);
-    // 유저가 결제창을 닫은 경우 등 예외 처리
+    // 유저가 결제창을 닫은 경우 (토스 SDK 에러 코드: USER_CANCEL)
     if (error.code === "USER_CANCEL") {
+      console.warn("Toss Payment Cancelled by User");
       alert("결제가 취소되었습니다.");
     } else {
+      // 실제 예기치 못한 시스템 에러만 error로 기록
+      console.error("Toss Integration Error:", error);
       alert(error.message || "결제 준비 중 오류가 발생했습니다.");
     }
     setIsProcessing(false);
   }
 };
+
+  const handleBack = () => {
+    // 히스토리가 있으면 뒤로 가고, 없으면 홈(/) 또는 요금제 페이지(/#pricing)로 이동
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/#pricing");
+    }
+  };
 
   if (loading) return <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>결제 시스템 준비 중...</div>;
   if (!product) return <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>상품 정보가 없습니다.</div>;
@@ -129,7 +146,7 @@ function CheckoutContent() {
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         <header style={{ position: "relative", textAlign: "center", marginBottom: "48px" }}>
           <button 
-            onClick={() => router.back()}
+            onClick={handleBack}
             style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", fontSize: "24px", cursor: "pointer", color: "var(--muted)", padding: "10px" }}
             aria-label="뒤로 가기"
           >
