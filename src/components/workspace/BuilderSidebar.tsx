@@ -5,6 +5,7 @@ import { useState } from "react";
 const SYSTEM_OPTIONS = {
   mode:       { label: "생성 모드", items: ["캐릭터 시트", "일반 화보"] },
   ratio:      { label: "이미지 비율", items: ["16:9", "9:16", "1:1", "4:3", "3:4"] },
+  gender:     { label: "성별", items: ["남성", "여성", "중성/미상"] },
 };
 
 const PRIMARY_OPTIONS = {
@@ -15,7 +16,6 @@ const PRIMARY_OPTIONS = {
 };
 
 const ESSENTIAL_OPTIONS = {
-  gender:     { label: "성별", items: ["남성", "여성", "중성/미상"] },
   ethnicity:  { label: "출신/계통", items: ["없음", "아시안", "서양"] },
   age:        { label: "연령대", items: ["유년기", "소년/소녀", "청년", "중년", "노년"] },
   race:       { label: "종족", items: ["인간", "엘프", "악마", "드래곤", "늑대인간", "고양이수인", "여우수인", "로봇", "천사", "오크", "뱀파이어", "유령"] },
@@ -75,25 +75,59 @@ export function BuilderSidebar({
   const tabs: Tab[] = ["기본", "외형", "의상"];
 
   const randomizeTab = (tab: Tab) => {
-    const opts = TAB_KEYS[tab];
+    const opts = tab === "기본" 
+      ? { gender: SYSTEM_OPTIONS.gender, ...TAB_KEYS[tab] } 
+      : TAB_KEYS[tab];
+
+    // 랜덤 제외 항목 정의
+    const EXCLUSIONS: Record<string, string[]> = {
+      style:      ["다크판타지"],
+      pose:       ["공중 부양", "뒤돌아보기", "웅크린", "역동적인 달리기", "우아한 인사", "자신만만한 팔짱"],
+      ethnicity:  ["없음", "아시안", "서양"],
+      age:        ["청년", "노년"],
+      race:       ["늑대인간", "악마", "드래곤", "로봇", "오크", "유령"],
+      job:        ["암살자", "성기사", "닌자", "집사"],
+      body:       ["근육질", "건장한/떡대", "글래머러스", "통통한"],
+      hairStyle:  ["올백"],
+      impression: ["날카로운", "흉터"],
+      expression: ["광기어린", "분노한", "쿨한", "자신만만"],
+      clothing:   ["무협풍", "로판 드레스"],
+      vibe:       ["냉혹한", "퇴폐적인", "광기 어린"]
+    };
+
     Object.entries(opts).forEach(([key, { items }]) => {
       if (!lockedOptions[key]) {
+        // 랜덤 풀 구성 (제외 항목 필터링)
+        const exclusions = EXCLUSIONS[key] || [];
+        let pool = items.filter(i => !exclusions.includes(i));
+
+        // 만약 필터링 후 풀이 비어있다면 원래 항목에서 랜덤 선택 (예: 혈통이 전부 제외된 경우 등 대비)
+        if (pool.length === 0) pool = [...items];
+
         // 체감상 더 '랜덤'하게 느껴지도록 현재 값과 다른 값이 나오도록 필터링 (옵션이 2개 이상일 때)
         const currentVal = selection[key];
-        const otherItems = items.filter(i => i !== currentVal);
-        const pool = otherItems.length > 0 ? otherItems : items;
-        onSelect(key, pool[Math.floor(Math.random() * pool.length)]);
+        const otherItems = pool.filter(i => i !== currentVal);
+        const finalPool = otherItems.length > 0 ? otherItems : pool;
+        
+        onSelect(key, finalPool[Math.floor(Math.random() * finalPool.length)]);
       }
     });
   };
 
   const toggleLockAll = (tab: Tab) => {
-    const keys = Object.keys(TAB_KEYS[tab]);
+    const keys = tab === "기본" 
+      ? ["gender", ...Object.keys(TAB_KEYS[tab])] 
+      : Object.keys(TAB_KEYS[tab]);
     const allLocked = keys.every(k => lockedOptions[k]);
     bulkSetLocks(keys, !allLocked);
   };
 
-  const isAllLocked = (tab: Tab) => Object.keys(TAB_KEYS[tab]).every(k => lockedOptions[k]);
+  const isAllLocked = (tab: Tab) => {
+    const keys = tab === "기본" 
+      ? ["gender", ...Object.keys(TAB_KEYS[tab])] 
+      : Object.keys(TAB_KEYS[tab]);
+    return keys.every(k => lockedOptions[k]);
+  };
 
   const renderChips = (key: string, items: string[], disabled = false) => (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -144,13 +178,43 @@ export function BuilderSidebar({
       {/* Step 1: 생성 모드 & 비율 (최상단 고정) */}
       <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 32, paddingBottom: 24, borderBottom: "1.5px dashed var(--border)" }}>
         {Object.entries(SYSTEM_OPTIONS).map(([key, { label, items }]) => {
-          if (key === "ratio" && selection.mode !== "일반 화보") return null;
+          const isSheetMode = selection.mode === "캐릭터 시트";
+          const isDisabled = key === "ratio" && isSheetMode;
+          const isGender = key === "gender";
+          
           return (
-            <div key={key}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: "var(--accent)", marginBottom: 12 }}>
-                {label}
+            <div key={key} style={{ opacity: isDisabled ? 0.6 : 1 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: "var(--accent)" }}>
+                  {label} {isDisabled && <span style={{ fontSize: 9, color: "var(--subtle)", marginLeft: 4 }}>(고정)</span>}
+                </div>
+                {isGender && (
+                  <button onClick={() => toggleLock(key)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, opacity: lockedOptions[key] ? 1 : 0.3, color: lockedOptions[key] ? "var(--accent)" : "var(--muted)" }}>
+                    {lockedOptions[key] ? "🔒" : "🔓"}
+                  </button>
+                )}
               </div>
-              {renderChips(key, items)}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {items.map((item) => {
+                  const isSelected = selection[key] === item;
+                  const canClick = !isDisabled;
+                  
+                  return (
+                    <button
+                      key={item}
+                      className={`chip${isSelected ? " on" : ""}`}
+                      onClick={() => canClick && onSelect(key, item)}
+                      disabled={isDisabled && !isSelected}
+                      style={{ 
+                        cursor: canClick ? "pointer" : "default",
+                        opacity: (isDisabled && !isSelected) ? 0.3 : 1,
+                      }}
+                    >
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           );
         })}
