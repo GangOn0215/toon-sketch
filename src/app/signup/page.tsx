@@ -63,37 +63,11 @@ export default function SignupPage() {
     return /^(010\d{8}|01[16789]\d{7,8})$/.test(cleaned);
   };
 
-  // 1단계 완료 → 즉시 가입 (발신번호 심사 완료 전 임시 비활성화)
-  const handleFormNext = async (email: string, password: string, nickname: string) => {
-    setLoading(true);
+  // 1단계 완료 → 휴대폰 인증 단계로 이동
+  const handleFormNext = (email: string, password: string, nickname: string) => {
+    setFormData({ email, password, nickname });
+    setStep("phone");
     setError(null);
-    try {
-      const { data, error: signupError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { email, nickname, full_name: nickname, phone: null, phone_verified: false },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (signupError) {
-        setError(signupError.message.includes("already registered") ? "이미 사용 중인 이메일입니다." : signupError.message);
-        setLoading(false);
-        return;
-      }
-      if (!data.user) {
-        setError("회원가입에 실패했습니다. 다시 시도해주세요.");
-        setLoading(false);
-        return;
-      }
-      setDoneEmail(email);
-      setDone(true);
-      setLoading(false);
-      setTimeout(() => router.push("/"), 2000);
-    } catch {
-      setError("알 수 없는 오류가 발생했습니다.");
-      setLoading(false);
-    }
   };
 
   // 2단계: OTP 발송 (CoolSMS)

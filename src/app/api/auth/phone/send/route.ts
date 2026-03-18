@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import crypto from "crypto";
+import SolapiMessageService from "coolsms-node-sdk";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -30,42 +30,20 @@ function validatePhone(num: string): boolean {
   return /^(010\d{8}|01[16789]\d{7,8})$/.test(cleaned);
 }
 
-async function sendNcpSms(to: string, otp: string): Promise<void> {
-  const accessKey = process.env.NCP_ACCESS_KEY!;
-  const secretKey = process.env.NCP_SECRET_KEY!;
-  const serviceId = process.env.NCP_SMS_SERVICE_ID!;
-  const from = process.env.NCP_SMS_FROM_NUMBER!.replace(/\D/g, "");
+async function sendCoolSms(to: string, otp: string): Promise<void> {
+  const apiKey = process.env.COOLSMS_API_KEY!;
+  const apiSecret = process.env.COOLSMS_API_SECRET!;
+  const from = process.env.COOLSMS_FROM_NUMBER!.replace(/\D/g, "");
 
-  const timestamp = String(Date.now());
-  const method = "POST";
-  const url = `/sms/v2/services/${serviceId}/messages`;
+  const messageService = new SolapiMessageService(apiKey, apiSecret);
 
-  const signature = crypto
-    .createHmac("sha256", secretKey)
-    .update(`${method} ${url}\n${timestamp}\n${accessKey}`)
-    .digest("base64");
-
-  const res = await fetch(`https://sens.apigw.ntruss.com${url}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-ncp-apigw-timestamp": timestamp,
-      "x-ncp-iam-access-key": accessKey,
-      "x-ncp-apigw-signature-v2": signature,
-    },
-    body: JSON.stringify({
-      type: "SMS",
-      from,
-      content: `[툰스케치] 인증번호 ${otp}를 입력해주세요. (3분 내 유효)`,
-      messages: [{ to }],
-    }),
+  const result = await messageService.sendOne({
+    to,
+    from,
+    text: `[툰스케치] 인증번호 ${otp}를 입력해주세요. (3분 내 유효)`,
   });
 
-  const data = await res.json();
-  console.log("[NCP SENS 응답]", JSON.stringify(data));
-  if (data.statusCode !== "202") {
-    throw new Error(data.statusName || "SMS 발송 실패");
-  }
+  console.log("[CoolSMS 응답]", JSON.stringify(result));
 }
 
 export async function POST(request: NextRequest) {
@@ -142,7 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     // SMS 발송
-    await sendNcpSms(formatted, otp);
+    await sendCoolSms(formatted, otp);
 
     return NextResponse.json({ ok: true });
   } catch (error) {
