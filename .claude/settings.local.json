@@ -35,7 +35,11 @@
       "Bash(cd D:/DEV_2025/git/toon-sketch && node -e \"const s = require\\('sharp'\\); console.log\\('sharp version:', s.versions.sharp\\); s\\({ create: { width: 10, height: 10, channels: 3, background: '#fff' } }\\).png\\(\\).toBuffer\\(\\).then\\(\\(\\) => console.log\\('sharp OK'\\)\\).catch\\(e => console.error\\('sharp ERROR:', e.message\\)\\)\")",
       "Bash(cd D:/DEV_2025/git/toon-sketch && find src -name \"*.ts\" -o -name \"*.tsx\" | xargs grep -l \"characters\\\\|thumbnail_url\\\\|image_url\" 2>/dev/null | grep -v node_modules)",
       "Bash(cd D:/DEV_2025/git/toon-sketch && find src -name \"*.tsx\" | xargs grep -l \"pricing\\\\|구독\\\\|플랜\\\\|plan\\\\|payment\\\\|결제\" 2>/dev/null | grep -v node_modules)",
-      "Bash(powershell.exe -c \"\\(New-Object Media.SoundPlayer 'C:\\\\Windows\\\\Media\\\\tada.wav'\\).PlaySync\\(\\)\")"
+      "Bash(powershell.exe -c \"\\(New-Object Media.SoundPlayer 'C:\\\\Windows\\\\Media\\\\tada.wav'\\).PlaySync\\(\\)\")",
+      "Bash(grep -rn \"파트너\\\\|partner\\\\|광고\\\\|ad_\" D:/Porgramming_2025/git/toon-sketch/src --include=*.tsx --include=*.ts -l)",
+      "Bash(grep -rn \"modal\\\\|Modal\" D:/Porgramming_2025/git/toon-sketch/src/components/admin/ --include=*.tsx)",
+      "Bash(powershell.exe -c \"Get-Date -Format 'HH:mm'\")",
+      "Bash(git push:*)"
     ]
   }
 }
